@@ -7,7 +7,7 @@ import { icon_remove } from "../../../x_content/icon"
 import { iconHtml } from "../../util/icon/x_preact/icon"
 
 import { Icon } from "../../util/icon/data"
-import { PreactNode } from "../vnode"
+import { PreactNode } from "../node"
 
 export function VectorRemoveButton({
     label,

@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { PreactContent } from "../../../../../common/x_preact/vnode"
+import { PreactContent } from "../../../../../common/x_preact/node"
 
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 

@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactContent } from "../../../../../common/x_preact/vnode"
+import { PreactContent } from "../../../../../common/x_preact/node"
 
 import { authPermissionLabel } from "../../../../../x_content/permission"
 

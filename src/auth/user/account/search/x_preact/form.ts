@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { PreactNode } from "../../../../../common/x_preact/vnode"
+import { PreactNode } from "../../../../../common/x_preact/node"
 
 import { buttons } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"

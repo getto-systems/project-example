@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactContent, PreactKey, PreactNode } from "../../../../x_preact/vnode"
+import { PreactContent, PreactKey, PreactNode } from "../../../../x_preact/node"
 
 import { useLayoutEffect, useMemo, useState } from "preact/hooks"
 

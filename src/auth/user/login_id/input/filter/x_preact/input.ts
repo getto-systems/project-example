@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { PreactContent, PreactNode } from "../../../../../../common/x_preact/vnode"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/node"
 
 import { label, search } from "../../../../../../z_vendor/getto-css/preact/design/form"
 

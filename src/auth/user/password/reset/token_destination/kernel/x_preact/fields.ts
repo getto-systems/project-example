@@ -1,4 +1,4 @@
-import { PreactContent } from "../../../../../../../common/x_preact/vnode"
+import { PreactContent } from "../../../../../../../common/x_preact/node"
 import { ResetTokenDestinationType } from "../data"
 
 export function resetTokenDestinationTypeLabel(type: ResetTokenDestinationType): PreactContent {

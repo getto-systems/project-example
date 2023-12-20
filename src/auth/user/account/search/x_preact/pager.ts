@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { PreactNode } from "../../../../../common/x_preact/vnode"
+import { PreactNode } from "../../../../../common/x_preact/node"
 
 import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 import { SearchPager } from "../../../../../common/util/search/offset/x_preact/offset"

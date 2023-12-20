@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactNode } from "../../../x_preact/vnode"
+import { PreactNode } from "../../../x_preact/node"
 
 import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 import { focusClass, listEditLabel } from "../../../x_preact/design/table"

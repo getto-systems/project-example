@@ -1,6 +1,6 @@
 import { h } from "preact"
 import { html } from "htm/preact"
-import { PreactNode } from "../../../../../common/x_preact/vnode"
+import { PreactNode } from "../../../../../common/x_preact/node"
 
 import { container } from "../../../../../z_vendor/getto-css/preact/design/box"
 

@@ -1,4 +1,4 @@
-import { PreactContent } from "../../../../x_preact/vnode"
+import { PreactContent } from "../../../../x_preact/node"
 
 import { ValidateBoardValue } from "../../../board/validate/data"
 

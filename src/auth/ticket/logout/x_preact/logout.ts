@@ -1,7 +1,7 @@
 import { h } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
-import { PreactNode } from "../../../../common/x_preact/vnode"
+import { PreactNode } from "../../../../common/x_preact/node"
 
 import { env } from "../../../../y_environment/ui/env"
 

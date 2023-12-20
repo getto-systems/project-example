@@ -1,4 +1,4 @@
-import { PreactContent, PreactNode } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { useAtom } from "../../../z_vendor/getto-atom/x_preact/hooks"
 

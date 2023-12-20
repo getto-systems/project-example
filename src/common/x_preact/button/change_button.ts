@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { PreactContent, PreactNode } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { SendButton } from "./send_button"
 

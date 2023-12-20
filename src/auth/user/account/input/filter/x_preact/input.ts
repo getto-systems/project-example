@@ -1,6 +1,6 @@
 import { h } from "preact"
 import { useAtom } from "../../../../../../z_vendor/getto-atom/x_preact/hooks"
-import { PreactContent, PreactNode } from "../../../../../../common/x_preact/vnode"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/node"
 
 import { label, search_double } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { checkboxOptions } from "../../../../../../common/x_preact/design/checkbox"

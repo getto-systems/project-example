@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { PreactNode } from "../../../../../common/x_preact/vnode"
+import { PreactNode } from "../../../../../common/x_preact/node"
 
 import { useNotifyUnexpectedError } from "../../../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../../../common/x_preact/hooks"

@@ -1,6 +1,6 @@
 import { h } from "preact"
 import { html } from "htm/preact"
-import { PreactContent, PreactNode } from "../../../../../../common/x_preact/vnode"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/node"
 
 import { remoteCommonErrorReason } from "../../../../../../common/util/remote/x_error/reason"
 

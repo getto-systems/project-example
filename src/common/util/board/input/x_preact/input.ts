@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactNode } from "../../../../x_preact/vnode"
+import { PreactNode } from "../../../../x_preact/node"
 
 import { useInputRef } from "./hooks"
 

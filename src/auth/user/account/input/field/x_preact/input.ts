@@ -1,5 +1,5 @@
 import { h } from "preact"
-import { PreactContent, PreactNode } from "../../../../../../common/x_preact/vnode"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/node"
 
 import { useAtom } from "../../../../../../z_vendor/getto-atom/x_preact/hooks"
 import { useEditableState } from "../../../../../../common/util/board/editable/x_preact/hooks"

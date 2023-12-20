@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactContent, PreactNode } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { button_delete } from "../../../z_vendor/getto-css/preact/design/form"
 

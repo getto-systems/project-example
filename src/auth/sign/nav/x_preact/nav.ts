@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactNode } from "../../../../common/x_preact/vnode"
+import { PreactNode } from "../../../../common/x_preact/node"
 
 import { iconHtml } from "../../../../common/util/icon/x_preact/icon"
 

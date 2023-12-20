@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactNode } from "../../common/x_preact/vnode"
+import { PreactNode } from "../../common/x_preact/node"
 
 import { v_small } from "../../z_vendor/getto-css/preact/design/alignment"
 import { buttons, field } from "../../z_vendor/getto-css/preact/design/form"

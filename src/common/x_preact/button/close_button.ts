@@ -1,4 +1,4 @@
-import { PreactContent, PreactNode } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { button_cancel } from "../../../z_vendor/getto-css/preact/design/form"
 

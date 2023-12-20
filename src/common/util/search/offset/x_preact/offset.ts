@@ -1,6 +1,6 @@
 import { h } from "preact"
 import { html } from "htm/preact"
-import { PreactContent, PreactNode } from "../../../../x_preact/vnode"
+import { PreactContent, PreactNode } from "../../../../x_preact/node"
 
 import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 

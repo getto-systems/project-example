@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactContent, PreactNode } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { button_disabled, button_send } from "../../../z_vendor/getto-css/preact/design/form"
 import { icon_add, icon_ok, icon_spinner } from "../../../x_content/icon"

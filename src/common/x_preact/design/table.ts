@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactContent, PreactNode } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { PagerOptionsProps, SortSignContent } from "../../../z_vendor/getto-css/preact/design/table"
 

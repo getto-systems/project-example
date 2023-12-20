@@ -1,5 +1,5 @@
 import { html } from "htm/preact"
-import { PreactNode } from "../../../../../common/x_preact/vnode"
+import { PreactNode } from "../../../../../common/x_preact/node"
 
 import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
