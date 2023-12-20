@@ -1,11 +1,9 @@
 import { RemoteCommonError } from "../../../../../common/util/remote/data"
-import { LoginId } from "../../../login_id/kernel/data"
-import { Password } from "../../input/data"
+import { Password } from "../../input/field/data"
 
 export type ResetToken = string & { ResetToken: never }
 
 export type ResetPasswordFields = Readonly<{
-    loginId: LoginId
     newPassword: Password
 }>
 

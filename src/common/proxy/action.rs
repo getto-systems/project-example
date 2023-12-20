@@ -1,91 +1,84 @@
-use getto_application::{data::MethodResult, infra::ActionStatePubSub};
+use std::sync::Arc;
+
+use crate::common::proxy::infra::{ProxyCall, ProxyCallInfra, ProxyCallLogger};
 
 use crate::{
-    auth::{
-        data::{AuthPermissionRequired, AuthorizeTokenExtract},
-        method::{authorize_with_token, AuthorizeWithTokenEvent, AuthorizeWithTokenInfra},
-    },
-    common::proxy::{
-        data::{CoreProxyError, ProxyResponseBody},
-        event::CoreProxyCallEvent,
-        infra::ProxyCall,
-    },
+    auth::data::{AuthorizeTokenExtract, ValidateAuthorizeTokenError},
+    common::api::request::data::RequestInfo,
 };
 
-pub enum CoreProxyState {
-    AuthorizeWithToken(AuthorizeWithTokenEvent),
-    ProxyCall(CoreProxyCallEvent<ProxyResponseBody>),
+pub struct ProxyCallAction<M: ProxyCallInfra> {
+    logger: Arc<
+        dyn ProxyCallLogger<
+            <<M as ProxyCallInfra>::ProxyCall as ProxyCall>::Response,
+            <<M as ProxyCallInfra>::ProxyCall as ProxyCall>::Error,
+        >,
+    >,
+    infra: M,
 }
 
-impl std::fmt::Display for CoreProxyState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::AuthorizeWithToken(event) => event.fmt(f),
-            Self::ProxyCall(event) => event.fmt(f),
-        }
-    }
-}
-
-pub trait CoreProxyMaterial {
-    type AuthorizeWithToken: AuthorizeWithTokenInfra;
-    type ProxyCall: ProxyCall<Response = ProxyResponseBody, Error = CoreProxyError>;
-
-    fn authorize_with_token(&self) -> &Self::AuthorizeWithToken;
-    fn proxy_call(&self) -> &Self::ProxyCall;
-}
-
-pub struct CoreProxyAction<M: CoreProxyMaterial> {
-    pubsub: ActionStatePubSub<CoreProxyState>,
-    name: &'static str,
-    required: AuthPermissionRequired,
-    material: M,
-}
-
-pub type CoreProxyParams = (&'static str, AuthPermissionRequired);
-
-impl<M: CoreProxyMaterial> CoreProxyAction<M> {
-    pub fn with_material((name, required): CoreProxyParams, material: M) -> Self {
+impl<M: ProxyCallInfra> ProxyCallAction<M> {
+    pub fn new(infra: M) -> Self {
         Self {
-            pubsub: ActionStatePubSub::new(),
-            name,
-            required,
-            material,
+            logger: Arc::new(NoopLogger),
+            infra,
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&CoreProxyState) + Send + Sync) {
-        self.pubsub.subscribe(handler);
-    }
-
-    pub async fn ignite(
+    pub fn with_logger(
         self,
+        logger: Arc<
+            dyn ProxyCallLogger<
+                <<M as ProxyCallInfra>::ProxyCall as ProxyCall>::Response,
+                <<M as ProxyCallInfra>::ProxyCall as ProxyCall>::Error,
+            >,
+        >,
+    ) -> Self {
+        Self { logger, ..self }
+    }
+}
+
+impl<M: ProxyCallInfra> ProxyCallAction<M> {
+    pub async fn call(
+        &self,
+        info: RequestInfo,
         token: impl AuthorizeTokenExtract,
-        request: <<M as CoreProxyMaterial>::ProxyCall as ProxyCall>::Request,
-    ) -> MethodResult<CoreProxyState> {
-        let (_ticket, token, _required) = authorize_with_token(
-            self.material.authorize_with_token(),
-            (token, self.required),
-            |event| self.pubsub.post(CoreProxyState::AuthorizeWithToken(event)),
-        )
-        .await?;
+        request: <<M as ProxyCallInfra>::ProxyCall as ProxyCall>::Request,
+    ) -> Result<
+        <<M as ProxyCallInfra>::ProxyCall as ProxyCall>::Response,
+        <<M as ProxyCallInfra>::ProxyCall as ProxyCall>::Error,
+    > {
+        self.logger.try_to_proxy_call();
 
-        self.pubsub
-            .post(CoreProxyState::ProxyCall(CoreProxyCallEvent::TryToCall(
-                self.name.to_owned(),
-            )));
+        let token = token
+            .convert()
+            .map_err(|err| self.logger.invalid_authorize_token(err))?;
 
-        Ok(self
-            .pubsub
-            .post(CoreProxyState::ProxyCall(CoreProxyCallEvent::Response(
-                self.material
-                    .proxy_call()
-                    .call(token, request)
-                    .await
-                    .map_err(|err| {
-                        self.pubsub.post(CoreProxyState::ProxyCall(
-                            CoreProxyCallEvent::ServiceError(err),
-                        ))
-                    })?,
-            ))))
+        let response = self
+            .infra
+            .proxy_call()
+            .call(info, token, request)
+            .await
+            .map_err(|err| self.logger.failed_to_proxy_call(err))?;
+
+        Ok(self.logger.succeed_to_proxy_call(response))
+    }
+}
+
+struct NoopLogger;
+
+impl<R, E> ProxyCallLogger<R, E> for NoopLogger {
+    fn try_to_proxy_call(&self) {}
+    fn invalid_authorize_token(
+        &self,
+        err: ValidateAuthorizeTokenError,
+    ) -> ValidateAuthorizeTokenError {
+        err
+    }
+    fn failed_to_proxy_call(&self, err: E) -> E {
+        err
+    }
+    fn succeed_to_proxy_call(&self, response: R) -> R {
+        response
     }
 }

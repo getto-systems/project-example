@@ -1,9 +1,9 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../x_preact/node"
 
 import { remoteCommonErrorReason } from "../../../util/remote/x_error/reason"
 
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import {
     appMenu,
@@ -29,8 +29,8 @@ export const MENU_ID = "menu"
 type Props = Readonly<{
     menu: OutlineMenuAction
 }>
-export function DisplayOutlineMenu(props: Props): VNode {
-    const state = useApplicationState(props.menu.state)
+export function DisplayOutlineMenu(props: Props): PreactNode {
+    const state = useAtom(props.menu.state)
 
     switch (state.type) {
         case "initial-menu":
@@ -51,26 +51,29 @@ export function DisplayOutlineMenu(props: Props): VNode {
             return menu([menuBox(repositoryError(state.err))])
     }
 
-    function menu(content: readonly VNode[]) {
+    function menu(content: readonly PreactNode[]) {
         return appMenu([...content, menuFooter(poweredBy)])
     }
 
-    function content(wholeMenu: Menu): VNode {
+    function content(wholeMenu: Menu): PreactNode {
         // id="menu" は breadcrumb の href="#menu" と対応
         // mobile レイアウトで menu に移動
         return menuBody(MENU_ID, menuContent(wholeMenu, bareCategory))
 
         interface CategoryDecorator {
-            (content: VNode): VNode
+            (content: PreactNode): PreactNode
         }
-        function bareCategory(content: VNode) {
+        function bareCategory(content: PreactNode) {
             return content
         }
-        function liCategory(content: VNode) {
+        function liCategory(content: PreactNode) {
             return html`<li>${content}</li>`
         }
 
-        function menuContent(menu: Menu, categoryDecorator: CategoryDecorator): readonly VNode[] {
+        function menuContent(
+            menu: Menu,
+            categoryDecorator: CategoryDecorator,
+        ): readonly PreactNode[] {
             return menu.map((node) => {
                 switch (node.type) {
                     case "category":
@@ -125,22 +128,22 @@ function badge(badgeCount: number) {
     return badge_alert(html`${badgeCount}`)
 }
 
-function requiredToLogin(): readonly VNode[] {
+function requiredToLogin(): readonly PreactNode[] {
     return [notice_alert("認証エラー"), html`<small><p>もう一度ログインしてください</p></small>`]
 }
-function repositoryError(err: RepositoryError): readonly VNode[] {
+function repositoryError(err: RepositoryError): readonly PreactNode[] {
     switch (err.type) {
         case "infra-error":
             return [notice_alert("ストレージエラー"), ...errorDetail(err.err)]
     }
 }
-function error(err: RemoteCommonError): readonly VNode[] {
+function error(err: RemoteCommonError): readonly PreactNode[] {
     return remoteCommonErrorReason(err, (reason) => [
         notice_alert(reason.message),
         ...reason.detail.map((message) => html`<small><p>${message}</p></small>`),
     ])
 }
-function errorDetail(err: string): readonly VNode[] {
+function errorDetail(err: string): readonly PreactNode[] {
     if (err.length === 0) {
         return []
     }

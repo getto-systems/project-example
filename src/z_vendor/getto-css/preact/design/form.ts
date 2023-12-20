@@ -1,9 +1,7 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../common"
 
-import { VNodeContent } from "../common"
-
-export function form(content: VNodeContent): VNode {
+export function form(content: PreactContent): PreactNode {
     return html`<form>${content}</form>`
 }
 
@@ -13,13 +11,13 @@ type FieldContent =
     | Readonly<{ type: NoticeFieldType; content: NoticeFieldContent }>
 
 export type NormalFieldContent = Readonly<{
-    title: VNodeContent
-    body: VNodeContent
-    help?: readonly VNodeContent[]
+    title: PreactContent
+    body: PreactContent
+    help?: readonly PreactContent[]
 }>
-export type NoticeFieldContent = NormalFieldContent & Readonly<{ notice: readonly VNodeContent[] }>
+export type NoticeFieldContent = NormalFieldContent & Readonly<{ notice: readonly PreactContent[] }>
 export type SearchFieldContent = NormalFieldContent &
-    Readonly<{ label: { (content: VNode): VNode } }>
+    Readonly<{ label: { (content: PreactNode): PreactNode } }>
 
 type FieldType = NormalFieldType | SearchFieldType | NoticeFieldType
 type NormalFieldType = "normal"
@@ -46,11 +44,11 @@ export type InputFieldContent = NormalFieldContent &
         editableState?: Readonly<{ isEditable: boolean }>
         validateState?:
             | Readonly<{ type: "normal" }>
-            | Readonly<{ type: "error"; notice: readonly VNodeContent[] }>
-        label: { (content: VNode): VNode }
+            | Readonly<{ type: "error"; notice: readonly PreactContent[] }>
+        label: { (content: PreactNode): PreactNode }
     }>
 
-export function inputField(content: InputFieldContent): VNode {
+export function inputField(content: InputFieldContent): PreactNode {
     const isEditable = content.editableState === undefined ? true : content.editableState.isEditable
 
     if (!isEditable || content.validateState === undefined) {
@@ -66,23 +64,23 @@ export function inputField(content: InputFieldContent): VNode {
     }
 }
 
-export function field(content: NormalFieldContent): VNode {
+export function field(content: NormalFieldContent): PreactNode {
     return fieldContent({ type: "normal", content })
 }
-export function field_error(content: NoticeFieldContent): VNode {
+export function field_error(content: NoticeFieldContent): PreactNode {
     return fieldContent({ type: "error", content })
 }
-export function field_warning(content: NoticeFieldContent): VNode {
+export function field_warning(content: NoticeFieldContent): PreactNode {
     return fieldContent({ type: "warning", content })
 }
-export function search(content: SearchFieldContent): VNode {
+export function search(content: SearchFieldContent): PreactNode {
     return content.label(fieldContent({ type: "search", content }))
 }
-export function search_double(content: SearchFieldContent): VNode {
+export function search_double(content: SearchFieldContent): PreactNode {
     return content.label(fieldContent({ type: "search_double", content }))
 }
 
-function fieldContent(field: FieldContent): VNode {
+function fieldContent(field: FieldContent): PreactNode {
     const help = {
         help: helpContent(),
         notice: noticeContent(),
@@ -92,13 +90,13 @@ function fieldContent(field: FieldContent): VNode {
         <dd class="field__body">${field.content.body} ${fieldHelp(help)}</dd>
     </dl>`
 
-    function helpContent(): readonly VNodeContent[] {
+    function helpContent(): readonly PreactContent[] {
         if (field.content.help) {
             return field.content.help
         }
         return []
     }
-    function noticeContent(): readonly VNodeContent[] {
+    function noticeContent(): readonly PreactContent[] {
         switch (field.type) {
             case "normal":
             case "search":
@@ -117,23 +115,23 @@ type FieldSectionContent =
     | Readonly<{ type: NoticeFieldType; content: NoticeFieldSectionContent }>
 
 export type NormalFieldSectionContent = NormalFieldSectionContent_base &
-    Partial<{ help: readonly VNodeContent[] }>
+    Partial<{ help: readonly PreactContent[] }>
 export type NoticeFieldSectionContent = NormalFieldSectionContent &
-    Readonly<{ notice: readonly VNodeContent[] }>
+    Readonly<{ notice: readonly PreactContent[] }>
 
-type NormalFieldSectionContent_base = Readonly<{ body: VNodeContent }>
+type NormalFieldSectionContent_base = Readonly<{ body: PreactContent }>
 
-export function fieldSection(content: NormalFieldSectionContent): VNode {
+export function fieldSection(content: NormalFieldSectionContent): PreactNode {
     return fieldSectionContent({ type: "normal", content })
 }
-export function fieldSection_error(content: NoticeFieldSectionContent): VNode {
+export function fieldSection_error(content: NoticeFieldSectionContent): PreactNode {
     return fieldSectionContent({ type: "error", content })
 }
-export function fieldSection_warning(content: NoticeFieldSectionContent): VNode {
+export function fieldSection_warning(content: NoticeFieldSectionContent): PreactNode {
     return fieldSectionContent({ type: "warning", content })
 }
 
-function fieldSectionContent(field: FieldSectionContent): VNode {
+function fieldSectionContent(field: FieldSectionContent): PreactNode {
     const help = {
         help: helpContent(),
         notice: noticeContent(),
@@ -142,13 +140,13 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
         ${field.content.body} ${fieldHelp(help)}
     </section>`
 
-    function helpContent(): readonly VNodeContent[] {
+    function helpContent(): readonly PreactContent[] {
         if (field.content.help) {
             return field.content.help
         }
         return []
     }
-    function noticeContent(): readonly VNodeContent[] {
+    function noticeContent(): readonly PreactContent[] {
         switch (field.type) {
             case "normal":
                 return []
@@ -161,10 +159,10 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
 }
 
 type FieldHelpContent = Readonly<{
-    help?: readonly VNodeContent[]
-    notice?: readonly VNodeContent[]
+    help?: readonly PreactContent[]
+    notice?: readonly PreactContent[]
 }>
-export function fieldHelp(content: FieldHelpContent): VNode {
+export function fieldHelp(content: FieldHelpContent): PreactNode {
     if (helpLength() + noticeLength() === 0) {
         return html``
     }
@@ -177,40 +175,40 @@ export function fieldHelp(content: FieldHelpContent): VNode {
         return content.notice?.length || 0
     }
 
-    function notice(): VNode[] {
+    function notice(): PreactNode[] {
         if (!content.notice) {
             return []
         }
         return content.notice.map(toFieldNotice)
     }
-    function help(): VNode[] {
+    function help(): PreactNode[] {
         if (!content.help) {
             return []
         }
         return content.help.map(toFieldHelp)
     }
 }
-export function fieldHelp_error(notice: readonly VNodeContent[]): VNode {
+export function fieldHelp_error(notice: readonly PreactContent[]): PreactNode {
     if (notice.length === 0) {
         return html``
     }
     return html`<aside class="field__help field_error">${notice.map(toFieldNotice)}</aside>`
 }
-export function fieldHelp_warning(notice: readonly VNodeContent[]): VNode {
+export function fieldHelp_warning(notice: readonly PreactContent[]): PreactNode {
     if (notice.length === 0) {
         return html``
     }
     return html`<aside class="field__help field_warning">${notice.map(toFieldNotice)}</aside>`
 }
-function toFieldNotice(message: VNodeContent) {
+function toFieldNotice(message: PreactContent) {
     return html`<p class="field__notice">${message}</p>`
 }
-function toFieldHelp(message: VNodeContent) {
+function toFieldHelp(message: PreactContent) {
     return html`<p>${message}</p>`
 }
 
-export type ButtonsContent = Partial<{ left: VNodeContent; right: VNodeContent }>
-export function buttons(content: ButtonsContent): VNode {
+export type ButtonsContent = Partial<{ left: PreactContent; right: PreactContent }>
+export function buttons(content: ButtonsContent): PreactNode {
     return html`<aside class="button__container">
         <section class="button_left">${left()}</section>
         <section class="button_right">${right()}</section>
@@ -248,21 +246,21 @@ export type StatefulButtonContent = ClickableButtonContent | ConnectButtonConten
 type ClickableButtonContent = Readonly<{
     state: ClickableButtonState
     onClick: Handler<Event>
-    label: VNodeContent
+    label: PreactContent
     submit?: boolean
 }>
 type ConnectButtonContent = Readonly<{
     state: ConnectButtonState
-    label: VNodeContent
+    label: PreactContent
     submit?: boolean
 }>
 
 export type StatelessButtonContent = Readonly<{
     onClick: Handler<Event>
-    label: VNodeContent
+    label: PreactContent
 }>
 export type DisabledButtonContent = Readonly<{
-    label: VNodeContent
+    label: PreactContent
 }>
 type NormalStateButtonContent = Readonly<{
     state: NormalButtonState
@@ -292,44 +290,44 @@ function mapButtonState(state: ButtonState): string {
     }
 }
 
-export function button_edit(content: StatefulButtonContent): VNode {
+export function button_edit(content: StatefulButtonContent): PreactNode {
     return buttonContent({ type: "edit", content })
 }
-export function button_search(content: StatefulButtonContent): VNode {
+export function button_search(content: StatefulButtonContent): PreactNode {
     return buttonContent({ type: "search", content })
 }
-export function button_send(content: StatefulButtonContent): VNode {
+export function button_send(content: StatefulButtonContent): PreactNode {
     return buttonContent({ type: "send", content })
 }
-export function button_delete(content: StatefulButtonContent): VNode {
+export function button_delete(content: StatefulButtonContent): PreactNode {
     return buttonContent({ type: "delete", content })
 }
-export function button_complete(content: StatefulButtonContent): VNode {
+export function button_complete(content: StatefulButtonContent): PreactNode {
     return buttonContent({ type: "complete", content })
 }
-export function button_warning(content: StatefulButtonContent): VNode {
+export function button_warning(content: StatefulButtonContent): PreactNode {
     return buttonContent({ type: "warning", content })
 }
-export function button_pending(content: StatefulButtonContent): VNode {
+export function button_pending(content: StatefulButtonContent): PreactNode {
     return buttonContent({ type: "pending", content })
 }
-export function button_cancel(content: StatelessButtonContent): VNode {
+export function button_cancel(content: StatelessButtonContent): PreactNode {
     return buttonContent({ type: "cancel", content: { ...content, state: "normal" } })
 }
-export function button_close(content: StatelessButtonContent): VNode {
+export function button_close(content: StatelessButtonContent): PreactNode {
     return buttonContent({ type: "close", content: { ...content, state: "normal" } })
 }
-export function button_undo(content: StatelessButtonContent): VNode {
+export function button_undo(content: StatelessButtonContent): PreactNode {
     return buttonContent({ type: "undo", content: { ...content, state: "normal" } })
 }
-export function button_redo(content: StatelessButtonContent): VNode {
+export function button_redo(content: StatelessButtonContent): PreactNode {
     return buttonContent({ type: "redo", content: { ...content, state: "normal" } })
 }
-export function button_disabled(content: DisabledButtonContent): VNode {
+export function button_disabled(content: DisabledButtonContent): PreactNode {
     return buttonContent({ type: "disabled", content: { ...content, state: "normal" } })
 }
 
-function buttonContent(button: ButtonContent): VNode {
+function buttonContent(button: ButtonContent): PreactNode {
     const info = detect()
     if (info.clickable) {
         return html`<button type=${info.type} class=${buttonClass()} onClick=${info.onClick}>
@@ -391,7 +389,7 @@ function buttonContent(button: ButtonContent): VNode {
     }
 }
 
-type LabelContent = Readonly<{ style: InputStyle; content: VNodeContent }>
+type LabelContent = Readonly<{ style: InputStyle; content: PreactContent }>
 
 type InputStyle = "small" | "normal" | "large" | "xLarge" | "fill"
 function mapInputStyle(style: InputStyle): string {
@@ -404,101 +402,101 @@ function mapInputStyle(style: InputStyle): string {
     }
 }
 
-export function label(content: VNodeContent): VNode {
+export function label(content: PreactContent): PreactNode {
     return html`<label>${content}</label>`
 }
 
-export function label_number_small(content: VNodeContent): VNode {
+export function label_number_small(content: PreactContent): PreactNode {
     return labelContent({ style: "small", content })
 }
-export function label_number(content: VNodeContent): VNode {
+export function label_number(content: PreactContent): PreactNode {
     return labelContent({ style: "normal", content })
 }
-export function label_number_fill(content: VNodeContent): VNode {
+export function label_number_fill(content: PreactContent): PreactNode {
     return labelContent({ style: "fill", content })
 }
 
-export function label_email_small(content: VNodeContent): VNode {
+export function label_email_small(content: PreactContent): PreactNode {
     return labelContent({ style: "small", content })
 }
-export function label_email(content: VNodeContent): VNode {
+export function label_email(content: PreactContent): PreactNode {
     return labelContent({ style: "normal", content })
 }
-export function label_email_fill(content: VNodeContent): VNode {
+export function label_email_fill(content: PreactContent): PreactNode {
     return labelContent({ style: "fill", content })
 }
 
-export function label_text_small(content: VNodeContent): VNode {
+export function label_text_small(content: PreactContent): PreactNode {
     return labelContent({ style: "small", content })
 }
-export function label_text(content: VNodeContent): VNode {
+export function label_text(content: PreactContent): PreactNode {
     return labelContent({ style: "normal", content })
 }
-export function label_text_large(content: VNodeContent): VNode {
+export function label_text_large(content: PreactContent): PreactNode {
     return labelContent({ style: "large", content })
 }
-export function label_text_xLarge(content: VNodeContent): VNode {
+export function label_text_xLarge(content: PreactContent): PreactNode {
     return labelContent({ style: "xLarge", content })
 }
-export function label_text_fill(content: VNodeContent): VNode {
+export function label_text_fill(content: PreactContent): PreactNode {
     return labelContent({ style: "fill", content })
 }
 
-export function label_password_small(content: VNodeContent): VNode {
+export function label_password_small(content: PreactContent): PreactNode {
     return labelContent({ style: "small", content })
 }
-export function label_password(content: VNodeContent): VNode {
+export function label_password(content: PreactContent): PreactNode {
     return labelContent({ style: "normal", content })
 }
-export function label_password_large(content: VNodeContent): VNode {
+export function label_password_large(content: PreactContent): PreactNode {
     return labelContent({ style: "large", content })
 }
-export function label_password_xLarge(content: VNodeContent): VNode {
+export function label_password_xLarge(content: PreactContent): PreactNode {
     return labelContent({ style: "xLarge", content })
 }
-export function label_password_fill(content: VNodeContent): VNode {
+export function label_password_fill(content: PreactContent): PreactNode {
     return labelContent({ style: "fill", content })
 }
 
-export function label_search_small(content: VNodeContent): VNode {
+export function label_search_small(content: PreactContent): PreactNode {
     return labelContent({ style: "small", content })
 }
-export function label_search(content: VNodeContent): VNode {
+export function label_search(content: PreactContent): PreactNode {
     return labelContent({ style: "normal", content })
 }
-export function label_search_large(content: VNodeContent): VNode {
+export function label_search_large(content: PreactContent): PreactNode {
     return labelContent({ style: "large", content })
 }
-export function label_search_xLarge(content: VNodeContent): VNode {
+export function label_search_xLarge(content: PreactContent): PreactNode {
     return labelContent({ style: "xLarge", content })
 }
-export function label_search_fill(content: VNodeContent): VNode {
+export function label_search_fill(content: PreactContent): PreactNode {
     return labelContent({ style: "fill", content })
 }
 
-export function label_textarea_small(content: VNodeContent): VNode {
+export function label_textarea_small(content: PreactContent): PreactNode {
     return labelContent({ style: "small", content })
 }
-export function label_textarea(content: VNodeContent): VNode {
+export function label_textarea(content: PreactContent): PreactNode {
     return labelContent({ style: "normal", content })
 }
-export function label_textarea_large(content: VNodeContent): VNode {
+export function label_textarea_large(content: PreactContent): PreactNode {
     return labelContent({ style: "large", content })
 }
-export function label_textarea_xLarge(content: VNodeContent): VNode {
+export function label_textarea_xLarge(content: PreactContent): PreactNode {
     return labelContent({ style: "xLarge", content })
 }
-export function label_textarea_fill(content: VNodeContent): VNode {
+export function label_textarea_fill(content: PreactContent): PreactNode {
     return labelContent({ style: "fill", content })
 }
 
-function labelContent({ style, content }: LabelContent): VNode {
+function labelContent({ style, content }: LabelContent): PreactNode {
     return html`<label class=${mapInputStyle(style)}>${content}</label>`
 }
 
 export type CheckableContent = Readonly<{
     isChecked: boolean
-    input: VNodeContent
+    input: PreactContent
     key: CheckableKey
 }>
 type CheckableKey = string | number
@@ -515,30 +513,30 @@ function mapCheckableStyle(type: CheckableType, style: CheckableStyle): string {
     }
 }
 
-export function checkbox(content: CheckableContent): VNode {
+export function checkbox(content: CheckableContent): PreactNode {
     return checkableContent("checkbox", "inline", content)
 }
-export function checkbox_block(content: CheckableContent): VNode {
+export function checkbox_block(content: CheckableContent): PreactNode {
     return checkableContent("checkbox", "block", content)
 }
-export function radio(content: CheckableContent): VNode {
+export function radio(content: CheckableContent): PreactNode {
     return checkableContent("radio", "inline", content)
 }
-export function radio_block(content: CheckableContent): VNode {
+export function radio_block(content: CheckableContent): PreactNode {
     return checkableContent("radio", "block", content)
 }
 function checkableContent(
     type: CheckableType,
     style: CheckableStyle,
     { isChecked, input, key }: CheckableContent,
-): VNode {
+): PreactNode {
     const checkClass = isChecked ? "input_checked" : ""
     return html`<label class="${mapCheckableStyle(type, style)} ${checkClass}" key=${key}
         >${input}</label
     >`
 }
 
-export function pager(content: VNodeContent): VNode {
+export function pager(content: PreactContent): PreactNode {
     return html`<label class="pager">${content}</label>`
 }
 

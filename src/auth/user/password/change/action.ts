@@ -1,42 +1,34 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
-
-import { initPasswordFieldAction } from "../input/action"
-import { PasswordFieldAction } from "../input/action"
-import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { initRegisterField } from "../../../../common/util/register/action"
-import {
-    EditableBoardAction,
-    initEditableBoardAction,
-} from "../../../../z_vendor/getto-application/board/editable/action"
-import {
-    initModifyField,
-    modifyField,
-    ModifyFieldHandler,
-} from "../../../../common/util/modify/action"
-
 import { checkTakeLongtime, ticker } from "../../../../common/util/timer/helper"
+import { emptyPassword } from "../input/field/convert"
+
+import { Atom, initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import { LoadState, loadState_loading } from "../../../../common/util/load/data"
+import { EditableBoardAction } from "../../../../common/util/board/editable/action"
+import { ValidateBoardState } from "../../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../../common/util/board/observe/action"
+import { composeModifyFieldBoard } from "../../../../common/util/board/field/action"
+import { initPasswordField, PasswordField } from "../input/field/action"
 
 import { ChangePasswordRemote, OverwritePasswordRemote } from "./infra"
 import { WaitTime } from "../../../../common/util/config/infra"
 
+import { ConvertBoardResult } from "../../../../common/util/board/kernel/data"
 import { ChangePasswordError, ChangePasswordFields, OverwritePasswordFields } from "./data"
-import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
+import { AuthUserAccount } from "../../account/kernel/data"
+import { ConnectState } from "../../../../common/util/connect/data"
 
 export interface ChangePasswordAction {
-    readonly state: ApplicationState<ChangePasswordState>
-    readonly currentPassword: PasswordFieldAction
-    readonly newPassword: PasswordFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<ChangePasswordState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
     readonly editable: EditableBoardAction
 
-    edit(): void
-    clear(): void
+    readonly currentPassword: PasswordField
+    readonly newPassword: PasswordField
+
+    reset(): void
     submit(): Promise<ChangePasswordState>
 }
 
@@ -45,13 +37,13 @@ export type ChangePasswordState = ChangePasswordEvent
 const initialState: ChangePasswordState = { type: "initial" }
 
 export interface OverwritePasswordAction {
-    readonly state: ApplicationState<OverwritePasswordState>
-    readonly newPassword: PasswordFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<OverwritePasswordState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
     readonly editable: EditableBoardAction
 
-    onSuccess(handler: (data: OverwritePasswordEntry) => void): void
+    readonly newPassword: PasswordField
 
     reset(): void
     submit(): Promise<OverwritePasswordState>
@@ -78,18 +70,24 @@ export type ChangePasswordConfig = Readonly<{
 }>
 
 export function initChangePasswordAction(material: ChangePasswordMaterial): ChangePasswordAction {
-    const { state, post } = initApplicationState({ initialState })
-    const editable = initEditableBoardAction()
-
-    const currentPassword = initPasswordFieldAction()
-    const newPassword = initPasswordFieldAction()
-
-    const convert = (): ConvertBoardResult<ChangePasswordFields> => {
-        const result = {
-            currentPassword: currentPassword.validate.check(),
-            newPassword: newPassword.validate.check(),
+    const change = initAtom({ initialState })
+    async function changeWithCurrentState(): Promise<ChangePasswordState> {
+        const fields = currentFields()
+        if (!fields.valid) {
+            return change.state.currentState()
         }
-        if (!result.currentPassword.valid || !result.newPassword.valid) {
+        return changePassword(material, fields.value, change.post)
+    }
+
+    const currentPassword = initPasswordField()
+    const newPassword = initPasswordField()
+
+    const currentFields = (): ConvertBoardResult<ChangePasswordFields> => {
+        const result = {
+            currentPassword: currentPassword[0].validate.currentState(),
+            newPassword: newPassword[0].validate.currentState(),
+        }
+        if (!result.newPassword.valid || !result.currentPassword.valid) {
             return { valid: false }
         }
         return {
@@ -101,51 +99,32 @@ export function initChangePasswordAction(material: ChangePasswordMaterial): Chan
         }
     }
 
-    const { validate, observe, clear } = initRegisterField(
-        [
-            ["newPassword", newPassword],
-            ["currentPassword", currentPassword],
-        ],
-        convert,
-    )
+    const data = initAtom<LoadState<AuthUserAccount>>({ initialState: loadState_loading() })
+    const { editable, validate, observe, reset } = composeModifyFieldBoard(data.state, [
+        [currentPassword, (_data: AuthUserAccount) => emptyPassword()],
+        [newPassword, (_data: AuthUserAccount) => emptyPassword()],
+    ])
 
-    onSuccess(() => {
-        editable.close()
+    const connect = mapAtom(change.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
     })
 
     return {
-        state,
-
-        currentPassword,
-        newPassword,
-
+        state: change.state,
+        connect,
         validate,
         observe,
         editable,
 
-        clear,
+        currentPassword: currentPassword[0],
+        newPassword: newPassword[0],
 
-        edit(): void {
-            editable.open()
-            clear()
-        },
-        async submit(): Promise<ChangePasswordState> {
-            const fields = convert()
-            if (!fields.valid) {
-                return state.currentState()
-            }
-            return changePassword(material, fields.value, post)
-        },
-    }
-
-    function onSuccess(handler: () => void): void {
-        state.subscribe((state) => {
-            switch (state.type) {
-                case "success":
-                    handler()
-                    break
-            }
-        })
+        reset,
+        submit: changeWithCurrentState,
     }
 }
 
@@ -192,17 +171,29 @@ export type OverwritePasswordConfig = Readonly<{
     resetToInitialTimeout: WaitTime
 }>
 
-export function initOverwritePasswordAction(material: OverwritePasswordMaterial): Readonly<{
-    action: OverwritePasswordAction
-    handler: ModifyFieldHandler<OverwritePasswordEntry>
-}> {
-    const { state, post } = initApplicationState({ initialState: initialOverwriteState })
+export function initOverwritePasswordAction(
+    data: Atom<LoadState<AuthUserAccount>>,
+    material: OverwritePasswordMaterial,
+): OverwritePasswordAction {
+    const overwrite = initAtom({ initialState: initialOverwriteState })
+    async function overwriteWithCurrentState(): Promise<OverwritePasswordState> {
+        const element = data.currentState()
+        if (!element.isLoad) {
+            return overwrite.state.currentState()
+        }
 
-    const newPassword = initPasswordFieldAction()
+        const fields = currentFields()
+        if (!fields.valid) {
+            return overwrite.state.currentState()
+        }
+        return overwritePassword(material, element.data, fields.value, overwrite.post)
+    }
 
-    const convert = (): ConvertBoardResult<OverwritePasswordFields> => {
+    const newPassword = initPasswordField()
+
+    const currentFields = (): ConvertBoardResult<OverwritePasswordFields> => {
         const result = {
-            newPassword: newPassword.validate.check(),
+            newPassword: newPassword[0].validate.currentState(),
         }
         if (!result.newPassword.valid) {
             return { valid: false }
@@ -215,64 +206,41 @@ export function initOverwritePasswordAction(material: OverwritePasswordMaterial)
         }
     }
 
-    const { validate, observe, editable, data, handler, reset } = initModifyField(
-        [modifyField("newPassword", newPassword, (_data: OverwritePasswordEntry) => "")],
-        convert,
-    )
+    const { editable, validate, observe, reset } = composeModifyFieldBoard(data, [
+        [newPassword, (_data: AuthUserAccount) => emptyPassword()],
+    ])
 
-    onSuccess(() => {
-        editable.close()
+    const connect = mapAtom(overwrite.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
     })
 
     return {
-        action: {
-            state,
+        state: overwrite.state,
+        connect,
+        validate,
+        observe,
+        editable,
 
-            newPassword,
+        newPassword: newPassword[0],
 
-            validate,
-            observe,
-            editable,
-
-            reset,
-
-            onSuccess,
-
-            async submit(): Promise<OverwritePasswordState> {
-                const element = data()
-                if (!element.isLoad) {
-                    return state.currentState()
-                }
-
-                const fields = convert()
-                if (!fields.valid) {
-                    return state.currentState()
-                }
-
-                return overwritePassword(material, element.data, fields.value, post)
-            },
-        },
-        handler,
-    }
-
-    function onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
-        state.subscribe((state) => {
-            if (state.type === "success") {
-                handler(state.data)
-            }
-        })
+        reset,
+        submit: overwriteWithCurrentState,
     }
 }
 
 type OverwritePasswordEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
-    | Readonly<{ type: "success"; data: OverwritePasswordEntry }>
+    | Readonly<{ type: "success" }>
     | Readonly<{ type: "initial" }>
 
 async function overwritePassword<S>(
     { infra, config }: OverwritePasswordMaterial,
-    user: OverwritePasswordEntry,
+    user: AuthUserAccount,
     fields: OverwritePasswordFields,
     post: Post<OverwritePasswordEvent, S>,
 ): Promise<S> {
@@ -290,7 +258,7 @@ async function overwritePassword<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", data: user })
+    post({ type: "success" })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

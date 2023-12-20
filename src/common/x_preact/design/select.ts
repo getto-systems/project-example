@@ -1,9 +1,10 @@
-import { PrepareElementState } from "../../util/prepare/data"
-import { SelectBoardContent } from "../../../z_vendor/getto-application/board/input/x_preact/select"
+import { SelectBoardContent } from "../../util/board/input/x_preact/select"
+
+import { LoadState } from "../../util/load/data"
 
 export function selectOptions<T>(
-    state: PrepareElementState<readonly T[]>,
-    option: { (value: T): SelectBoardContent },
+    state: LoadState<readonly T[]>,
+    option: (value: T) => SelectBoardContent,
 ): readonly SelectBoardContent[] {
     if (state.isLoad) {
         return state.data.map(option)
@@ -13,8 +14,8 @@ export function selectOptions<T>(
 }
 
 export function selectOptionsWithAll<T>(
-    state: PrepareElementState<readonly T[]>,
-    option: { (value: T): SelectBoardContent },
+    state: LoadState<readonly T[]>,
+    option: (value: T) => SelectBoardContent,
 ): readonly SelectBoardContent[] {
     if (state.isLoad) {
         return [all(), ...state.data.map(option)]
@@ -24,8 +25,8 @@ export function selectOptionsWithAll<T>(
 }
 
 export function selectOptionsWithPrompt<T>(
-    state: PrepareElementState<readonly T[]>,
-    option: { (value: T): SelectBoardContent },
+    state: LoadState<readonly T[]>,
+    option: (value: T) => SelectBoardContent,
 ): readonly SelectBoardContent[] {
     if (state.isLoad) {
         return [prompt(), ...state.data.map(option)]

@@ -1,15 +1,11 @@
-import { h, VNode } from "preact"
-import { html } from "htm/preact"
+import { h } from "preact"
 
-import { VNodeContent } from "../../../../../common/x_preact/vnode"
-
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { PreactContent } from "../../../../../common/x_preact/node"
 
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
-import { focusClass, listEditLabel } from "../../../../../common/x_preact/design/table"
-
-import { ResetTokenDestinationLabel } from "../../../password/reset/token_destination/input/x_preact/input"
+import { ResetTokenDestinationLabel } from "../../../password/reset/token_destination/input/field/x_preact/input"
+import { EditLinkForRegisterList } from "../../../../../common/util/list/x_preact/edit_link"
 
 import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
 import { tableStructure } from "../../../../../z_vendor/getto-table/preact/cell/structure"
@@ -17,7 +13,6 @@ import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simpl
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
 import { RegisterAuthUserAccountAction } from "../action"
-import { focusedData } from "../../../../../common/util/list/action"
 
 import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
 import { authPermissionGranted } from "../../kernel/x_preact/field"
@@ -35,7 +30,8 @@ export function initRegisteredAuthUserAccountTableStructure(
         tableCell("edit", (_key) => ({
             label: "",
             header: linky,
-            column: (data: AuthUserAccount) => h(EditLink, { data }),
+            column: (data: AuthUserAccount) =>
+                h(EditLinkForRegisterList, { focus: register.focus, data }),
         })).alwaysVisible(),
 
         tableCell("loginId", (key) => ({
@@ -66,35 +62,10 @@ export function initRegisteredAuthUserAccountTableStructure(
         return row.loginId
     }
 
-    function loginId(row: AuthUserAccount): VNodeContent {
+    function loginId(row: AuthUserAccount): PreactContent {
         return row.loginId
     }
-    function resetTokenDestination(row: AuthUserAccount): VNodeContent {
+    function resetTokenDestination(row: AuthUserAccount): PreactContent {
         return h(ResetTokenDestinationLabel, row)
-    }
-
-    function EditLink(props: Readonly<{ data: AuthUserAccount }>): VNode {
-        const focusState = useApplicationState(register.list.focus.state)
-
-        const data = focusedData(focusState)
-        const isFocused = focusState.type !== "close" && data.isFocused && data.data === props.data
-
-        return html`<a
-            href="#"
-            id="${isFocused ? "focused" : undefined}"
-            class="${focusClass(isFocused)}"
-            onClick=${onClick}
-        >
-            ${listEditLabel()}
-        </a>`
-
-        function onClick(e: Event) {
-            e.preventDefault()
-            if (e.target instanceof HTMLElement) {
-                e.target.blur()
-            }
-
-            register.list.focus.change(props.data)
-        }
     }
 }

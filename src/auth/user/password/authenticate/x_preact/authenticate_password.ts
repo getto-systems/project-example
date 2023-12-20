@@ -1,25 +1,24 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
-
-import { VNodeContent } from "../../../../../common/x_preact/vnode"
+import { PreactContent, PreactNode } from "../../../../../common/x_preact/node"
 
 import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { siteInfo } from "../../../../../x_content/site"
-import { lnir } from "../../../../../common/util/icon/init/line_icon"
+import { lnir } from "../../../../../common/util/icon/detail/line_icon"
 import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidateBoardMessage } from "../../../../../common/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { LoginIdField } from "../../../login_id/input/x_preact/field"
-import { PasswordField } from "../../input/x_preact/input"
+import { AuthUserLoginIdField } from "../../../login_id/input/field/x_preact/input"
+import { AuthUserPasswordField } from "../../input/field/x_preact/input"
 import { SendButton } from "../../../../../common/x_preact/button/send_button"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
 
@@ -32,10 +31,10 @@ type Props = Readonly<{
     link: SignLink
     authenticate: AuthenticatePasswordAction
 }>
-export function AuthenticatePassword(props: Props): VNode {
+export function AuthenticatePassword(props: Props): PreactNode {
     useLoadScript(props.authenticate)
 
-    const authenticateState = useApplicationState(props.authenticate.state)
+    const authenticateState = useAtom(props.authenticate.state)
     switch (authenticateState.type) {
         case "try-to-load":
             // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
@@ -58,31 +57,28 @@ export function AuthenticatePassword(props: Props): VNode {
         form: true,
         title: "ログイン",
         body: [
-            h(LoginIdField, {
+            h(AuthUserLoginIdField, {
                 field: props.authenticate.loginId,
                 autocomplete: "username",
             }),
-            h(PasswordField, {
+            h(AuthUserPasswordField, {
                 field: props.authenticate.password,
                 autocomplete: "current-password",
             }),
-            buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
-            h(ValidationMessage, props.authenticate.validate),
+            buttons({ left: h(Submit, {}), right: h(Reset, {}) }),
+            h(ValidateBoardMessage, { state: props.authenticate.validate }),
             h(Message, {}),
         ],
         footer: footerLinks(),
     })
 
-    function Submit(_props: unknown): VNode {
-        const validateState = useApplicationState(props.authenticate.validate.state)
-        const observeState = useApplicationState(props.authenticate.observe.state)
-
+    function Submit(_props: unknown): PreactNode {
         return h(SendButton, {
             label: "ログイン",
             icon: lnir(["enter"]),
-            isConnecting: authenticateState.type === "try-to-login",
-            validateState,
-            observeState,
+            connect: props.authenticate.connect,
+            validate: props.authenticate.validate,
+            observe: props.authenticate.observe,
             onClick,
         })
 
@@ -91,18 +87,19 @@ export function AuthenticatePassword(props: Props): VNode {
             props.authenticate.submit()
         }
     }
-    function Clear(_props: unknown): VNode {
-        const observeState = useApplicationState(props.authenticate.observe.state)
-
-        return h(ClearChangesButton, { observeState, onClick })
+    function Reset(_props: unknown): PreactNode {
+        return h(ClearChangesButton, {
+            observe: props.authenticate.observe,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.authenticate.clear()
+            props.authenticate.reset()
         }
     }
 
-    function Message(_props: unknown): VNode {
+    function Message(_props: unknown): PreactNode {
         switch (authenticateState.type) {
             case "initial-login":
             case "try-to-load":
@@ -136,7 +133,7 @@ export function AuthenticatePassword(props: Props): VNode {
     }
 }
 
-function loginError(err: AuthenticatePasswordError): readonly VNodeContent[] {
+function loginError(err: AuthenticatePasswordError): readonly PreactContent[] {
     switch (err.type) {
         case "invalid-password":
             return ["ログインIDかパスワードが違います"]
@@ -150,7 +147,7 @@ function loginError(err: AuthenticatePasswordError): readonly VNodeContent[] {
 }
 
 function useLoadScript(authenticate: AuthenticatePasswordAction): void {
-    const authenticateState = useApplicationState(authenticate.state)
+    const authenticateState = useAtom(authenticate.state)
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
         switch (authenticateState.type) {

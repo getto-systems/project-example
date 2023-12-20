@@ -1,7 +1,5 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
-
-import { VNodeContent, VNodeKey } from "../common"
+import { PreactContent, PreactKey, PreactNode } from "../common"
 
 import {
     TableDataColumnRow,
@@ -34,14 +32,14 @@ export type SortQuery = Readonly<{
 export type SortOrder = "normal" | "reverse"
 
 export type SortSignContent = Readonly<{
-    normal: { (): VNodeContent }
-    reverse: { (): VNodeContent }
+    normal: { (): PreactContent }
+    reverse: { (): PreactContent }
 }>
 export function sortSign(
     sign: SortSignContent,
     currentSort: SortQuery,
     key: SortKey,
-): VNodeContent {
+): PreactContent {
     if (currentSort.key !== key) {
         return ""
     }
@@ -49,7 +47,7 @@ export function sortSign(
 }
 
 export interface SortLink {
-    (key: SortKey): { (content: VNodeContent): VNode }
+    (key: SortKey): { (content: PreactContent): PreactNode }
 }
 
 export type Sort = Readonly<{
@@ -58,7 +56,7 @@ export type Sort = Readonly<{
     href: { (query: SortQuery): SortHref }
     sign: SortSignContent
 }>
-export type SortKey = VNodeKey
+export type SortKey = PreactKey
 export type SortHref = string
 export function sortLink(sort: Sort): SortLink {
     return (key) => (content) =>
@@ -89,19 +87,19 @@ export function sortLink(sort: Sort): SortLink {
     }
 }
 
-export function tableViewColumns(content: VNodeContent): VNode {
+export function tableViewColumns(content: PreactContent): PreactNode {
     return html`<section class="table__viewColumns">${content}</section>`
 }
 
 export type PagerOptionContent = Readonly<{
-    key: VNodeKey
+    key: PreactKey
     value: string
-    label: VNodeContent
+    label: PreactContent
 }>
 export type PagerOptionsProps = Readonly<{
     all: number
     step: number
-    content: { (params: PagerOptionsContentParams): VNodeContent }
+    content: { (params: PagerOptionsContentParams): PreactContent }
 }>
 export type PagerOptionsContentParams = Readonly<{ start: number; end: number }>
 export function pagerOptions({
@@ -140,35 +138,38 @@ function tableClass(type: TableType): string {
     }
 }
 
-export function table(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table(sticky: TableDataSticky, content: PreactContent): PreactNode {
     return tableContent(["normal"], sticky, content)
 }
-export function table_noMargin(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table_noMargin(sticky: TableDataSticky, content: PreactContent): PreactNode {
     return tableContent(["normal", "noMargin"], sticky, content)
 }
-export function table_small(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table_small(sticky: TableDataSticky, content: PreactContent): PreactNode {
     return tableContent(["small"], sticky, content)
 }
-export function table_small_noMargin(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table_small_noMargin(sticky: TableDataSticky, content: PreactContent): PreactNode {
     return tableContent(["small", "noMargin"], sticky, content)
 }
-export function table_fill(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table_fill(sticky: TableDataSticky, content: PreactContent): PreactNode {
     return tableContent(["fill"], sticky, content)
 }
-export function table_fill_noMargin(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table_fill_noMargin(sticky: TableDataSticky, content: PreactContent): PreactNode {
     return tableContent(["fill", "noMargin"], sticky, content)
 }
-export function table_small_fill(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table_small_fill(sticky: TableDataSticky, content: PreactContent): PreactNode {
     return tableContent(["small", "fill"], sticky, content)
 }
-export function table_small_fill_noMargin(sticky: TableDataSticky, content: VNodeContent): VNode {
+export function table_small_fill_noMargin(
+    sticky: TableDataSticky,
+    content: PreactContent,
+): PreactNode {
     return tableContent(["small", "fill", "noMargin"], sticky, content)
 }
 function tableContent(
     types: readonly TableType[],
     sticky: TableDataSticky,
-    content: VNodeContent,
-): VNode {
+    content: PreactContent,
+): PreactNode {
     return html`<table class="table ${types.map(tableClass).join(" ")} ${stickyTableClass(sticky)}">
         ${content}
     </table>`
@@ -186,17 +187,17 @@ function stickyTableClass(sticky: TableDataSticky): string {
     }
 }
 
-export function thead(content: VNodeContent): VNode {
+export function thead(content: PreactContent): PreactNode {
     return html`<thead>
         ${content}
     </thead>`
 }
-export function tbody(content: VNodeContent): VNode {
+export function tbody(content: PreactContent): PreactNode {
     return html`<tbody>
         ${content}
     </tbody>`
 }
-export function tfoot(content: VNodeContent): VNode {
+export function tfoot(content: PreactContent): PreactNode {
     return html`<tfoot>
         ${content}
     </tfoot>`
@@ -207,7 +208,7 @@ export type TableHeaderContent = Readonly<{
     header: TableDataHeaderRow
 }> &
     Partial<{ singleLastBorderBottom: boolean }>
-export function tableHeader(content: TableHeaderContent): readonly VNode[] {
+export function tableHeader(content: TableHeaderContent): readonly PreactNode[] {
     type HeaderRow = Readonly<{
         sticky: StickyHorizontalInfo
         containers: readonly HeaderContainer[]
@@ -236,11 +237,11 @@ export function tableHeader(content: TableHeaderContent): readonly VNode[] {
     }
     return buildHeaderRows(base, headers).map(headerTr)
 
-    function headerTr({ sticky: info, containers }: HeaderRow): VNode {
+    function headerTr({ sticky: info, containers }: HeaderRow): PreactNode {
         return tr([key(info.level)], className, containers.map(headerTh(info)))
     }
 
-    function headerTh(info: StickyHorizontalInfo): { (container: HeaderContainer): VNode } {
+    function headerTh(info: StickyHorizontalInfo): { (container: HeaderContainer): PreactNode } {
         return ({ index, colspan, rowspan, style, header }) => html`<th
             class="${className(index, style)}"
             colspan=${colspan}
@@ -432,7 +433,7 @@ export type TableSummaryContent = Readonly<{
 export function tableSummary({
     sticky,
     summary: { key, className, summaries },
-}: TableSummaryContent): readonly VNode[] {
+}: TableSummaryContent): readonly PreactNode[] {
     return [tr([key], className, summaries.map(summaryTd(sticky)))]
 }
 
@@ -444,7 +445,7 @@ export type TableColumnContent = Readonly<{
         noLastBorderBottom: boolean
     }>
 
-export function tableColumn(content: TableColumnContent): readonly VNode[] {
+export function tableColumn(content: TableColumnContent): readonly PreactNode[] {
     type ColumnEntry = ColumnEntry_simple | ColumnEntry_expansion | ColumnEntry_tree
     type ColumnEntry_simple = Readonly<{ type: "simple"; container: ColumnContainer }>
     type ColumnEntry_expansion = Readonly<{
@@ -467,10 +468,10 @@ export function tableColumn(content: TableColumnContent): readonly VNode[] {
         style: TableDataFullStyle
         column: TableDataColumnSimple | EmptyColumn
     }>
-    type EmptyColumn = Readonly<{ type: "empty"; key: VNodeKey }>
+    type EmptyColumn = Readonly<{ type: "empty"; key: PreactKey }>
 
     type ColumnRow = Readonly<{
-        key: readonly VNodeKey[]
+        key: readonly PreactKey[]
         className: TableDataClassName
         containers: readonly ColumnContainer[]
     }>
@@ -484,11 +485,11 @@ export function tableColumn(content: TableColumnContent): readonly VNode[] {
 
     return buildColumnRows({ index: 0, bottom: true }, column).map(columnTr)
 
-    function columnTr({ key, className, containers }: ColumnRow): VNode {
+    function columnTr({ key, className, containers }: ColumnRow): PreactNode {
         return tr(key, className, containers.map(columnTd))
     }
 
-    function columnTd({ index, colspan, rowspan, style, column }: ColumnContainer): VNode {
+    function columnTd({ index, colspan, rowspan, style, column }: ColumnContainer): PreactNode {
         return html`<td
             class="${className()}"
             colspan=${colspan}
@@ -728,12 +729,12 @@ export type TableFooterContent = Readonly<{
 export function tableFooter({
     sticky,
     footer: { key, className, footers },
-}: TableFooterContent): readonly VNode[] {
+}: TableFooterContent): readonly PreactNode[] {
     return [tr([key], className, footers.map(summaryTd(sticky)))]
 }
 
 const summaryTd =
-    (sticky: TableDataSticky): { (summary: TableDataSummary, index: number): VNode } =>
+    (sticky: TableDataSticky): { (summary: TableDataSummary, index: number): PreactNode } =>
     (summary, index) => {
         return html`<td class="${className()}" colspan=${summary.length} key=${summary.key}>
             ${summaryContent(summary)}
@@ -744,7 +745,7 @@ const summaryTd =
         }
     }
 
-function summaryContent(summary: TableDataSummary): VNodeContent {
+function summaryContent(summary: TableDataSummary): PreactContent {
     switch (summary.type) {
         case "empty":
         case "empty-expansion":
@@ -756,7 +757,11 @@ function summaryContent(summary: TableDataSummary): VNodeContent {
     }
 }
 
-function tr(key: readonly VNodeKey[], className: TableDataClassName, content: VNodeContent): VNode {
+function tr(
+    key: readonly PreactKey[],
+    className: TableDataClassName,
+    content: PreactContent,
+): PreactNode {
     return html`<tr class="${className.join(" ")}" key=${key.join("_")} data-root-key=${key[0]}>
         ${content}
     </tr>`

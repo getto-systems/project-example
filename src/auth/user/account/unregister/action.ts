@@ -1,23 +1,25 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
-import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
-import { initEditableDataHandler, ModifyFieldHandler } from "../../../../common/util/modify/action"
-
 import { checkTakeLongtime } from "../../../../common/util/timer/helper"
+
+import { Atom, initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import { LoadState } from "../../../../common/util/load/data"
+import { LoadableListAtomUpdater } from "../../../../common/util/list/action"
+import {
+    EditableBoardAction,
+    initEditableBoardAction,
+} from "../../../../common/util/board/editable/action"
 
 import { UnregisterAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../common/util/config/infra"
 
 import { UnregisterAuthUserAccountError } from "./data"
 import { LoginId } from "../../login_id/kernel/data"
+import { AuthUserAccount } from "../kernel/data"
+import { ConnectState } from "../../../../common/util/connect/data"
 
 export interface UnregisterAuthUserAccountAction {
-    readonly state: ApplicationState<UnregisterAuthUserAccountState>
+    readonly state: Atom<UnregisterAuthUserAccountState>
+    readonly connect: Atom<ConnectState>
     readonly editable: EditableBoardAction
-
-    onSuccess(handler: (data: UnregisterAuthUserAccountEntry) => void): void
 
     submit(): Promise<UnregisterAuthUserAccountState>
 }
@@ -42,44 +44,43 @@ export type UnregisterAuthUserAccountConfig = Readonly<{
 }>
 
 export function initUnregisterAuthUserAccountAction(
+    data: Atom<LoadState<AuthUserAccount>>,
+    updater: LoadableListAtomUpdater<AuthUserAccount>,
     material: UnregisterAuthUserAccountMaterial,
-): Readonly<{
-    action: UnregisterAuthUserAccountAction
-    handler: ModifyFieldHandler<UnregisterAuthUserAccountEntry>
-}> {
-    const { state, post } = initApplicationState({ initialState })
+): UnregisterAuthUserAccountAction {
+    const unregister = initAtom({ initialState })
+    async function unregisterWithCurrentState(): Promise<UnregisterAuthUserAccountState> {
+        const element = data.currentState()
+        if (!element.isLoad) {
+            return unregister.state.currentState()
+        }
 
-    const { editable, data, handler } = initEditableDataHandler<UnregisterAuthUserAccountEntry>()
+        return unregisterAuthUserAccount(material, element.data, unregister.post)
+    }
 
-    onSuccess(() => {
-        editable.close()
+    const editable = initEditableBoardAction()
+
+    unregister.state.subscribe((state) => {
+        if (state.type === "success") {
+            updater.update((list) => list.filter((item) => item.loginId !== state.data.loginId))
+            editable.close()
+        }
+    })
+
+    const connect = mapAtom(unregister.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
     })
 
     return {
-        action: {
-            state,
-            editable,
+        state: unregister.state,
+        connect,
+        editable,
 
-            onSuccess,
-
-            async submit(): Promise<UnregisterAuthUserAccountState> {
-                const element = data()
-                if (!element.isLoad) {
-                    return state.currentState()
-                }
-
-                return unregisterUser(material, element.data, post)
-            },
-        },
-        handler,
-    }
-
-    function onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
-        state.subscribe((state) => {
-            if (state.type === "success") {
-                handler(state.data)
-            }
-        })
+        submit: unregisterWithCurrentState,
     }
 }
 
@@ -88,7 +89,7 @@ type UnregisterUserEvent =
     | Readonly<{ type: "failed"; err: UnregisterAuthUserAccountError }>
     | Readonly<{ type: "success"; data: UnregisterAuthUserAccountEntry }>
 
-async function unregisterUser<S>(
+async function unregisterAuthUserAccount<S>(
     { infra, config }: UnregisterAuthUserAccountMaterial,
     user: Readonly<{ loginId: LoginId }>,
     post: Post<UnregisterUserEvent, S>,

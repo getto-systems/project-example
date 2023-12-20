@@ -1,5 +1,6 @@
 use std::env::var;
 
+#[derive(Debug)]
 pub struct AuthEnv {
     pub log_level: String,
     pub port: String,
@@ -28,7 +29,7 @@ pub struct AuthEnv {
 }
 
 impl AuthEnv {
-    pub fn new() -> Self {
+    pub fn load() -> Self {
         Self {
             log_level: load("AUTH_LOG_LEVEL"),
             port: load("PORT"),

@@ -1,23 +1,33 @@
-use actix_web::{post, web::Data, HttpRequest, Responder};
+use std::sync::Arc;
 
-use getto_application::helper::flatten;
+use actix_web::{post, web::Data, HttpRequest, HttpResponse};
 
-use crate::x_outside_feature::proxy::{feature::ProxyAppFeature, logger::ProxyLogger};
+use crate::{
+    common::api::response::x_actix_web::ProxyResponder,
+    x_outside_feature::proxy::feature::ProxyAppFeature,
+};
 
-use crate::auth::user::password::reset::reset::proxy::init::ActiveResetPasswordProxyMaterial;
+use crate::common::api::{feature::AsInfra, logger::detail::StdoutJsonLogger};
 
-use crate::common::api::{logger::infra::Logger, response::actix_web::ProxyResponder};
+use crate::auth::user::password::reset::reset::proxy::action::ResetPasswordProxyAction;
+
+use crate::common::api::request::data::RequestInfo;
 
 #[post("")]
 pub async fn service_reset(
     feature: Data<ProxyAppFeature>,
     request: HttpRequest,
     body: String,
-) -> impl Responder {
-    let (request_id, logger) = ProxyLogger::default(&feature, &request);
+) -> HttpResponse {
+    async {
+        let info = RequestInfo::from_request(&request);
+        let logger = Arc::new(StdoutJsonLogger::with_request(info.clone()));
 
-    let mut action = ActiveResetPasswordProxyMaterial::action(&feature, request_id);
-    action.subscribe(move |state| logger.log(state));
-
-    flatten(action.ignite(body).await).respond_to()
+        ResetPasswordProxyAction::live(feature.as_infra())
+            .with_logger(logger.clone())
+            .request(info, (), body)
+            .await
+    }
+    .await
+    .respond_to()
 }

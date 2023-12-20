@@ -1,7 +1,5 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
-
-import { VNodeContent } from "../../../z_vendor/getto-css/preact/common"
+import { PreactContent, PreactNode } from "../node"
 
 import { button_undo } from "../../../z_vendor/getto-css/preact/design/form"
 
@@ -10,15 +8,18 @@ import { iconHtml } from "../../util/icon/x_preact/icon"
 
 import { Icon } from "../../util/icon/data"
 
-type Props = Readonly<{
-    label?: VNodeContent
+export function VectorUndoRemoveButton({
+    label,
+    icon,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     icon?: Icon
     onClick: { (e: Event): void }
-}>
-export function VectorUndoRemoveButton({ label, icon, onClick }: Props): VNode {
+}>): PreactNode {
     return button_undo({ label: buttonLabel(icon || icon_undo), onClick })
 
-    function buttonLabel(icon: Icon): VNode {
+    function buttonLabel(icon: Icon): PreactNode {
         return html`${label || "戻す"} ${iconHtml(icon)}`
     }
 }

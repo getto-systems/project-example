@@ -1,151 +1,118 @@
-use getto_application::{data::MethodResult, infra::ActionStatePubSub};
+mod detail;
 
-use crate::auth::ticket::authorize::method::{
-    authorize_with_token, AuthorizeWithTokenEvent, AuthorizeWithTokenInfra,
-};
+use std::sync::Arc;
 
 use crate::auth::{
     kernel::infra::AuthClock,
     ticket::authorize::infra::{
-        AuthorizeFieldsExtract, ClarifyAuthorizeTokenAuthTicketRepository,
-        ClarifyAuthorizeTokenAuthUserRepository,
+        AuthorizeFieldsExtract, AuthorizeInfra, AuthorizeLogger, AuthorizeRepository,
+        AuthorizeTokenDecoder, CheckAuthorizeTokenInfra, CheckAuthorizeTokenLogger,
     },
 };
 
-use crate::{
-    auth::ticket::kernel::data::{AuthPermissionError, AuthPermissionRequired, AuthTicket},
-    common::api::repository::data::RepositoryError,
+use crate::auth::ticket::{
+    authorize::data::{
+        AuthorizeError, AuthorizeSuccess, CheckAuthorizeTokenError, CheckAuthorizeTokenSuccess,
+    },
+    kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
 };
 
-pub enum ClarifyAuthorizeTokenState {
-    AuthorizeWithToken(AuthorizeWithTokenEvent),
-    ClarifyAuthorizeToken(ClarifyAuthorizeTokenEvent),
+pub struct CheckAuthorizeTokenAction<M: CheckAuthorizeTokenInfra> {
+    logger: Arc<dyn CheckAuthorizeTokenLogger>,
+    infra: M,
 }
 
-impl std::fmt::Display for ClarifyAuthorizeTokenState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::AuthorizeWithToken(event) => event.fmt(f),
-            Self::ClarifyAuthorizeToken(event) => event.fmt(f),
-        }
+impl<M: CheckAuthorizeTokenInfra> CheckAuthorizeTokenAction<M> {
+    pub async fn check(
+        &self,
+        token: impl AuthorizeTokenExtract,
+        required: AuthPermissionRequired,
+    ) -> Result<CheckAuthorizeTokenSuccess, CheckAuthorizeTokenError> {
+        self.logger.try_to_check_authorize_token();
+
+        let token = token
+            .convert()
+            .map_err(|err| self.logger.invalid_request(err))?;
+
+        let ticket = self
+            .infra
+            .token_decoder()
+            .decode(token.clone())
+            .map_err(|err| self.logger.invalid_token(err))?;
+
+        ticket
+            .attrs
+            .granted
+            .has_enough_permission(&required)
+            .map_err(|err| self.logger.forbidden(err))?;
+
+        Ok(CheckAuthorizeTokenSuccess::new(
+            self.logger
+                .succeed_to_check_authorize_token(ticket.attrs.granted),
+        ))
     }
 }
 
-pub trait ClarifyAuthorizeTokenMaterial {
-    type AuthorizeWithToken: AuthorizeWithTokenInfra;
-    type Clock: AuthClock;
-    type TicketRepository: ClarifyAuthorizeTokenAuthTicketRepository;
-    type UserRepository: ClarifyAuthorizeTokenAuthUserRepository;
-
-    fn authorize_with_token(&self) -> &Self::AuthorizeWithToken;
-    fn clock(&self) -> &Self::Clock;
-    fn ticket_repository(&self) -> &Self::TicketRepository;
-    fn user_repository(&self) -> &Self::UserRepository;
+pub struct AuthorizeAction<M: AuthorizeInfra> {
+    logger: Arc<dyn AuthorizeLogger>,
+    infra: M,
 }
 
-pub struct ClarifyAuthorizeTokenAction<M: ClarifyAuthorizeTokenMaterial> {
-    pub info: ClarifyAuthorizeTokenActionInfo,
-    pubsub: ActionStatePubSub<ClarifyAuthorizeTokenState>,
-    material: M,
-}
-
-pub struct ClarifyAuthorizeTokenActionInfo;
-
-impl ClarifyAuthorizeTokenActionInfo {
-    pub const fn name(&self) -> &'static str {
-        "auth.ticket.authorize.clarify"
-    }
-}
-
-impl<M: ClarifyAuthorizeTokenMaterial> ClarifyAuthorizeTokenAction<M> {
-    pub fn with_material(material: M) -> Self {
-        Self {
-            info: ClarifyAuthorizeTokenActionInfo,
-            pubsub: ActionStatePubSub::new(),
-            material,
-        }
-    }
-
-    pub fn subscribe(
-        &mut self,
-        handler: impl 'static + Fn(&ClarifyAuthorizeTokenState) + Send + Sync,
-    ) {
-        self.pubsub.subscribe(handler);
-    }
-
-    pub async fn ignite(
-        self,
+impl<M: AuthorizeInfra> AuthorizeAction<M> {
+    pub async fn authorize(
+        &self,
         fields: impl AuthorizeFieldsExtract,
-    ) -> MethodResult<ClarifyAuthorizeTokenState> {
-        let pubsub = self.pubsub;
+    ) -> Result<AuthorizeSuccess, AuthorizeError> {
+        self.logger.try_to_authorize();
 
-        let (ticket, _token, required) =
-            authorize_with_token(self.material.authorize_with_token(), fields, |event| {
-                pubsub.post(ClarifyAuthorizeTokenState::AuthorizeWithToken(event))
-            })
-            .await?;
+        let fields = fields
+            .convert()
+            .map_err(|err| self.logger.invalid_request(err))?;
 
-        clarify_authorize_token(&self.material, ticket, required, |event| {
-            pubsub.post(ClarifyAuthorizeTokenState::ClarifyAuthorizeToken(event))
-        })
-        .await
-    }
-}
+        let ticket = self
+            .infra
+            .token_decoder()
+            .decode(fields.token.clone())
+            .map_err(|err| self.logger.invalid_token(err))?;
 
-pub enum ClarifyAuthorizeTokenEvent {
-    TicketNotFound,
-    TicketHasExpired,
-    UserNotFound,
-    Success(AuthTicket),
-    RepositoryError(RepositoryError),
-    PermissionError(AuthPermissionError),
-}
+        ticket
+            .attrs
+            .granted
+            .has_enough_permission(&fields.required)
+            .map_err(|err| self.logger.forbidden(err))?;
 
-const SUCCESS: &'static str = "clarify authorize-token success";
-const ERROR: &'static str = "clarify authorize-token error";
+        let expansion_limit = self
+            .infra
+            .repository()
+            .lookup_expansion_limit(&ticket)
+            .await
+            .map_err(|err| self.logger.failed_to_lookup_expansion_limit(err))?
+            .ok_or_else(|| {
+                self.logger
+                    .expansion_limit_not_found(AuthorizeError::TicketNotFound)
+            })?;
 
-impl std::fmt::Display for ClarifyAuthorizeTokenEvent {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::TicketNotFound => write!(f, "{}; ticket not found", ERROR),
-            Self::TicketHasExpired => write!(f, "{}; ticket has expired", ERROR),
-            Self::UserNotFound => write!(f, "{}; user not found", ERROR),
-            Self::Success(ticket) => {
-                write!(f, "{}; {}", SUCCESS, ticket.attrs)
-            }
-            Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
-            Self::PermissionError(err) => write!(f, "{}; {}", ERROR, err),
+        if expansion_limit.has_elapsed(&self.infra.clock().now()) {
+            return Err(self
+                .logger
+                .ticket_has_expired(AuthorizeError::TicketHasExpired));
         }
+
+        let granted = self
+            .infra
+            .repository()
+            .lookup_permission_granted(&ticket.attrs.user_id)
+            .await
+            .map_err(|err| self.logger.failed_to_lookup_permission_granted(err))?
+            .ok_or_else(|| {
+                self.logger
+                    .permission_granted_not_found(AuthorizeError::UserNotFound)
+            })?;
+
+        granted
+            .has_enough_permission(&fields.required)
+            .map_err(|err| self.logger.forbidden(err))?;
+
+        Ok(self.logger.authorized(AuthorizeSuccess::new(ticket.attrs)))
     }
-}
-
-async fn clarify_authorize_token<S>(
-    infra: &impl ClarifyAuthorizeTokenMaterial,
-    ticket: AuthTicket,
-    required: AuthPermissionRequired,
-    post: impl Fn(ClarifyAuthorizeTokenEvent) -> S,
-) -> MethodResult<S> {
-    let expansion_limit = infra
-        .ticket_repository()
-        .lookup_expansion_limit(&ticket)
-        .await
-        .map_err(|err| post(ClarifyAuthorizeTokenEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(ClarifyAuthorizeTokenEvent::TicketNotFound))?;
-
-    if expansion_limit.has_elapsed(&infra.clock().now()) {
-        return Err(post(ClarifyAuthorizeTokenEvent::TicketHasExpired));
-    }
-
-    let granted = infra
-        .user_repository()
-        .lookup_permission_granted(&ticket.attrs.user_id)
-        .await
-        .map_err(|err| post(ClarifyAuthorizeTokenEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(ClarifyAuthorizeTokenEvent::UserNotFound))?;
-
-    granted
-        .has_enough_permission(&required)
-        .map_err(|err| post(ClarifyAuthorizeTokenEvent::PermissionError(err)))?;
-
-    Ok(post(ClarifyAuthorizeTokenEvent::Success(ticket)))
 }

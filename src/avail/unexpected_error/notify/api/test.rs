@@ -1,56 +1,32 @@
-use getto_application_test::ApplicationActionStateHolder;
-use pretty_assertions::assert_eq;
+use crate::common::api::feature::AsInfra;
 
-use crate::{
-    auth::init::test::{StaticAuthorizeInfra, StaticAuthorizeToken},
-    avail::unexpected_error::notify::init::test::{
-        StaticNotifyUnexpectedErrorFields, StaticNotifyUnexpectedErrorMaterial,
-    },
+use crate::avail::unexpected_error::notify::action::{
+    NotifyUnexpectedErrorAction, NotifyUnexpectedErrorInfo,
 };
 
-use crate::avail::unexpected_error::notify::action::NotifyUnexpectedErrorAction;
-
-use crate::avail::unexpected_error::notify::infra::NotifyUnexpectedErrorFields;
+use crate::{
+    auth::data::AuthPermissionRequired,
+    avail::unexpected_error::notify::data::NotifyUnexpectedError,
+};
 
 #[tokio::test]
 async fn info() {
-    let material = StaticNotifyUnexpectedErrorMaterial {
-        authorize: StaticAuthorizeInfra::standard(),
-    };
-
-    let action = NotifyUnexpectedErrorAction::with_material(material);
-
-    let (name, required) = action.info.params();
     assert_eq!(
-        format!("{}; {}", name, required),
-        "avail.unexpected-error.notify; require: nothing",
+        NotifyUnexpectedErrorInfo::required(),
+        AuthPermissionRequired::Nothing,
     );
 }
 
 #[tokio::test]
-async fn success_notify() {
-    let holder = ApplicationActionStateHolder::new();
+async fn success() {
+    let feature = feature();
+    let action = NotifyUnexpectedErrorAction::mock(feature.as_infra());
 
-    let material = StaticNotifyUnexpectedErrorMaterial {
-        authorize: StaticAuthorizeInfra::standard(),
-    };
-    let fields = StaticNotifyUnexpectedErrorFields {
-        fields: NotifyUnexpectedErrorFields {
-            err: "UNEXPECTED-ERROR".into(),
-        },
-    };
+    let fields = NotifyUnexpectedError::new("error".to_owned());
 
-    let mut action = NotifyUnexpectedErrorAction::with_material(material);
-    action.subscribe(holder.handler());
+    action.notify(fields).await;
+}
 
-    let result = action.ignite(StaticAuthorizeToken, fields).await;
-    assert_eq!(
-        holder.extract(),
-        vec![
-            "try to proxy call: auth.ticket.authorize.clarify(require: nothing)",
-            "proxy call success",
-            "UNEXPECTED-ERROR",
-        ],
-    );
-    assert!(result.is_ok());
+fn feature() -> () {
+    ()
 }

@@ -1,12 +1,12 @@
-import { VNodeContent } from "../common"
+import { PreactContent } from "../common"
 
 import {
-    TableDataCellKey,
+    TableDataKey,
     TableDataColumnExpansion,
     TableDataColumnSimple,
     TableDataHeaderExpansion,
     TableDataSummaryExpansion,
-    TableDataView,
+    TableDataCell,
 } from "../core"
 
 import { tableDataMutable_base } from "../mutable/base"
@@ -45,7 +45,7 @@ import {
 import { initiallyVisibleCells, isVisible } from "./helper"
 
 export type TableDataExpansionContent<M, R> = Readonly<{
-    label: VNodeContent
+    label: PreactContent
     header: TableDataContentDecorator
     column: TableDataExpansionColumnContentProvider<R>
     length: TableDataExpansionLengthProvider<M>
@@ -56,22 +56,22 @@ export type TableDataExpansionContent<M, R> = Readonly<{
     }>
 
 export function tableCell_expansion<M, R>(
-    key: TableDataCellKey,
-    content: { (key: TableDataCellKey): TableDataExpansionContent<M, R> },
+    key: TableDataKey,
+    content: { (key: TableDataKey): TableDataExpansionContent<M, R> },
 ): TableCellExpansion<M, R> {
     return new Cell(key, content(key))
 }
 class Cell<M, R> implements TableCellExpansion<M, R> {
     readonly type = "expansion" as const
 
-    key: TableDataCellKey
+    key: TableDataKey
     content: TableDataExpansionContent<M, R>
     mutable: Readonly<{
         base: TableDataMutable_base<R>
         leaf: TableDataMutable_leaf
     }>
 
-    constructor(key: TableDataCellKey, content: TableDataExpansionContent<M, R>) {
+    constructor(key: TableDataKey, content: TableDataExpansionContent<M, R>) {
         this.key = key
         this.content = content
         this.mutable = {
@@ -92,11 +92,11 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         return this.mutable.leaf.verticalBorderMutable().border
     }
 
-    initiallyVisibleCells(): readonly TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataKey[] {
         return initiallyVisibleCells(this.key, this.mutable.leaf.visibleMutable())
     }
 
-    view(): readonly TableDataView[] {
+    view(): readonly TableDataCell[] {
         const { visibleType } = this.mutable.leaf.visibleMutable()
         if (visibleType === "always") {
             // always visible なセルは view に含めない

@@ -1,7 +1,5 @@
 import { html } from "htm/preact"
-import { VNode } from "preact"
-
-import { VNodeContent } from "../../../z_vendor/getto-css/preact/common"
+import { PreactContent } from "../../../z_vendor/getto-css/preact/common"
 
 import { button_delete } from "../../../z_vendor/getto-css/preact/design/form"
 
@@ -9,16 +7,20 @@ import { icon_remove } from "../../../x_content/icon"
 import { iconHtml } from "../../util/icon/x_preact/icon"
 
 import { Icon } from "../../util/icon/data"
+import { PreactNode } from "../node"
 
-type Props = Readonly<{
-    label?: VNodeContent
+export function VectorRemoveButton({
+    label,
+    icon,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     icon?: Icon
     onClick: { (e: Event): void }
-}>
-export function VectorRemoveButton({ label, icon, onClick }: Props): VNode {
+}>): PreactNode {
     return button_delete({ state: "normal", label: buttonLabel(icon || icon_remove), onClick })
 
-    function buttonLabel(icon: Icon): VNode {
+    function buttonLabel(icon: Icon): PreactNode {
         return html`${label || "削除"} ${iconHtml(icon)}`
     }
 }

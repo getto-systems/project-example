@@ -1,8 +1,9 @@
-import { h, VNode } from "preact"
-import { useErrorBoundary } from "preact/hooks"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../../common/x_preact/node"
 
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useErrorBoundary } from "preact/hooks"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
 import { CheckAuthTicket } from "../../../ticket/authenticate/x_preact/check_ticket"
@@ -18,8 +19,8 @@ type Props = Readonly<{
     link: SignLink
     sign: SignAction
 }>
-export function Sign(props: Props): VNode {
-    const state = useApplicationState(props.sign.state)
+export function Sign(props: Props): PreactNode {
+    const state = useAtom(props.sign.state)
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
         console.log(err)

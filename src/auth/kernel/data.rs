@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, NaiveDateTime, TimeZone, Utc};
 
 #[derive(Clone)]
 pub struct AuthDateTime(DateTime<Utc>);
@@ -34,7 +34,7 @@ impl AuthDateTime {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ExpireDateTime(DateTime<Utc>);
 
 impl ExpireDateTime {
@@ -43,10 +43,9 @@ impl ExpireDateTime {
     }
 
     pub(in crate::auth) fn restore_from_timestamp(value: i64) -> Self {
-        Self::restore(DateTime::<Utc>::from_utc(
-            NaiveDateTime::from_timestamp_opt(value, 0).unwrap_or_default(),
-            Utc,
-        ))
+        Self::restore(
+            Utc.from_utc_datetime(&NaiveDateTime::from_timestamp_opt(value, 0).unwrap_or_default()),
+        )
     }
 
     pub const fn extract(self) -> DateTime<Utc> {

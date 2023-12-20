@@ -1,19 +1,25 @@
-use crate::auth::user::password::kernel::infra::{HashedPassword, PlainPassword};
+use crate::auth::{
+    kernel::infra::AuthClock,
+    user::password::kernel::infra::{AuthUserPasswordHasher, HashedPassword, PlainPassword},
+};
 
 use crate::{
     auth::{
         kernel::data::{AuthDateTime, ExpireDateTime},
-        ticket::kernel::data::AuthPermissionGranted,
+        ticket::kernel::data::{AuthPermissionGranted, AuthenticateSuccess},
         user::{
             kernel::data::AuthUserId,
-            login_id::kernel::data::LoginId,
-            password::reset::{
-                kernel::data::{
-                    ResetPasswordId, ResetPasswordToken, ResetPasswordTokenDestination,
-                },
-                reset::data::{
-                    DecodeResetTokenError, NotifyResetPasswordError, NotifyResetPasswordResponse,
-                    ValidateResetPasswordFieldsError,
+            password::{
+                kernel::data::PasswordHashError,
+                reset::{
+                    kernel::data::{
+                        ResetPasswordId, ResetPasswordToken, ResetPasswordTokenDestination,
+                    },
+                    reset::data::{
+                        DecodeResetTokenError, NotifyResetPasswordError,
+                        NotifyResetPasswordResponse, ResetPasswordError,
+                        ValidateResetPasswordFieldsError,
+                    },
                 },
             },
         },
@@ -23,12 +29,33 @@ use crate::{
 
 pub struct ResetPasswordFields {
     pub reset_token: ResetPasswordToken,
-    pub login_id: LoginId,
     pub new_password: PlainPassword,
 }
 
 pub trait ResetPasswordFieldsExtract {
     fn convert(self) -> Result<ResetPasswordFields, ValidateResetPasswordFieldsError>;
+}
+
+impl ResetPasswordFieldsExtract for ResetPasswordFields {
+    fn convert(self) -> Result<ResetPasswordFields, ValidateResetPasswordFieldsError> {
+        Ok(self)
+    }
+}
+
+pub trait ResetPasswordInfra {
+    type Clock: AuthClock;
+    type Repository: ResetPasswordRepository;
+    type PasswordHasher: AuthUserPasswordHasher;
+    type TokenDecoder: ResetPasswordTokenDecoder;
+    type ResetNotifier: ResetPasswordNotifier;
+
+    fn clock(&self) -> &Self::Clock;
+    fn repository(&self) -> &Self::Repository;
+    fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
+        Self::PasswordHasher::new(plain_password)
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder;
+    fn reset_notifier(&self) -> &Self::ResetNotifier;
 }
 
 pub trait ResetPasswordTokenDecoder {
@@ -43,7 +70,6 @@ pub trait ResetPasswordRepository {
     ) -> Result<
         Option<(
             AuthUserId,
-            LoginId,
             ResetPasswordTokenDestination,
             ResetPasswordTokenMoment,
         )>,
@@ -55,12 +81,15 @@ pub trait ResetPasswordRepository {
         user_id: &AuthUserId,
     ) -> Result<Option<AuthPermissionGranted>, RepositoryError>;
 
-    async fn reset_password(
+    async fn consume_reset_id(
+        &self,
+        reset_id: ResetPasswordId,
+        reset_at: AuthDateTime,
+    ) -> Result<(), RepositoryError>;
+    async fn update_password(
         &self,
         user_id: AuthUserId,
-        reset_id: ResetPasswordId,
         new_password: HashedPassword,
-        reset_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
 }
 
@@ -92,4 +121,27 @@ pub trait ResetPasswordNotifier {
         &self,
         destination: ResetPasswordTokenDestination,
     ) -> Result<NotifyResetPasswordResponse, NotifyResetPasswordError>;
+}
+
+pub trait ResetPasswordLogger: Send + Sync {
+    fn try_to_reset_password(&self);
+    fn invalid_request(
+        &self,
+        err: ValidateResetPasswordFieldsError,
+    ) -> ValidateResetPasswordFieldsError;
+    fn failed_to_decode_token(&self, err: DecodeResetTokenError) -> DecodeResetTokenError;
+    fn failed_to_lookup_reset_token_entry(&self, err: RepositoryError) -> RepositoryError;
+    fn reset_token_not_found(&self, err: ResetPasswordError) -> ResetPasswordError;
+    fn failed_to_lookup_permission_granted(&self, err: RepositoryError) -> RepositoryError;
+    fn already_reset(&self, err: ResetPasswordError) -> ResetPasswordError;
+    fn expired(&self, err: ResetPasswordError) -> ResetPasswordError;
+    fn failed_to_hash_password(&self, err: PasswordHashError) -> PasswordHashError;
+    fn failed_to_consume_reset_id(&self, err: RepositoryError) -> RepositoryError;
+    fn failed_to_update_password(&self, err: RepositoryError) -> RepositoryError;
+    fn failed_to_notify(&self, err: NotifyResetPasswordError) -> NotifyResetPasswordError;
+    fn succeed_to_notify(
+        &self,
+        response: NotifyResetPasswordResponse,
+    ) -> NotifyResetPasswordResponse;
+    fn succeed_to_reset_password(&self, auth: AuthenticateSuccess) -> AuthenticateSuccess;
 }

@@ -1,14 +1,14 @@
-import { VNode } from "preact"
-
-import { VNodeContent } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { button_undo } from "../../../z_vendor/getto-css/preact/design/form"
 
-type Props = Readonly<{
-    label?: VNodeContent
+export function ClearSearchButton({
+    label,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     onClick: { (e: Event): void }
-}>
-export function ClearSearchButton({ label, onClick }: Props): VNode {
+}>): PreactNode {
     const buttonLabel = label || "検索項目をクリア"
     return button_undo({ label: buttonLabel, onClick })
 }

@@ -1,11 +1,11 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../common/x_preact/node"
 
 import { v_small } from "../../z_vendor/getto-css/preact/design/alignment"
 import { buttons, field } from "../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 
-import { lnir } from "../../common/util/icon/init/line_icon"
+import { lnir } from "../../common/util/icon/detail/line_icon"
 
 import { env } from "../../y_environment/ui/env"
 
@@ -13,10 +13,11 @@ import { iconHtml } from "../../common/util/icon/x_preact/icon"
 import { icon_home } from "../../x_content/icon"
 import { siteInfo } from "../../x_content/site"
 
-type Props = Readonly<{
-    err: string
-}>
-export function ApplicationError(props: Props): VNode {
+export function ApplicationError(
+    props: Readonly<{
+        err: string
+    }>,
+): PreactNode {
     return loginBox(siteInfo, {
         title: html`システムエラーが発生しました`,
         body: [

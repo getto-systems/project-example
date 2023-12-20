@@ -1,17 +1,22 @@
-import { VNode } from "preact"
+import { PreactContent, PreactNode } from "../node"
 
-import { VNodeContent } from "../vnode"
-
-import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
+import { useAtom } from "../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { button_disabled, button_undo } from "../../../z_vendor/getto-css/preact/design/form"
 
-type Props = Readonly<{
-    observeState: ObserveBoardState
-    label?: VNodeContent
+import { Atom } from "../../../z_vendor/getto-atom/atom"
+import { ObserveBoardState } from "../../util/board/observe/action"
+
+export function ClearChangesButton({
+    observe,
+    label,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
+    observe: Atom<ObserveBoardState>
     onClick: { (e: Event): void }
-}>
-export function ClearChangesButton({ observeState, label, onClick }: Props): VNode {
+}>): PreactNode {
+    const observeState = useAtom(observe)
     const buttonLabel = label || "入力内容をクリア"
 
     if (observeState.hasChanged) {

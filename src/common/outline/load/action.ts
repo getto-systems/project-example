@@ -1,7 +1,4 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 
 import { buildMenu, BuildMenuParams } from "./helper"
 import { toMenuCategory, toMenuItem } from "./convert"
@@ -23,7 +20,7 @@ import { RemoteCommonError } from "../../util/remote/data"
 import { BreadcrumbList, BreadcrumbNode, Menu, MenuCategoryPath, MenuTargetPath } from "./data"
 
 export interface OutlineBreadcrumbListAction {
-    readonly state: ApplicationState<OutlineBreadcrumbListState>
+    readonly state: Atom<OutlineBreadcrumbListState>
 }
 
 export type OutlineBreadcrumbListState = Readonly<{ list: BreadcrumbList }>
@@ -43,7 +40,7 @@ export type OutlineBreadcrumbListConfig = Readonly<{
 export function initOutlineBreadcrumbListAction(
     material: OutlineBreadcrumbListMaterial,
 ): OutlineBreadcrumbListAction {
-    const { state } = initApplicationState({ initialState: { list: load(material) } })
+    const { state } = initAtom({ initialState: { list: load(material) } })
     return {
         state,
     }
@@ -100,7 +97,7 @@ function load({ shell, config }: OutlineBreadcrumbListMaterial): BreadcrumbList 
 const EMPTY: BreadcrumbList = []
 
 export interface OutlineMenuAction {
-    readonly state: ApplicationState<OutlineMenuState>
+    readonly state: Atom<OutlineMenuState>
     updateBadge(): Promise<OutlineMenuState>
     show(path: MenuCategoryPath): Promise<OutlineMenuState>
     hide(path: MenuCategoryPath): Promise<OutlineMenuState>
@@ -135,7 +132,7 @@ export type OutlineMenuConfig = Readonly<{
 }>
 
 export function initOutlineMenuAction(material: OutlineMenuMaterial): OutlineMenuAction {
-    const { state, post } = initApplicationState({
+    const { state, post } = initAtom({
         initialState,
         ignite: async (): Promise<OutlineMenuState> => {
             return outlineMenu(material, (event) => {

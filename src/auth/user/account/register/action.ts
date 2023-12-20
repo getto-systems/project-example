@@ -1,47 +1,59 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
-
 import { checkTakeLongtime, ticker } from "../../../../common/util/timer/helper"
 
-import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import {
-    initResetTokenDestinationFieldAction,
-    ResetTokenDestinationFieldAction,
-} from "../../password/reset/token_destination/input/action"
-import {
-    AuthPermissionGrantedFieldAction,
-    AuthUserTextFieldAction,
-    initAuthPermissionGrantedFieldAction,
-    initAuthUserTextFieldAction,
-} from "../input/field/action"
-import { initLoginIdFieldAction, LoginIdFieldAction } from "../../login_id/input/action"
-import { initRegisterField } from "../../../../common/util/register/action"
-import { initListRegisteredAction, ListRegisteredAction } from "../../../../common/util/list/action"
-
 import { ALL_AUTH_PERMISSIONS } from "../../../../x_content/permission"
+
+import { Atom, initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import { LoadState, loadState_loaded, loadState_loading } from "../../../../common/util/load/data"
+import { ValidateBoardState } from "../../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../../common/util/board/observe/action"
+import { composeRegisterFieldBoard } from "../../../../common/util/board/field/action"
+import { AuthUserTextField, initAuthUserTextField } from "../input/field/action"
+import {
+    AuthPermissionGrantedField,
+    initAuthPermissionGrantedField,
+} from "../../kernel/input/field/action"
+import { initLoginIdField, LoginIdField } from "../../login_id/input/field/action"
+import {
+    ResetTokenDestinationField,
+    initResetTokenDestinationField,
+} from "../../password/reset/token_destination/input/field/action"
+import {
+    initLoadableListAtomUpdater,
+    initPushListAction,
+    initFocusRegisterListAction,
+    LoadableListAtomUpdater,
+    FocusRegisterListAction,
+} from "../../../../common/util/list/action"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../common/util/config/infra"
 
+import { ConvertBoardResult } from "../../../../common/util/board/kernel/data"
 import { RegisterAuthUserAccountError } from "./data"
-import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccount } from "../kernel/data"
+import { AuthPermission } from "../../kernel/data"
+import {
+    ResetTokenDestinationType,
+    resetTokenDestinationTypeVariants,
+} from "../../password/reset/token_destination/kernel/data"
+import { ConnectState, SuccessState } from "../../../../common/util/connect/data"
 
 export interface RegisterAuthUserAccountAction {
-    readonly state: ApplicationState<RegisterAuthUserAccountState>
-    readonly list: ListRegisteredAction<AuthUserAccount>
+    readonly focus: FocusRegisterListAction<AuthUserAccount>
 
-    readonly loginId: LoginIdFieldAction
-    readonly granted: AuthPermissionGrantedFieldAction
-    readonly resetTokenDestination: ResetTokenDestinationFieldAction
-    readonly memo: AuthUserTextFieldAction<"memo">
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<RegisterAuthUserAccountState>
+    readonly list: Atom<LoadState<readonly AuthUserAccount[]>>
+    readonly success: Atom<SuccessState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
 
-    clear(): void
+    readonly loginId: LoginIdField
+    readonly granted: AuthPermissionGrantedField
+    readonly resetTokenDestination: ResetTokenDestinationField
+    readonly memo: AuthUserTextField<"memo">
+
+    reset(): void
     submit(): Promise<RegisterAuthUserAccountState>
 }
 
@@ -65,20 +77,38 @@ export type RegisterAuthUserAccountConfig = Readonly<{
 
 export function initRegisterAuthUserAccountAction(
     material: RegisterAuthUserAccountMaterial,
-): RegisterAuthUserAccountAction {
-    const { state, post } = initApplicationState({ initialState })
+): [RegisterAuthUserAccountAction, LoadableListAtomUpdater<AuthUserAccount>] {
+    const register = initAtom({ initialState })
+    async function registerWithCurrentState(): Promise<RegisterAuthUserAccountState> {
+        const fields = currentFields()
+        if (!fields.valid) {
+            return register.state.currentState()
+        }
+        return registerAuthUserAccount(material, fields.value, register.post)
+    }
 
-    const loginId = initLoginIdFieldAction()
-    const granted = initAuthPermissionGrantedFieldAction()
-    const resetTokenDestination = initResetTokenDestinationFieldAction()
-    const memo = initAuthUserTextFieldAction("memo")
+    const list = initAtom<LoadState<readonly AuthUserAccount[]>>({
+        initialState: loadState_loading(),
+    })
 
-    const convert = (): ConvertBoardResult<AuthUserAccount> => {
+    const grantedOptions = initAtom<LoadState<readonly AuthPermission[]>>({
+        initialState: loadState_loaded(ALL_AUTH_PERMISSIONS),
+    })
+    const resetOptions = initAtom<LoadState<readonly ResetTokenDestinationType[]>>({
+        initialState: loadState_loaded(resetTokenDestinationTypeVariants),
+    })
+
+    const loginId = initLoginIdField()
+    const granted = initAuthPermissionGrantedField(grantedOptions.state)
+    const resetTokenDestination = initResetTokenDestinationField(resetOptions.state)
+    const memo = initAuthUserTextField("memo")
+
+    const currentFields = (): ConvertBoardResult<AuthUserAccount> => {
         const result = {
-            loginId: loginId.validate.check(),
-            granted: granted.input.validate.check(),
-            resetTokenDestination: resetTokenDestination.validate.check(),
-            memo: memo.validate.check(),
+            loginId: loginId[0].validate.currentState(),
+            granted: granted[0].validate.currentState(),
+            resetTokenDestination: resetTokenDestination[0].validate.currentState(),
+            memo: memo[0].validate.currentState(),
         }
         if (
             !result.loginId.valid ||
@@ -99,59 +129,57 @@ export function initRegisterAuthUserAccountAction(
         }
     }
 
-    const { validate, observe, clear } = initRegisterField(
-        [
-            ["loginId", loginId],
-            ["granted", granted.input],
-            ["resetTokenDestination", resetTokenDestination],
-            ["memo", memo],
-        ],
-        convert,
-    )
-
-    granted.setOptions(ALL_AUTH_PERMISSIONS)
-
-    const list = initListRegisteredAction<AuthUserAccount>()
-
-    clear()
-
-    onSuccess((data) => {
-        clear()
-        list.handler.register(data)
-    })
-
-    return {
-        state,
-
-        list: list.action,
-
+    const { validate, observe, reset } = composeRegisterFieldBoard([
         loginId,
-        granted: granted.input,
+        granted,
         resetTokenDestination,
         memo,
+    ])
 
-        validate,
-        observe,
-        clear,
+    const { push } = initPushListAction<AuthUserAccount>(list)
 
-        async submit(): Promise<RegisterAuthUserAccountState> {
-            const fields = convert()
-            if (!fields.valid) {
-                return state.currentState()
-            }
-            return registerUser(material, fields.value, post)
+    const focus = initFocusRegisterListAction(list.state, (entry) => `${entry.loginId}`)
+
+    register.state.subscribe((state) => {
+        if (state.type === "success") {
+            push(state.data)
+            reset()
+        }
+    })
+
+    const success = mapAtom(register.state, (state): SuccessState => {
+        return { isSuccess: state.type === "success" }
+    })
+
+    const connect = mapAtom(register.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
+    })
+
+    return [
+        {
+            focus,
+
+            state: register.state,
+            list: list.state,
+            success,
+            connect,
+            validate,
+            observe,
+
+            loginId: loginId[0],
+            granted: granted[0],
+            resetTokenDestination: resetTokenDestination[0],
+            memo: memo[0],
+
+            reset,
+            submit: registerWithCurrentState,
         },
-    }
-
-    function onSuccess(handler: (data: AuthUserAccount) => void): void {
-        state.subscribe((state) => {
-            switch (state.type) {
-                case "success":
-                    handler(state.data)
-                    break
-            }
-        })
-    }
+        initLoadableListAtomUpdater(list),
+    ]
 }
 
 type RegisterUserEvent =
@@ -160,7 +188,7 @@ type RegisterUserEvent =
     | Readonly<{ type: "success"; data: AuthUserAccount }>
     | Readonly<{ type: "initial" }>
 
-async function registerUser<S>(
+async function registerAuthUserAccount<S>(
     { infra, config }: RegisterAuthUserAccountMaterial,
     fields: AuthUserAccount,
     post: Post<RegisterUserEvent, S>,

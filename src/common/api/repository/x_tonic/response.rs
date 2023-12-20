@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::common::api::response::tonic::ServiceResponder;
+use crate::common::api::response::x_tonic::ServiceResponder;
 
 use crate::common::api::repository::data::RepositoryError;
 

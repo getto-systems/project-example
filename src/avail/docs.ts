@@ -1,4 +1,4 @@
-import { DocsDescription } from "../z_vendor/getto-application/docs/data"
+import { DocsDescription } from "../common/util/docs/data"
 
 export const docs_avail: DocsDescription = {
     title: "アクセスの保証",

@@ -1,9 +1,7 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../../../x_preact/node"
 
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
-
-import { VNodeContent } from "../../../x_preact/vnode"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { mainTitleWithSidebarButton } from "../../../../z_vendor/getto-css/preact/layout/app"
 import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
@@ -18,28 +16,28 @@ import { ToggleSidebarAction } from "../action"
 
 type Props = Readonly<{
     sidebar: ToggleSidebarAction
-    title: VNodeContent
+    title: PreactContent
 }>
-export function MainTitleWithSidebar(props: Props): VNode {
-    const state = useApplicationState(props.sidebar.state)
+export function MainTitleWithSidebar(props: Props): PreactNode {
+    const state = useAtom(props.sidebar.state)
 
     return html`${[content(), error()]}`
 
-    function content(): VNode {
+    function content(): PreactNode {
         return mainTitleWithSidebarButton({
             title: props.title,
             button: sidebarButton(),
         })
     }
 
-    function sidebarButton(): VNode {
+    function sidebarButton(): PreactNode {
         if (isSidebarExpand(state)) {
             return foldButton()
         } else {
             return expandButton()
         }
 
-        function foldButton(): VNode {
+        function foldButton(): PreactNode {
             return html`<a href="#" onClick=${onClick}>${iconHtml(icon_sidebar_fold)}</a>`
 
             function onClick(e: Event) {
@@ -47,7 +45,7 @@ export function MainTitleWithSidebar(props: Props): VNode {
                 props.sidebar.fold()
             }
         }
-        function expandButton(): VNode {
+        function expandButton(): PreactNode {
             return html`<a href="#" onClick=${onClick}>${iconHtml(icon_sidebar_expand)}</a>`
 
             function onClick(e: Event) {
@@ -57,7 +55,7 @@ export function MainTitleWithSidebar(props: Props): VNode {
         }
     }
 
-    function error(): VNode {
+    function error(): PreactNode {
         switch (state.type) {
             case "success":
                 return html``

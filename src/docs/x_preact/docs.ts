@@ -1,4 +1,5 @@
-import { h, VNode } from "preact"
+import { PreactNode } from "../../common/x_preact/node"
+import { h } from "preact"
 import { html } from "htm/preact"
 
 import { useNotifyUnexpectedError } from "../../avail/unexpected_error/notify/x_preact/hooks"
@@ -22,14 +23,14 @@ import { DisplayOutlineBreadcrumbList } from "../../common/outline/load/x_preact
 
 import { DocsResource } from "../resource"
 
-import { DocsDescription } from "../../z_vendor/getto-application/docs/data"
+import { DocsDescription } from "../../common/util/docs/data"
 
 type Props = DocsResource &
     Readonly<{
         title: string
         docs: readonly DocsDescription[]
     }>
-export function Docs(props: Props): VNode {
+export function Docs(props: Props): PreactNode {
     useDocumentTitle(props.title)
     const err = useNotifyUnexpectedError(props)
     if (err) {
@@ -48,7 +49,7 @@ export function Docs(props: Props): VNode {
     })
 }
 
-function content(docs: readonly DocsDescription[]): VNode {
+function content(docs: readonly DocsDescription[]): PreactNode {
     return container(
         docs.map((docs) =>
             box({

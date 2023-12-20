@@ -1,28 +1,26 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../common/util/timer/helper"
 
 import { AuthenticatePasswordAction, initAuthenticatePasswordAction } from "./action"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../common/util/clock/mock"
-import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
+import { mockSingleBoardStore } from "../../../../common/util/board/input/test_helper"
 import {
     mockGetScriptPathShell,
     mockSecureServerURL,
-} from "../../../sign/get_script_path/init/mock"
-import { initMemoryDB } from "../../../../common/util/repository/init/memory"
-import { convertDB } from "../../../../common/util/repository/init/convert"
+} from "../../../sign/get_script_path/detail/mock"
+import { initMemoryDB } from "../../../../common/util/repository/detail/memory"
+import { convertDB } from "../../../../common/util/repository/detail/convert"
 
 import { Clock } from "../../../../common/util/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "./infra"
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../ticket/kernel/infra"
 import { CheckAuthTicketRemote } from "../../../ticket/authenticate/infra"
-import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { SingleBoardStore } from "../../../../common/util/board/input/infra"
 
 import { authTicketRepositoryConverter } from "../../../ticket/kernel/convert"
 import { convertCheckRemote } from "../../../ticket/authenticate/convert"
-
-import { LoadScriptError } from "../../../sign/get_script_path/data"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -46,14 +44,14 @@ test("submit valid login-id and password", async () => {
         }
     })
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
-            store.password.set(VALID_LOGIN.password)
+    const result = observeAtom(action.state)
 
-            return action.submit()
-        }),
-    ).toEqual([
+    store.loginId.set(VALID_LOGIN.loginId)
+    store.password.set(VALID_LOGIN.password)
+
+    await action.submit()
+
+    expect(result()).toEqual([
         { type: "try-to-login", hasTakenLongtime: false },
         {
             type: "try-to-load",
@@ -80,14 +78,14 @@ test("submit valid login-id and password; take long time", async () => {
         }
     })
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
-            store.password.set(VALID_LOGIN.password)
+    const result = observeAtom(action.state)
 
-            return action.submit()
-        }),
-    ).toEqual([
+    store.loginId.set(VALID_LOGIN.loginId)
+    store.password.set(VALID_LOGIN.password)
+
+    await action.submit()
+
+    expect(result()).toEqual([
         { type: "try-to-login", hasTakenLongtime: false },
         { type: "try-to-login", hasTakenLongtime: true },
         {
@@ -106,19 +104,19 @@ test("submit valid login-id and password; take long time", async () => {
 test("submit without fields", async () => {
     const { action } = standard()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.submit()
-        }),
-    ).toEqual([])
+    const result = observeAtom(action.state)
+
+    await action.submit()
+
+    expect(result()).toEqual([])
 })
 
-test("clear", () => {
+test("reset", () => {
     const { action, store } = standard()
 
     store.loginId.set(VALID_LOGIN.loginId)
     store.password.set(VALID_LOGIN.password)
-    action.clear()
+    action.reset()
 
     expect(store.loginId.get()).toEqual("")
     expect(store.password.get()).toEqual("")
@@ -127,13 +125,13 @@ test("clear", () => {
 test("load error", async () => {
     const { action } = standard()
 
-    const err: LoadScriptError = { type: "infra-error", err: "load error" }
+    const result = observeAtom(action.state)
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.loadError(err)
-        }),
-    ).toEqual([{ type: "load-error", err }])
+    await action.loadError({ type: "infra-error", err: "load error" })
+
+    expect(result()).toEqual([
+        { type: "load-error", err: { type: "infra-error", err: "load error" } },
+    ])
 })
 
 function standard() {
@@ -166,8 +164,8 @@ function initResource(
 ): Readonly<{
     action: AuthenticatePasswordAction
     store: Readonly<{
-        loginId: BoardValueStore
-        password: BoardValueStore
+        loginId: SingleBoardStore
+        password: SingleBoardStore
     }>
 }> {
     const currentURL = new URL("https://example.com/index.html")
@@ -193,8 +191,8 @@ function initResource(
     })
 
     const store = {
-        loginId: mockBoardValueStore(action.loginId.input),
-        password: mockBoardValueStore(action.password.input),
+        loginId: mockSingleBoardStore(action.loginId.input),
+        password: mockSingleBoardStore(action.password.input),
     }
 
     return { action, store }

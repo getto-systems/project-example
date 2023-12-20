@@ -1,4 +1,5 @@
-import { h, VNode } from "preact"
+import { PreactNode } from "../../../common/x_preact/node"
+import { h } from "preact"
 
 import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../common/x_preact/hooks"
@@ -21,7 +22,7 @@ import { Dashboard } from "../../../x_content/x_preact/dashboard"
 
 import { BaseResource } from "../base/resource"
 
-export function DashboardPage(props: BaseResource): VNode {
+export function DashboardPage(props: BaseResource): PreactNode {
     const pageTitle = "ホーム"
 
     useDocumentTitle(pageTitle)

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "preact/hooks"
 
-import { VNodeKey } from "../../../common"
+import { PreactKey } from "../../../common"
 
 // rows をページの高さによって分割する
 // design/print の report で出力される構造で、
 // rows が report のコンテンツの table - tbody - tr として整形される場合に使用できる
 export function useReportRowsComposition<R>(
     rows: readonly R[],
-    content: ReportRowsCompositionContent
+    content: ReportRowsCompositionContent,
 ): ReportRowsComposition<R> {
     const [data, setData] = useState(initialReportRowsComposition(rows))
     useEffect(() => {
@@ -35,12 +35,12 @@ function initialReportRowsComposition<R>(rows: readonly R[]): ReportRowsComposit
 
 function composeReportRows<R>(
     { rowKey, root }: ReportRowsCompositionContent,
-    data: ReportRowsComposition<R>
+    data: ReportRowsComposition<R>,
 ): NextReportRowsComposition<R> {
     type ComposeInfo = Readonly<{ changeKeyCount: number; currentKey: CurrentKey }>
     type CurrentKey =
         | Readonly<{ type: "initial" }>
-        | Readonly<{ type: "focused"; key: VNodeKey }>
+        | Readonly<{ type: "focused"; key: PreactKey }>
         | Readonly<{ type: "notFound" }>
 
     type ContentHeight = Readonly<{ found: false }> | Readonly<{ found: true; height: number }>
@@ -150,7 +150,7 @@ type NextReportRowsComposition<R> =
 
 function nextComposition<R>(
     data: ReportRowsComposition<R>,
-    splitIndex: number
+    splitIndex: number,
 ): NextReportRowsComposition<R> {
     return {
         hasNext: true,

@@ -1,7 +1,4 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 import { AuthenticateWithTokenAction } from "../../ticket/authenticate/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { RequestResetTokenAction } from "../../user/password/reset/request_token/action"
@@ -12,7 +9,7 @@ import { SignViewType } from "../router/data"
 import { SignViewTypeDetecter } from "../router/infra"
 
 export interface SignAction {
-    readonly state: ApplicationState<SignActionState>
+    readonly state: Atom<SignActionState>
 }
 
 export interface SignViewFactory {
@@ -41,7 +38,7 @@ export type SignActionShell = Readonly<{
 }>
 
 export function initSignAction(shell: SignActionShell, factory: SignViewFactory): SignAction {
-    const { state, post } = initApplicationState({ initialState, ignite })
+    const { state, post } = initAtom({ initialState, ignite })
     return { state }
 
     async function ignite(): Promise<SignActionState> {

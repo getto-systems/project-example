@@ -1,16 +1,16 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../../../../../common/x_preact/node"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidateBoardMessage } from "../../../../../common/x_preact/design/form"
 
-import { VNodeContent } from "../../../../../common/x_preact/vnode"
-
-import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
-import { AuthUserMemoField, AuthPermissionGrantedField } from "../../input/field/x_preact/input"
+import { AuthUserLoginIdStaticField } from "../../../login_id/input/field/x_preact/input"
+import { AuthPermissionGrantedField } from "../../../kernel/input/field/x_preact/input"
+import { AuthUserMemoField } from "../../input/field/x_preact/input"
 import { EditButton } from "../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
 import { ResetButton } from "../../../../../common/x_preact/button/reset_button"
@@ -19,24 +19,21 @@ import { ChangeButton } from "../../../../../common/x_preact/button/change_butto
 
 import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 
+import { Atom } from "../../../../../z_vendor/getto-atom/atom"
+import { LoadState } from "../../../../../common/util/load/data"
 import { ModifyAuthUserAccountAction } from "../action"
-import { ApplicationState } from "../../../../../z_vendor/getto-application/action/action"
-import { FocusState } from "../../../../../common/util/list/action"
 
 import { ModifyAuthUserAccountError } from "../data"
 import { AuthUserAccount } from "../../kernel/data"
 
 type Props = Readonly<{
-    focus: ApplicationState<FocusState<AuthUserAccount>>
+    focus: Atom<LoadState<AuthUserAccount>>
     modify: ModifyAuthUserAccountAction
 }>
-export function ModifyAuthUserAccount(props: Props): VNode {
-    const focusState = useApplicationState(props.focus)
-    switch (focusState.type) {
-        case "close":
-        case "not-found":
-        case "data-remove":
-            return html``
+export function ModifyAuthUserAccount(props: Props): PreactNode {
+    const focusState = useAtom(props.focus)
+    if (!focusState.isLoad) {
+        return html``
     }
 
     const edit = { data: focusState.data, editable: props.modify.editable }
@@ -45,28 +42,28 @@ export function ModifyAuthUserAccount(props: Props): VNode {
         form: true,
         title: "基本情報",
         body: [
-            h(StaticLoginIdField, { data: edit.data }),
+            h(AuthUserLoginIdStaticField, { data: edit.data }),
             h(AuthUserMemoField, { edit, field: props.modify.memo }),
             h(AuthPermissionGrantedField, { edit, field: props.modify.granted }),
         ],
         footer: h(Footer, {}),
     })
 
-    function Footer(_props: unknown): VNode {
-        const editableState = useApplicationState(props.modify.editable.state)
+    function Footer(_props: unknown): PreactNode {
+        const editableState = useAtom(props.modify.editable.state)
 
         if (!editableState.isEditable) {
             return h(Edit, {})
         }
         return html`${[
             buttons({ left: h(Submit, {}), right: h(Reset, {}) }),
-            h(ValidationMessage, props.modify.validate),
+            h(ValidateBoardMessage, { state: props.modify.validate }),
             h(Message, {}),
             buttons({ right: h(Close, {}) }),
         ]}`
 
-        function Edit(_props: unknown): VNode {
-            const modifyState = useApplicationState(props.modify.state)
+        function Edit(_props: unknown): PreactNode {
+            const modifyState = useAtom(props.modify.state)
 
             if (modifyState.type === "success") {
                 return h(EditSuccessButton, { onClick })
@@ -80,15 +77,11 @@ export function ModifyAuthUserAccount(props: Props): VNode {
             }
         }
 
-        function Submit(_props: unknown): VNode {
-            const modifyState = useApplicationState(props.modify.state)
-            const validateState = useApplicationState(props.modify.validate.state)
-            const observeState = useApplicationState(props.modify.observe.state)
-
+        function Submit(_props: unknown): PreactNode {
             return h(ChangeButton, {
-                isConnecting: modifyState.type === "try",
-                validateState,
-                observeState,
+                connect: props.modify.connect,
+                validate: props.modify.validate,
+                observe: props.modify.observe,
                 onClick,
             })
 
@@ -98,10 +91,11 @@ export function ModifyAuthUserAccount(props: Props): VNode {
             }
         }
 
-        function Reset(): VNode {
-            const observeState = useApplicationState(props.modify.observe.state)
-
-            return h(ResetButton, { observeState, onClick })
+        function Reset(): PreactNode {
+            return h(ResetButton, {
+                observe: props.modify.observe,
+                onClick,
+            })
 
             function onClick(e: Event) {
                 e.preventDefault()
@@ -109,7 +103,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
             }
         }
 
-        function Close(_props: unknown): VNode {
+        function Close(_props: unknown): PreactNode {
             return h(CloseButton, { onClick })
 
             function onClick(e: Event) {
@@ -118,8 +112,8 @@ export function ModifyAuthUserAccount(props: Props): VNode {
             }
         }
 
-        function Message(_props: unknown): VNode {
-            const modifyState = useApplicationState(props.modify.state)
+        function Message(_props: unknown): PreactNode {
+            const modifyState = useAtom(props.modify.state)
 
             switch (modifyState.type) {
                 case "initial":
@@ -139,7 +133,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
     }
 }
 
-function modifyError(err: ModifyAuthUserAccountError): readonly VNodeContent[] {
+function modifyError(err: ModifyAuthUserAccountError): readonly PreactContent[] {
     switch (err.type) {
         case "conflict":
             return ["他で変更がありました", "一旦リロードしてやり直してください"]

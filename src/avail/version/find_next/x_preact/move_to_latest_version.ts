@@ -1,8 +1,9 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { useErrorBoundary, useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../../common/x_preact/node"
 
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
@@ -19,8 +20,8 @@ import { CheckDeployExistsError } from "../../find_next/data"
 type Props = Readonly<{
     findNext: FindNextVersionAction
 }>
-export function MoveToLatestVersion(props: Props): VNode {
-    const state = useApplicationState(props.findNext.state)
+export function MoveToLatestVersion(props: Props): PreactNode {
+    const state = useAtom(props.findNext.state)
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
         console.log(err)

@@ -5,18 +5,18 @@ import { ProfilePage } from "../page"
 
 import { newWorkerForegroundOutsideFeature } from "../../../../../x_outside_feature/worker"
 
-import { newRequestResetTokenConfig } from "../../../../../auth/user/password/reset/request_token/init/config"
-import { newChangePasswordConfig } from "../../../../../auth/user/password/change/init/config"
+import { newRequestResetTokenConfig } from "../../../../../auth/user/password/reset/request_token/detail/config"
+import { newChangePasswordConfig } from "../../../../../auth/user/password/change/detail/config"
 
-import { newBaseResource } from "../../../base/init/resource"
+import { newBaseResource } from "../../../base/detail/resource"
 import {
     newRequestResetTokenProxy,
     RequestResetTokenProxy,
-} from "../../../../../auth/user/password/reset/request_token/init/worker/foreground"
+} from "../../../../../auth/user/password/reset/request_token/detail/worker/foreground"
 import {
     ChangePasswordProxy,
     newChangePasswordProxy,
-} from "../../../../../auth/user/password/change/init/worker/foreground"
+} from "../../../../../auth/user/password/change/detail/worker/foreground"
 
 import { initRequestResetTokenAction } from "../../../../../auth/user/password/reset/request_token/action"
 import { initChangePasswordAction } from "../../../../../auth/user/password/change/action"

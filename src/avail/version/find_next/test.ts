@@ -1,9 +1,9 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../z_vendor/getto-atom/test_helper"
 import { standardApplicationTargetPath } from "./test_helper"
 
 import { ticker } from "../../../common/util/timer/helper"
-import { mockFindNextVersionShell } from "./init/mock"
+import { mockFindNextVersionShell } from "./detail/mock"
 
 import { applicationPath } from "./helper"
 
@@ -14,11 +14,11 @@ import { FindNextVersionAction, initFindNextVersionAction } from "../find_next/a
 test("up to date", async () => {
     const { action } = standard()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: true,
@@ -37,11 +37,11 @@ test("up to date", async () => {
 test("up to date; take longtime", async () => {
     const { action } = takeLongtime()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         { type: "take-longtime" },
         {
             type: "success",
@@ -58,11 +58,11 @@ test("up to date; take longtime", async () => {
 test("found next major version", async () => {
     const { action } = found(["/2.0.0-ui/index.html"])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -78,11 +78,11 @@ test("found next major version", async () => {
 test("found next minor version", async () => {
     const { action } = found(["/1.1.0-ui/index.html"])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -98,11 +98,11 @@ test("found next minor version", async () => {
 test("found next patch version", async () => {
     const { action } = found(["/1.0.1-ui/index.html"])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -118,11 +118,11 @@ test("found next patch version", async () => {
 test("found next minor version; recursive", async () => {
     const { action } = found(["/1.1.0-ui/index.html", "/1.2.0-ui/index.html"])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -138,11 +138,11 @@ test("found next minor version; recursive", async () => {
 test("found next patch version; recursive", async () => {
     const { action } = found(["/1.0.1-ui/index.html", "/1.0.2-ui/index.html"])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -158,11 +158,11 @@ test("found next patch version; recursive", async () => {
 test("found next patch version; complex", async () => {
     const { action } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html"])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -182,11 +182,11 @@ test("found next patch version; complex skipped", async () => {
         "/1.1.3-ui/index.html",
     ])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -202,11 +202,11 @@ test("found next patch version; complex skipped", async () => {
 test("found next minor version; complex current version", async () => {
     const { action } = foundComplex(["/1.1.0-ui/index.html"])
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: false,
@@ -222,11 +222,11 @@ test("found next minor version; complex current version", async () => {
 test("invalid version url", async () => {
     const { action } = invalidVersion()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: true,
@@ -252,11 +252,11 @@ test("invalid ApplicationTargetPath", () => {
 test("specify target", async () => {
     const { action } = specifyTarget()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
             upToDate: true,

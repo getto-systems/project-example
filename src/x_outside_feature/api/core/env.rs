@@ -1,5 +1,6 @@
 use std::env::var;
 
+#[derive(Debug)]
 pub struct CoreEnv {
     pub log_level: String,
     pub port: String,
@@ -10,7 +11,7 @@ pub struct CoreEnv {
 }
 
 impl CoreEnv {
-    pub fn new() -> Self {
+    pub fn load() -> Self {
         Self {
             log_level: load("CORE_LOG_LEVEL"),
             port: load("PORT"),

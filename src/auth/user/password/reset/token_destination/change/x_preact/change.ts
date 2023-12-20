@@ -1,7 +1,8 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../../../../../../../common/x_preact/node"
 
-import { useApplicationState } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import {
     buttons,
@@ -9,40 +10,34 @@ import {
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
 
-import { VNodeContent } from "../../../../../../../common/x_preact/vnode"
-
 import {
     takeLongtimeField,
-    ValidationMessage,
+    ValidateBoardMessage,
 } from "../../../../../../../common/x_preact/design/form"
+import { remoteCommonErrorReason } from "../../../../../../../common/util/remote/x_error/reason"
 
-import { ResetTokenDestinationField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../../../common/x_preact/button/edit_success_button"
 import { ResetButton } from "../../../../../../../common/x_preact/button/reset_button"
 import { ChangeButton } from "../../../../../../../common/x_preact/button/change_button"
 import { CloseButton } from "../../../../../../../common/x_preact/button/close_button"
+import { ResetTokenDestinationField } from "../../input/field/x_preact/input"
 
-import { remoteCommonErrorReason } from "../../../../../../../common/util/remote/x_error/reason"
-
+import { Atom } from "../../../../../../../z_vendor/getto-atom/atom"
+import { LoadState } from "../../../../../../../common/util/load/data"
 import { ChangeResetTokenDestinationAction } from "../action"
-import { ApplicationState } from "../../../../../../../z_vendor/getto-application/action/action"
-import { FocusState } from "../../../../../../../common/util/list/action"
 
 import { ChangeResetTokenDestinationError } from "../data"
 import { AuthUserAccount } from "../../../../../account/kernel/data"
 
 type Props = Readonly<{
-    focus: ApplicationState<FocusState<AuthUserAccount>>
+    focus: Atom<LoadState<AuthUserAccount>>
     change: ChangeResetTokenDestinationAction
 }>
-export function ChangeResetTokenDestination(props: Props): VNode {
-    const focusState = useApplicationState(props.focus)
-    switch (focusState.type) {
-        case "close":
-        case "not-found":
-        case "data-remove":
-            return html``
+export function ChangeResetTokenDestination(props: Props): PreactNode {
+    const focusState = useAtom(props.focus)
+    if (!focusState.isLoad) {
+        return html``
     }
 
     const edit = { data: focusState.data, editable: props.change.editable }
@@ -54,21 +49,21 @@ export function ChangeResetTokenDestination(props: Props): VNode {
         footer: h(Footer, {}),
     })
 
-    function Footer(_props: unknown): VNode {
-        const editableState = useApplicationState(props.change.editable.state)
+    function Footer(_props: unknown): PreactNode {
+        const editableState = useAtom(props.change.editable.state)
 
         if (!editableState.isEditable) {
             return h(Edit, {})
         }
         return html`${[
             buttons({ left: h(Submit, {}), right: h(Reset, {}) }),
-            h(ValidationMessage, props.change.validate),
+            h(ValidateBoardMessage, { state: props.change.validate }),
             h(Message, {}),
             buttons({ right: h(Close, {}) }),
         ]}`
 
-        function Edit(_props: unknown): VNode {
-            const changeState = useApplicationState(props.change.state)
+        function Edit(_props: unknown): PreactNode {
+            const changeState = useAtom(props.change.state)
 
             if (changeState.type === "success") {
                 return h(EditSuccessButton, { onClick })
@@ -82,15 +77,11 @@ export function ChangeResetTokenDestination(props: Props): VNode {
             }
         }
 
-        function Submit(_props: unknown): VNode {
-            const changeState = useApplicationState(props.change.state)
-            const validateState = useApplicationState(props.change.validate.state)
-            const observeState = useApplicationState(props.change.observe.state)
-
+        function Submit(_props: unknown): PreactNode {
             return h(ChangeButton, {
-                isConnecting: changeState.type === "try",
-                validateState,
-                observeState,
+                connect: props.change.connect,
+                validate: props.change.validate,
+                observe: props.change.observe,
                 onClick,
             })
 
@@ -100,10 +91,11 @@ export function ChangeResetTokenDestination(props: Props): VNode {
             }
         }
 
-        function Reset(_props: unknown): VNode {
-            const observeState = useApplicationState(props.change.observe.state)
-
-            return h(ResetButton, { observeState, onClick })
+        function Reset(_props: unknown): PreactNode {
+            return h(ResetButton, {
+                observe: props.change.observe,
+                onClick,
+            })
 
             function onClick(e: Event) {
                 e.preventDefault()
@@ -111,7 +103,7 @@ export function ChangeResetTokenDestination(props: Props): VNode {
             }
         }
 
-        function Close(_props: unknown): VNode {
+        function Close(_props: unknown): PreactNode {
             return h(CloseButton, { onClick })
 
             function onClick(e: Event) {
@@ -120,8 +112,8 @@ export function ChangeResetTokenDestination(props: Props): VNode {
             }
         }
 
-        function Message(_props: unknown): VNode {
-            const changeState = useApplicationState(props.change.state)
+        function Message(_props: unknown): PreactNode {
+            const changeState = useAtom(props.change.state)
 
             switch (changeState.type) {
                 case "initial":
@@ -141,7 +133,7 @@ export function ChangeResetTokenDestination(props: Props): VNode {
     }
 }
 
-function changeError(err: ChangeResetTokenDestinationError): readonly VNodeContent[] {
+function changeError(err: ChangeResetTokenDestinationError): readonly PreactContent[] {
     switch (err.type) {
         case "conflict":
             return ["他で変更がありました", "一旦リロードしてやり直してください"]

@@ -1,60 +1,46 @@
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
-use lazy_static::lazy_static;
 use tonic::{service::interceptor, transport::Server, Request};
 
-use example_api::x_outside_feature::auth::{env::AuthEnv, feature::AuthAppFeature};
+use example_api::{
+    auth::x_tonic::route::AuthServer,
+    x_outside_feature::auth::{env::AuthEnv, feature::AuthAppFeature},
+};
 
-lazy_static! {
-    static ref ENV: AuthEnv = AuthEnv::new();
-}
+static ENV: OnceLock<AuthEnv> = OnceLock::new();
 
 #[tokio::main]
 async fn main() {
-    let feature: Arc<AuthAppFeature> = Arc::new(AuthAppFeature::new(&ENV));
+    ENV.set(AuthEnv::load()).unwrap();
 
-    let server = route::Server::new();
+    let feature: Arc<AuthAppFeature> = Arc::new(AuthAppFeature::new(&ENV.get().unwrap()).await);
+
+    let server = AuthServer::default();
 
     Server::builder()
         .layer(interceptor(move |mut request: Request<()>| {
             request.extensions_mut().insert(Arc::clone(&feature));
             Ok(request)
         }))
-        .add_service(server.auth.ticket.logout())
-        .add_service(server.auth.ticket.authenticate_with_token())
-        .add_service(server.auth.ticket.clarify_authorize_token())
-        .add_service(server.auth.user.login_id.overwrite())
-        .add_service(server.auth.user.password.authenticate())
-        .add_service(server.auth.user.password.change())
-        .add_service(server.auth.user.password.overwrite())
-        .add_service(server.auth.user.password.reset.request_token())
-        .add_service(server.auth.user.password.reset.reset())
-        .add_service(server.auth.user.password.reset.token_destination.change())
-        .add_service(server.auth.user.account.search())
-        .add_service(server.auth.user.account.modify())
-        .add_service(server.auth.user.account.register())
-        .add_service(server.auth.user.account.unregister())
+        .add_service(server.ticket.logout.server())
+        .add_service(server.ticket.authenticate_with_token.server())
+        .add_service(server.ticket.authorize.server())
+        .add_service(server.user.login_id.overwrite.server())
+        .add_service(server.user.password.authenticate.server())
+        .add_service(server.user.password.change.server())
+        .add_service(server.user.password.overwrite.server())
+        .add_service(server.user.password.reset.request_token.server())
+        .add_service(server.user.password.reset.reset.server())
+        .add_service(server.user.password.reset.token_destination.change.server())
+        .add_service(server.user.account.search())
+        .add_service(server.user.account.modify.server())
+        .add_service(server.user.account.register.server())
+        .add_service(server.user.account.unregister.server())
         .serve(
-            format!("0.0.0.0:{}", &ENV.port)
+            format!("0.0.0.0:{}", &ENV.get().unwrap().port)
                 .parse()
                 .expect("failed to parse socket addr"),
         )
         .await
         .expect("failed to start grpc server")
-}
-
-mod route {
-    use example_api::auth::x_tonic::route::AuthServer;
-
-    pub struct Server {
-        pub auth: AuthServer,
-    }
-
-    impl Server {
-        pub const fn new() -> Self {
-            Self {
-                auth: AuthServer::new(),
-            }
-        }
-    }
 }

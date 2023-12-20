@@ -1,33 +1,32 @@
 import { test, expect } from "vitest"
-import {
-    observeApplicationState,
-    observeApplicationStateTuple2,
-} from "../../../../z_vendor/getto-application/action/test_helper"
+import { observe2Atom, observeAtom } from "../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../common/util/timer/helper"
 
-import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
-import { mockSearchAuthUserAccountShell } from "./init/mock"
+import {
+    mockMultipleBoardStore,
+    mockSingleBoardStore,
+} from "../../../../common/util/board/input/test_helper"
+import { mockSearchAuthUserAccountShell } from "./detail/mock"
+
+import { readSearchAuthUserAccountSortKey } from "./detail/query"
+import { restoreLoginId } from "../../login_id/kernel/convert"
+import { restoreAuthUserField } from "../kernel/convert"
 
 import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./action"
 
-import { readSearchAuthUserAccountSortKey } from "./convert"
-import { restoreLoginId } from "../../login_id/input/convert"
-import { restoreAuthUserField } from "../kernel/convert"
-
-import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { MultipleBoardStore, SingleBoardStore } from "../../../../common/util/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
 
 import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountRemoteResponse } from "./data"
-import { AuthUserAccount } from "../kernel/data"
 
 test("initial load", async () => {
     const { search } = standard()
 
-    expect(
-        await observeApplicationState(search.state, async () => {
-            return search.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(search.state)
+
+    await search.state.ignitionState
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "success", response: standard_response },
     ])
@@ -38,12 +37,14 @@ test("search", async () => {
 
     await search.state.ignitionState
 
-    expect(
-        await observeApplicationState(search.state, async () => {
-            store.loginId.set("MY-LOGIN-ID")
-            return search.search()
-        }),
-    ).toEqual([
+    const result = observeAtom(search.state)
+
+    store.loginId.set("MY-LOGIN-ID")
+    store.granted.set(["auth-user"])
+
+    await search.search()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "success", response: standard_response },
     ])
@@ -54,13 +55,28 @@ test("search; take longtime", async () => {
 
     await search.state.ignitionState
 
-    expect(
-        await observeApplicationState(search.state, async () => {
-            return search.search()
-        }),
-    ).toEqual([
+    const result = observeAtom(search.state)
+
+    await search.search()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
+        { type: "success", response: standard_response },
+    ])
+})
+
+test("load", async () => {
+    const { search } = standard()
+
+    await search.state.ignitionState
+
+    const result = observeAtom(search.state)
+
+    await search.load()
+
+    expect(result()).toEqual([
+        { type: "try", hasTakenLongtime: false },
         { type: "success", response: standard_response },
     ])
 })
@@ -70,22 +86,35 @@ test("sort", async () => {
 
     await search.state.ignitionState
 
-    expect(
-        await observeApplicationState(search.state, async () => {
-            return search.sort("loginId")
-        }),
-    ).toEqual([
-        { type: "try", hasTakenLongtime: false },
-        { type: "success", response: standard_response },
+    const result = observe2Atom(search.state, search.sortKey)
+
+    await search.sort("loginId")
+
+    expect(result()).toEqual([
+        [
+            { type: "success", response: standard_response },
+            { key: "loginId", order: "reverse" },
+        ],
+        [
+            { type: "try", hasTakenLongtime: false },
+            { key: "loginId", order: "reverse" },
+        ],
+        [
+            { type: "success", response: standard_response },
+            { key: "loginId", order: "normal" },
+        ],
+        [
+            { type: "success", response: standard_response },
+            { key: "loginId", order: "normal" },
+        ],
     ])
-    expect(search.currentSort()).toEqual({ key: "loginId", order: "normal" })
 })
 
-test("clear", () => {
+test("reset", () => {
     const { search, store } = standard()
 
     store.loginId.set("MY-LOGIN-ID")
-    search.clear()
+    search.reset()
 
     expect(store.loginId.get()).toEqual("")
 })
@@ -100,54 +129,11 @@ test("read sort key", () => {
     })
 })
 
-test("detected", async () => {
-    const { search } = detected()
-
-    expect(
-        await observeApplicationStateTuple2(
-            [search.list.focus.state, search.list.scroll.state],
-            async () => {
-                await search.list.state.ignitionState
-                return search.list.focus.state.currentState()
-            },
-        ),
-    ).toEqual([[{ type: "focus-change", data: standard_response.list[0] }], [{ type: "detect" }]])
-})
-
-test("focus / close", async () => {
-    const { search } = standard()
-
-    expect(
-        await observeApplicationState(search.list.focus.state, async () => {
-            await search.list.state.ignitionState
-            const another: AuthUserAccount = {
-                loginId: restoreLoginId("another-1"),
-                granted: [],
-                resetTokenDestination: { type: "none" },
-                memo: restoreAuthUserField("memo"),
-            }
-
-            search.list.focus.change(standard_response.list[0], { y: 0 })
-            search.list.focus.close({ y: 0 })
-            search.list.focus.change(another, { y: 0 })
-
-            return search.list.focus.state.currentState()
-        }),
-    ).toEqual([
-        { type: "focus-change", data: standard_response.list[0] },
-        { type: "close", isFocused: true, data: standard_response.list[0] },
-        { type: "not-found" },
-    ])
-})
-
 function standard() {
     return initResource(standard_url(), standard_search())
 }
 function takeLongtime() {
     return initResource(standard_url(), takeLongtime_search())
-}
-function detected() {
-    return initResource(detected_url(), standard_search())
 }
 
 function initResource(
@@ -156,12 +142,13 @@ function initResource(
 ): Readonly<{
     search: SearchAuthUserAccountAction
     store: Readonly<{
-        loginId: BoardValueStore
+        loginId: SingleBoardStore
+        granted: MultipleBoardStore
     }>
 }> {
     const urlStore = { current: currentURL }
 
-    const search = initSearchAuthUserAccountAction({
+    const [search, _updater] = initSearchAuthUserAccountAction({
         infra: {
             searchRemote,
         },
@@ -174,17 +161,15 @@ function initResource(
     })
 
     const store = {
-        loginId: mockBoardValueStore(search.loginId.input),
+        loginId: mockSingleBoardStore(search.loginId.input),
+        granted: mockMultipleBoardStore(search.granted.input),
     }
 
     return { search, store }
 }
 
 function standard_url(): URL {
-    return new URL("https://example.com/index.html")
-}
-function detected_url(): URL {
-    return new URL("https://example.com/index.html?id=user-1")
+    return new URL("https://example.com/index.html?filter-granted=auth-user")
 }
 
 function standard_search(): SearchAuthUserAccountRemote {

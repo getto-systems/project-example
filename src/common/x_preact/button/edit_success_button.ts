@@ -1,18 +1,18 @@
 import { html } from "htm/preact"
-import { VNode } from "preact"
-
-import { VNodeContent } from "../vnode"
+import { PreactContent, PreactNode } from "../node"
 
 import { button_edit } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_ok } from "../../../x_content/icon"
 import { iconHtml } from "../../util/icon/x_preact/icon"
 
-type Props = Readonly<{
-    label?: VNodeContent
+export function EditSuccessButton({
+    label,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     onClick: { (e: Event): void }
-}>
-export function EditSuccessButton({ label, onClick }: Props): VNode {
+}>): PreactNode {
     return button_edit({
         state: "normal",
         label: html`${label || "変更"} ${iconHtml(icon_ok)}`,

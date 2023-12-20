@@ -1,13 +1,12 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../../../../../common/x_preact/node"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../common/x_preact/design/form"
-
-import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { DeleteConfirmButton } from "../../../../../common/x_preact/button/delete_confirm_button"
 import { DeleteButton } from "../../../../../common/x_preact/button/delete_button"
@@ -22,8 +21,8 @@ import { UnregisterAuthUserAccountError } from "../data"
 type Props = Readonly<{
     unregister: UnregisterAuthUserAccountAction
 }>
-export function UnregisterAuthUserAccount(props: Props): VNode {
-    const editableState = useApplicationState(props.unregister.editable.state)
+export function UnregisterAuthUserAccount(props: Props): PreactNode {
+    const editableState = useAtom(props.unregister.editable.state)
 
     return box({
         form: true,
@@ -51,7 +50,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
               }),
     })
 
-    function DeleteConfirm(_props: unknown): VNode {
+    function DeleteConfirm(_props: unknown): PreactNode {
         return h(DeleteConfirmButton, { onClick })
 
         function onClick(e: Event) {
@@ -60,11 +59,9 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function Submit(_props: unknown): VNode {
-        const unregisterState = useApplicationState(props.unregister.state)
-
+    function Submit(_props: unknown): PreactNode {
         return h(DeleteButton, {
-            isConnecting: unregisterState.type === "try",
+            connect: props.unregister.connect,
             onClick,
         })
 
@@ -74,7 +71,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function Close(_props: unknown): VNode {
+    function Close(_props: unknown): PreactNode {
         return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
@@ -83,8 +80,8 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function Message(_props: unknown): VNode {
-        const unregisterState = useApplicationState(props.unregister.state)
+    function Message(_props: unknown): PreactNode {
+        const unregisterState = useAtom(props.unregister.state)
 
         switch (unregisterState.type) {
             case "initial":
@@ -103,7 +100,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
     }
 }
 
-function modifyError(err: UnregisterAuthUserAccountError): readonly VNodeContent[] {
+function modifyError(err: UnregisterAuthUserAccountError): readonly PreactContent[] {
     switch (err.type) {
         case "invalid":
             return ["データが正しくありません", "一旦リロードしてやり直してください"]

@@ -1,26 +1,25 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../common"
+import { PreactContent, PreactNode } from "../common"
 
-export function small(content: VNodeContent): VNode {
+export function small(content: PreactContent): PreactNode {
     return html`<small>${content}</small>`
 }
-export function big(content: VNodeContent): VNode {
+export function big(content: PreactContent): PreactNode {
     return html`<big>${content}</big>`
 }
 
 type Size = "small" | "medium" | "large"
 
-export function v_small(): VNode {
+export function v_small(): PreactNode {
     return vertical("small")
 }
-export function v_medium(): VNode {
+export function v_medium(): PreactNode {
     return vertical("medium")
 }
-export function v_large(): VNode {
+export function v_large(): PreactNode {
     return vertical("large")
 }
-function vertical(size: Size): VNode {
+function vertical(size: Size): PreactNode {
     return html`<div class="vertical vertical_${size}"></div>`
 }

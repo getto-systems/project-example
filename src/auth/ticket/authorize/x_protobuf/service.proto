@@ -2,13 +2,16 @@ syntax = "proto3";
 
 package auth.ticket.authorize.service;
 
-service ClarifyAuthorizeTokenPb {
-    rpc Clarify (ClarifyAuthorizeTokenRequestPb) returns (ClarifyAuthorizeTokenResponsePb);
+import "auth/ticket/x_protobuf/service.proto";
+
+service AuthorizePb {
+    rpc Authorize (AuthorizeRequestPb) returns (AuthorizeResponsePb);
 }
-message ClarifyAuthorizeTokenRequestPb {
+message AuthorizeRequestPb {
     bool require_nothing = 1;
     repeated string require_permissions = 2;
 }
-message ClarifyAuthorizeTokenResponsePb {
+message AuthorizeResponsePb {
     string user_id = 1;
+    auth.ticket.service.AuthPermissionGrantedPb granted = 2;
 }

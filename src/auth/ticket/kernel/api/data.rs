@@ -3,18 +3,35 @@ use std::collections::{HashMap, HashSet};
 use crate::x_content::{metadata::METADATA_AUTHORIZE_TOKEN, permission::AuthPermission};
 
 use crate::{
-    auth::{kernel::data::ExpireDateTime, user::kernel::data::AuthUserId},
-    common::api::request::data::MetadataError,
-    common::proxy::data::ProxyMetadataExtract,
+    auth::{
+        kernel::data::ExpireDateTime,
+        user::kernel::data::{AuthUser, AuthUserId},
+    },
+    common::{api::request::data::MetadataError, proxy::data::ProxyMetadataExtract},
 };
 
-#[derive(Clone)]
+#[derive(Debug, PartialEq)]
+pub struct AuthenticateSuccess(AuthUser);
+
+impl AuthenticateSuccess {
+    pub fn new(user: AuthUser) -> Self {
+        Self(user)
+    }
+}
+
+impl std::fmt::Display for AuthenticateSuccess {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "authenticate success; {}", self.0)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct AuthTicket {
     pub ticket_id: AuthTicketId,
     pub attrs: AuthTicketAttrs,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AuthTicketAttrs {
     pub user_id: AuthUserId,
     pub granted: AuthPermissionGranted,
@@ -45,7 +62,16 @@ impl std::fmt::Display for AuthTicketAttrs {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+impl Into<AuthTicketAttrs> for AuthenticateSuccess {
+    fn into(self) -> AuthTicketAttrs {
+        AuthTicketAttrs {
+            user_id: self.0.user_id,
+            granted: self.0.granted,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AuthTicketId(String);
 
 impl AuthTicketId {
@@ -64,7 +90,7 @@ impl std::fmt::Display for AuthTicketId {
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct AuthPermissionGranted(HashSet<AuthPermission>);
 
 impl AuthPermissionGranted {
@@ -115,12 +141,6 @@ impl AuthPermissionGranted {
     }
 }
 
-impl Default for AuthPermissionGranted {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
-
 impl std::fmt::Display for AuthPermissionGranted {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
@@ -152,10 +172,26 @@ impl std::fmt::Display for ValidateAuthPermissionGrantedError {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum AuthPermissionRequired {
     Nothing,
     HasSome(HashSet<AuthPermission>),
+}
+
+impl AuthPermissionRequired {
+    pub fn union(self, other: Self) -> Self {
+        match (self, other) {
+            (Self::Nothing, Self::Nothing) => Self::Nothing,
+            (Self::Nothing, Self::HasSome(permissions)) => Self::HasSome(permissions),
+            (Self::HasSome(permissions), Self::Nothing) => Self::HasSome(permissions),
+            (Self::HasSome(self_permissions), Self::HasSome(other_permissions)) => Self::HasSome(
+                self_permissions
+                    .union(&other_permissions)
+                    .map(Clone::clone)
+                    .collect(),
+            ),
+        }
+    }
 }
 
 impl std::fmt::Display for AuthPermissionRequired {
@@ -179,6 +215,7 @@ pub trait AuthPermissionRequiredExtract {
     fn convert(self) -> Result<AuthPermissionRequired, ValidateAuthPermissionError>;
 }
 
+#[derive(Debug)]
 pub enum AuthPermissionError {
     PermissionDenied(AuthPermissionGranted, AuthPermissionRequired),
 }
@@ -193,6 +230,7 @@ impl std::fmt::Display for AuthPermissionError {
     }
 }
 
+#[derive(Debug)]
 pub enum ValidateAuthPermissionError {
     Invalid,
 }
@@ -205,7 +243,7 @@ impl std::fmt::Display for ValidateAuthPermissionError {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AuthenticateToken(String);
 
 impl AuthenticateToken {
@@ -222,6 +260,13 @@ pub trait AuthenticateTokenExtract {
     fn convert(self) -> Result<AuthenticateToken, ValidateAuthenticateTokenError>;
 }
 
+impl AuthenticateTokenExtract for AuthenticateToken {
+    fn convert(self) -> Result<AuthenticateToken, ValidateAuthenticateTokenError> {
+        Ok(self)
+    }
+}
+
+#[derive(Debug)]
 pub enum ValidateAuthenticateTokenError {
     NotFound,
     MetadataError(MetadataError),
@@ -236,6 +281,7 @@ impl std::fmt::Display for ValidateAuthenticateTokenError {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum DecodeAuthenticateTokenError {
     Expired,
     Invalid(String),
@@ -250,7 +296,7 @@ impl std::fmt::Display for DecodeAuthenticateTokenError {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AuthorizeToken(String);
 
 impl AuthorizeToken {
@@ -267,6 +313,12 @@ pub trait AuthorizeTokenExtract {
     fn convert(self) -> Result<AuthorizeToken, ValidateAuthorizeTokenError>;
 }
 
+impl AuthorizeTokenExtract for AuthorizeToken {
+    fn convert(self) -> Result<AuthorizeToken, ValidateAuthorizeTokenError> {
+        Ok(self)
+    }
+}
+
 impl<T: AuthorizeTokenExtract + Send> ProxyMetadataExtract for T {
     fn convert(self) -> Result<HashMap<&'static str, String>, MetadataError> {
         match self.convert() {
@@ -281,6 +333,7 @@ impl<T: AuthorizeTokenExtract + Send> ProxyMetadataExtract for T {
     }
 }
 
+#[derive(Debug)]
 pub enum ValidateAuthorizeTokenError {
     NotFound,
     MetadataError(MetadataError),
@@ -295,6 +348,7 @@ impl std::fmt::Display for ValidateAuthorizeTokenError {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum DecodeAuthorizeTokenError {
     Expired,
     Invalid(String),
@@ -309,16 +363,19 @@ impl std::fmt::Display for DecodeAuthorizeTokenError {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct AuthToken {
     pub authenticate_token: (AuthenticateToken, ExpireDateTime),
     pub authorize_token: (AuthorizeToken, ExpireDateTime),
     pub cdn_token: (CdnToken, ExpireDateTime),
 }
 
+#[derive(Debug, PartialEq)]
 pub enum CdnToken {
     AWSCloudfront(AWSCloudfrontToken),
 }
 
+#[derive(Debug, PartialEq)]
 pub struct AWSCloudfrontToken {
     pub key_pair_id: String,
     pub policy: String,

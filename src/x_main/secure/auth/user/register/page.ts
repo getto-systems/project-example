@@ -1,6 +1,7 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
+import { PreactNode } from "../../../../../common/x_preact/node"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import {
     appLayout,
@@ -29,7 +30,7 @@ import { isSidebarExpand } from "../../../../../common/util/sidebar/x_preact/hel
 
 import { RegisterUserAccountPageResource } from "./resource"
 
-export function RegisterUserAccountPage(props: RegisterUserAccountPageResource): VNode {
+export function RegisterUserAccountPage(props: RegisterUserAccountPageResource): PreactNode {
     const pageTitle = "ユーザー登録"
     const focusedTitle = "ユーザー詳細"
     const sidebarTitle = "登録済み一覧"
@@ -37,8 +38,8 @@ export function RegisterUserAccountPage(props: RegisterUserAccountPageResource):
     useDocumentTitle(pageTitle)
     const err = useNotifyUnexpectedError(props)
 
-    const sidebarState = useApplicationState(props.sidebar.state)
-    const focusState = useApplicationState(props.register.list.focus.state)
+    const sidebarState = useAtom(props.sidebar.state)
+    const focusState = useAtom(props.register.focus.detect)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -48,30 +49,29 @@ export function RegisterUserAccountPage(props: RegisterUserAccountPageResource):
         siteInfo,
         header: [],
         menu: h(DisplayOutlineMenu, props),
-        main:
-            focusState.type === "close"
-                ? appMain({
-                      header: mainHeader([
-                          h(MainTitleWithSidebar, {
-                              sidebar: props.sidebar,
-                              title: pageTitle,
-                          }),
-                          h(DisplayOutlineBreadcrumbList, props),
-                      ]),
-                      body: mainBody(h(RegisterAuthUserAccount, props)),
-                      copyright,
-                  })
-                : appMain({
-                      header: mainHeader([
-                          h(MainTitleWithSidebar, {
-                              sidebar: props.sidebar,
-                              title: focusedTitle,
-                          }),
-                          h(DisplayOutlineBreadcrumbList, props),
-                      ]),
-                      body: mainBody(h(FocusRegisteredAuthUserAccount, props)),
-                      copyright,
-                  }),
+        main: focusState.found
+            ? appMain({
+                  header: mainHeader([
+                      h(MainTitleWithSidebar, {
+                          sidebar: props.sidebar,
+                          title: focusedTitle,
+                      }),
+                      h(DisplayOutlineBreadcrumbList, props),
+                  ]),
+                  body: mainBody(h(FocusRegisteredAuthUserAccount, props)),
+                  copyright,
+              })
+            : appMain({
+                  header: mainHeader([
+                      h(MainTitleWithSidebar, {
+                          sidebar: props.sidebar,
+                          title: pageTitle,
+                      }),
+                      h(DisplayOutlineBreadcrumbList, props),
+                  ]),
+                  body: mainBody(h(RegisterAuthUserAccount, props)),
+                  copyright,
+              }),
         sidebar: isSidebarExpand(sidebarState)
             ? appSidebar({
                   header: mainHeader([mainTitle(sidebarTitle)]),

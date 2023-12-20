@@ -2,7 +2,7 @@ use crate::common::api::search::y_protobuf::service::SearchSortPb;
 
 use crate::common::api::search::data::{SearchSort, SearchSortOrder};
 
-impl<K: Default + From<String>> From<Option<SearchSortPb>> for SearchSort<K> {
+impl<K: Copy + Default + From<String>> From<Option<SearchSortPb>> for SearchSort<K> {
     fn from(data: Option<SearchSortPb>) -> Self {
         match data {
             Some(data) => SearchSort {

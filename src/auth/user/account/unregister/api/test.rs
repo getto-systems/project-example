@@ -1,23 +1,21 @@
-use getto_application_test::ApplicationActionStateHolder;
+use std::sync::Arc;
+
 use pretty_assertions::assert_eq;
 
-use crate::auth::{
-    ticket::{
-        authorize::init::test::StaticAuthorizeInfra,
-        kernel::init::{
-            request::test::StaticAuthorizeToken,
-            ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
+use crate::{
+    auth::{
+        ticket::kernel::detail::repository::memory::StoreTicket,
+        user::kernel::detail::repository::memory::{
+            login_id::MapLoginId, user::MapUser, StoreLoginId, StoreUser,
         },
     },
-    user::{
-        account::unregister::init::test::{
-            StaticUnregisterAuthUserAccountFields, StaticUnregisterAuthUserAccountMaterial,
-        },
-        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
-    },
+    common::api::feature::AsInfra,
+    x_content::permission::AuthPermission,
 };
 
-use crate::auth::user::account::unregister::action::UnregisterAuthUserAccountAction;
+use crate::auth::user::account::unregister::action::{
+    UnregisterAuthUserAccountAction, UnregisterAuthUserAccountInfo,
+};
 
 use crate::auth::user::{
     account::unregister::infra::UnregisterAuthUserAccountFields,
@@ -25,8 +23,9 @@ use crate::auth::user::{
 };
 
 use crate::auth::{
-    ticket::kernel::data::AuthPermissionGranted,
+    ticket::kernel::data::{AuthPermissionGranted, AuthPermissionRequired},
     user::{
+        account::unregister::data::UnregisterAuthUserAccountError,
         kernel::data::{AuthUser, AuthUserId},
         login_id::kernel::data::LoginId,
     },
@@ -34,91 +33,90 @@ use crate::auth::{
 
 #[tokio::test]
 async fn info() {
-    let store = TestStore::new();
-    let material = StaticUnregisterAuthUserAccountMaterial {
-        authorize: StaticAuthorizeInfra::new(operator_user_id()),
-        ticket_repository: standard_ticket_repository(&store),
-        user_repository: standard_user_repository(&store),
-    };
-
-    let action = UnregisterAuthUserAccountAction::with_material(material);
-
-    let (name, required) = action.info.params();
     assert_eq!(
-        format!("{}; {}", name, required),
-        "auth.user.account.unregister; require: some [auth-user]",
+        UnregisterAuthUserAccountInfo::required(),
+        AuthPermissionRequired::user(),
     );
 }
 
 #[tokio::test]
-async fn success_unregister_user() {
-    let holder = ApplicationActionStateHolder::new();
-
-    let store = TestStore::new();
-    let material = StaticUnregisterAuthUserAccountMaterial {
-        authorize: StaticAuthorizeInfra::new(operator_user_id()),
-        ticket_repository: standard_ticket_repository(&store),
-        user_repository: standard_user_repository(&store),
-    };
-    let fields = StaticUnregisterAuthUserAccountFields::Valid(UnregisterAuthUserAccountFields {
-        login_id: stored_login_id(),
+async fn success() -> Result<(), UnregisterAuthUserAccountError> {
+    let feature = feature(Infra {
+        user: vec![(
+            AuthUser {
+                user_id: AuthUserId::restore("user-id".to_owned()),
+                granted: AuthPermissionGranted::restore(
+                    vec![AuthPermission::AuthUser].into_iter().collect(),
+                ),
+            },
+            LoginId::restore("login-id".to_owned()),
+        )],
     });
+    let action = UnregisterAuthUserAccountAction::mock(feature.as_infra());
 
-    let mut action = UnregisterAuthUserAccountAction::with_material(material);
-    action.subscribe(holder.handler());
+    let fields = UnregisterAuthUserAccountFields {
+        login_id: LoginId::restore("login-id".to_owned()),
+    };
 
-    let result = action.ignite(StaticAuthorizeToken, fields).await;
+    action.unregister(fields).await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn error_user_id_not_found() {
+    let feature = feature(Infra {
+        user: vec![(
+            AuthUser {
+                user_id: AuthUserId::restore("user-id".to_owned()),
+                granted: AuthPermissionGranted::restore(
+                    vec![AuthPermission::AuthUser].into_iter().collect(),
+                ),
+            },
+            LoginId::restore("login-id".to_owned()),
+        )],
+    });
+    let action = UnregisterAuthUserAccountAction::mock(feature.as_infra());
+
+    let fields = UnregisterAuthUserAccountFields {
+        login_id: LoginId::restore("UNKNOWN-login-id".to_owned()),
+    };
+
+    let err = action.unregister(fields).await.unwrap_err();
+
     assert_eq!(
-        holder.extract(),
-        vec![
-            "try to proxy call: auth.ticket.authorize.clarify(require: some [auth-user])",
-            "proxy call success",
-            "unregister auth user account success",
-        ],
-    );
-    assert!(result.is_ok());
-}
-
-struct TestStore {
-    ticket: MemoryAuthTicketStore,
-    user: MemoryAuthUserStore,
-}
-
-impl TestStore {
-    fn new() -> Self {
-        Self {
-            ticket: MemoryAuthTicketStore::new(),
-            user: MemoryAuthUserStore::new(),
-        }
-    }
-}
-
-fn standard_ticket_repository<'a>(store: &'a TestStore) -> MemoryAuthTicketRepository<'a> {
-    MemoryAuthTicketRepository::new(&store.ticket)
-}
-fn standard_user_repository<'a>(store: &'a TestStore) -> MemoryAuthUserRepository<'a> {
-    MemoryAuthUserRepository::with_user_and_password(
-        &store.user,
-        stored_login_id(),
-        stored_user(),
-        stored_password(),
-        vec![],
+        format!("{}", err),
+        format!("{}", UnregisterAuthUserAccountError::NotFound),
     )
 }
 
-fn stored_user() -> AuthUser {
-    AuthUser {
-        user_id: AuthUserId::restore("user-id".to_owned()),
-        granted: AuthPermissionGranted::default(),
-    }
-}
-fn stored_login_id() -> LoginId {
-    LoginId::restore("login-id".into())
-}
-fn stored_password() -> HashedPassword {
-    HashedPassword::restore("password".into())
+struct Infra {
+    user: Vec<(AuthUser, LoginId)>,
 }
 
-fn operator_user_id() -> AuthUserId {
-    AuthUserId::restore("operator-user-id".to_owned())
+fn feature(infra: Infra) -> (Arc<StoreTicket>, Arc<StoreLoginId>, Arc<StoreUser>) {
+    let ticket_store = Arc::new(StoreTicket::default());
+    let login_id_store = Arc::new(StoreLoginId::default());
+    let user_store = Arc::new(StoreUser::default());
+
+    for (user, login_id) in infra.user {
+        MapLoginId::insert_entry(
+            &login_id_store,
+            login_id.clone(),
+            user.user_id.clone(),
+            Default::default(),
+        );
+        MapUser::insert_entry(
+            &user_store,
+            user.user_id,
+            (
+                login_id,
+                Some(user.granted),
+                Some(HashedPassword::restore("PASSWORD".to_owned())),
+                None,
+            ),
+        );
+    }
+
+    (ticket_store, login_id_store, user_store)
 }

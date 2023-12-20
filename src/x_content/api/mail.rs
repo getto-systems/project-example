@@ -1,6 +1,6 @@
 pub const SENDER_ADDRESS: &'static str = "GETTO Example <labo@message.getto.systems>";
 
-pub mod notify_password_reset_token {
+pub mod send_reset_token {
     pub const SUBJECT: &'static str = "GETTO Example パスワードリセットの件 [URL のご案内]";
     pub const BODY: &'static str = r#####"お世話になっております
 GETTO Example システムです

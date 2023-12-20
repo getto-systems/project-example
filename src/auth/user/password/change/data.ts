@@ -1,5 +1,5 @@
 import { RemoteCommonError } from "../../../../common/util/remote/data"
-import { Password } from "../input/data"
+import { Password } from "../input/field/data"
 
 export type ChangePasswordFields = Readonly<{
     currentPassword: Password

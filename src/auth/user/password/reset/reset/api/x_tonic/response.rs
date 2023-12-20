@@ -1,19 +1,14 @@
 use tonic::{Response, Status};
 
-use crate::common::api::response::tonic::ServiceResponder;
+use crate::common::api::response::x_tonic::ServiceResponder;
 
 use crate::auth::user::password::reset::reset::y_protobuf::service::{
     ResetPasswordErrorKindPb, ResetPasswordResponsePb,
 };
 
-use crate::auth::user::password::reset::reset::action::{ResetPasswordEvent, ResetPasswordState};
-
 use crate::auth::ticket::encode::method::EncodeAuthTokenEvent;
 
-use crate::auth::{
-    ticket::kernel::data::{AuthPermissionGranted, AuthToken},
-    user::password::reset::reset::data::{DecodeResetTokenError, NotifyResetPasswordError},
-};
+use crate::auth::ticket::kernel::data::{AuthPermissionGranted, AuthToken};
 
 impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordState {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
@@ -81,18 +76,4 @@ fn already_reset() -> Response<ResetPasswordResponsePb> {
         err: ResetPasswordErrorKindPb::AlreadyReset as i32,
         ..Default::default()
     })
-}
-
-impl<T> ServiceResponder<T> for DecodeResetTokenError {
-    fn respond_to(self) -> Result<Response<T>, Status> {
-        Err(Status::unauthenticated("failed to decode reset token"))
-    }
-}
-
-impl<T> ServiceResponder<T> for NotifyResetPasswordError {
-    fn respond_to(self) -> Result<Response<T>, Status> {
-        match self {
-            Self::InfraError(_) => Err(Status::internal("notify reset password error")),
-        }
-    }
 }

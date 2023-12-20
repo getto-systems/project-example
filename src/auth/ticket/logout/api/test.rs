@@ -1,118 +1,76 @@
-use getto_application_test::ApplicationActionStateHolder;
+use std::sync::Arc;
+
 use pretty_assertions::assert_eq;
 
-use chrono::{DateTime, Duration, TimeZone, Utc};
+use chrono::{DateTime, TimeZone, Utc};
 
-use crate::auth::ticket::{
-    authenticate::init::test::StaticAuthenticateWithTokenInfra,
-    kernel::init::{
-        request::test::StaticAuthenticateToken,
-        ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
-        token::authenticate::decoder::test::StaticAuthenticateTokenDecoder,
-    },
-    logout::init::test::StaticLogoutMaterial,
+use crate::{
+    auth::ticket::kernel::detail::repository::memory::{ticket::MapTicket, StoreTicket},
+    common::api::feature::AsInfra,
+    x_content::permission::AuthPermission,
 };
 
 use crate::auth::ticket::logout::action::LogoutAction;
 
 use crate::auth::{
-    kernel::data::{AuthDateTime, ExpansionLimitDuration},
-    ticket::kernel::data::AuthTicket,
+    kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+    ticket::{
+        authenticate::data::CheckAuthenticateTokenSuccess,
+        kernel::data::{AuthPermissionGranted, AuthTicket, AuthTicketAttrs, AuthTicketId},
+        logout::data::{LogoutError, LogoutSuccess},
+    },
+    user::kernel::data::AuthUserId,
 };
 
 #[tokio::test]
-async fn info() {
-    let store = TestStore::new();
-    let material = StaticLogoutMaterial {
-        authenticate_with_token: standard_authenticate_with_token_infra(),
-        ticket_repository: standard_ticket_repository(&store),
+async fn success() -> Result<(), LogoutError> {
+    let stored_ticket = AuthTicket {
+        ticket_id: AuthTicketId::restore("ticket-id".to_owned()),
+        attrs: AuthTicketAttrs {
+            user_id: AuthUserId::restore("user-id".to_owned()),
+            granted: AuthPermissionGranted::restore(
+                vec![AuthPermission::AuthUser].into_iter().collect(),
+            ),
+        },
     };
 
-    let action = LogoutAction::with_material(material);
+    let feature = feature(Infra {
+        now: Utc.with_ymd_and_hms(2021, 1, 1, 10, 0, 0).unwrap(),
+        ticket: vec![(
+            stored_ticket.clone(),
+            Utc.with_ymd_and_hms(2021, 1, 2, 10, 0, 0).unwrap(),
+        )],
+    });
+    let action = LogoutAction::mock(feature.as_infra());
 
-    assert_eq!(action.info.name(), "auth.ticket.logout");
+    let auth = CheckAuthenticateTokenSuccess::new(stored_ticket.clone());
+
+    let auth = action.logout(auth).await?;
+
+    assert_eq!(auth, LogoutSuccess::new(stored_ticket));
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn success_logout() {
-    let holder = ApplicationActionStateHolder::new();
-
-    let store = TestStore::new();
-    let material = StaticLogoutMaterial {
-        authenticate_with_token: standard_authenticate_with_token_infra(),
-        ticket_repository: standard_ticket_repository(&store),
-    };
-
-    let mut action = LogoutAction::with_material(material);
-    action.subscribe(holder.handler());
-
-    let result = action.ignite(StaticAuthenticateToken).await;
-    assert_eq!(
-        holder.extract(),
-        vec![
-            "authenticate with token success; ticket: ticket-id / user-id: user-id (granted: [])",
-            "logout success",
-        ],
-    );
-    assert!(result.is_ok());
+struct Infra {
+    now: DateTime<Utc>,
+    ticket: Vec<(AuthTicket, DateTime<Utc>)>,
 }
 
-#[tokio::test]
-async fn error_no_ticket() {
-    let holder = ApplicationActionStateHolder::new();
+fn feature(infra: Infra) -> Arc<StoreTicket> {
+    let ticket_store = Arc::new(StoreTicket::default());
 
-    let store = TestStore::new();
-    let material = StaticLogoutMaterial {
-        authenticate_with_token: standard_authenticate_with_token_infra(),
-        ticket_repository: no_ticket_repository(&store),
-    };
-
-    let mut action = LogoutAction::with_material(material);
-    action.subscribe(holder.handler());
-
-    let result = action.ignite(StaticAuthenticateToken).await;
-    assert_eq!(
-        holder.extract(),
-        vec![
-            "authenticate with token success; ticket: ticket-id / user-id: user-id (granted: [])",
-            "logout success",
-        ],
-    );
-    assert!(result.is_ok());
-}
-
-struct TestStore {
-    ticket: MemoryAuthTicketStore,
-}
-
-impl TestStore {
-    fn new() -> Self {
-        Self {
-            ticket: MemoryAuthTicketStore::new(),
-        }
+    for (ticket, expansion_limit) in infra.ticket {
+        MapTicket::insert_entry(
+            &ticket_store,
+            ticket.ticket_id,
+            (
+                ticket.attrs.user_id.clone(),
+                ExpansionLimitDateTime::restore(expansion_limit),
+                AuthDateTime::restore(infra.now.clone()),
+            ),
+        );
     }
-}
 
-fn standard_now() -> DateTime<Utc> {
-    Utc.with_ymd_and_hms(2021, 1, 1, 10, 0, 0).latest().unwrap()
-}
-
-fn standard_authenticate_with_token_infra() -> StaticAuthenticateWithTokenInfra {
-    StaticAuthenticateWithTokenInfra {
-        token_decoder: StaticAuthenticateTokenDecoder::Valid(stored_ticket()),
-    }
-}
-
-fn standard_ticket_repository<'a>(store: &'a TestStore) -> MemoryAuthTicketRepository<'a> {
-    let issued_at = AuthDateTime::restore(standard_now());
-    let limit =
-        issued_at.expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketRepository::with_ticket(&store.ticket, stored_ticket(), limit, issued_at)
-}
-fn no_ticket_repository<'a>(store: &'a TestStore) -> MemoryAuthTicketRepository<'a> {
-    MemoryAuthTicketRepository::new(&store.ticket)
-}
-
-fn stored_ticket() -> AuthTicket {
-    AuthTicket::standard()
+    ticket_store
 }

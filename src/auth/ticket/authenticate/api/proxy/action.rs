@@ -1,97 +1,50 @@
-use getto_application::{data::MethodResult, infra::ActionStatePubSub};
+mod detail;
 
-use crate::auth::ticket::authenticate::action::AuthenticateWithTokenActionInfo;
+use std::sync::Arc;
 
-use crate::auth::ticket::authenticate::{
-    method::{authenticate_with_token, AuthenticateWithTokenEvent, AuthenticateWithTokenInfra},
-    proxy::method::AuthProxyCallEvent,
+use crate::{
+    auth::ticket::authenticate::proxy::infra::{
+        AuthenticateWithTokenProxyInfra, AuthenticateWithTokenProxyLogger,
+    },
+    common::proxy::infra::ProxyCall,
 };
 
-use crate::common::proxy::infra::ProxyCall;
-
-use crate::auth::{
-    proxy::data::AuthProxyError,
-    ticket::{
-        authenticate::proxy::data::ProxyResponseAuthenticated,
+use crate::{
+    auth::ticket::{
+        authenticate::{
+            data::CheckAuthenticateTokenSuccess,
+            proxy::data::{AuthenticateWithTokenProxyError, ProxyResponseAuthenticated},
+        },
         kernel::data::AuthenticateTokenExtract,
     },
+    common::api::request::data::RequestInfo,
 };
 
-pub enum AuthenticateWithTokenProxyState {
-    AuthenticateWithToken(AuthenticateWithTokenEvent),
-    ProxyCall(AuthProxyCallEvent<ProxyResponseAuthenticated>),
+pub struct AuthenticateWithTokenProxyAction<M: AuthenticateWithTokenProxyInfra> {
+    logger: Arc<dyn AuthenticateWithTokenProxyLogger>,
+    infra: M,
 }
 
-impl std::fmt::Display for AuthenticateWithTokenProxyState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::AuthenticateWithToken(event) => event.fmt(f),
-            Self::ProxyCall(event) => event.fmt(f),
-        }
-    }
-}
-
-pub trait AuthenticateWithTokenProxyMaterial {
-    type AuthenticateWithToken: AuthenticateWithTokenInfra;
-    type ProxyCall: ProxyCall<
-        Request = (),
-        Response = ProxyResponseAuthenticated,
-        Error = AuthProxyError,
-    >;
-
-    fn authenticate_with_token(&self) -> &Self::AuthenticateWithToken;
-    fn proxy_call(&self) -> &Self::ProxyCall;
-}
-
-pub struct AuthenticateWithTokenProxyAction<M: AuthenticateWithTokenProxyMaterial> {
-    pubsub: ActionStatePubSub<AuthenticateWithTokenProxyState>,
-    material: M,
-}
-
-impl<M: AuthenticateWithTokenProxyMaterial> AuthenticateWithTokenProxyAction<M> {
-    pub fn with_material(material: M) -> Self {
-        Self {
-            pubsub: ActionStatePubSub::new(),
-            material,
-        }
-    }
-
-    pub fn subscribe(
-        &mut self,
-        handler: impl 'static + Fn(&AuthenticateWithTokenProxyState) + Send + Sync,
-    ) {
-        self.pubsub.subscribe(handler);
-    }
-
-    pub async fn ignite(
-        self,
+impl<M: AuthenticateWithTokenProxyInfra> AuthenticateWithTokenProxyAction<M> {
+    pub async fn authenticate(
+        &self,
+        info: RequestInfo,
         token: impl AuthenticateTokenExtract,
-    ) -> MethodResult<AuthenticateWithTokenProxyState> {
-        let (_ticket, token) =
-            authenticate_with_token(self.material.authenticate_with_token(), token, |event| {
-                self.pubsub
-                    .post(AuthenticateWithTokenProxyState::AuthenticateWithToken(
-                        event,
-                    ))
-            })
-            .await?;
+        auth: CheckAuthenticateTokenSuccess,
+    ) -> Result<ProxyResponseAuthenticated, AuthenticateWithTokenProxyError> {
+        self.logger.try_to_authenticate_with_token();
 
-        self.pubsub.post(AuthenticateWithTokenProxyState::ProxyCall(
-            AuthProxyCallEvent::TryToCall(AuthenticateWithTokenActionInfo.name().to_owned()),
-        ));
+        let token = token
+            .convert()
+            .map_err(|err| self.logger.invalid_request(err))?;
 
-        Ok(self.pubsub.post(AuthenticateWithTokenProxyState::ProxyCall(
-            AuthProxyCallEvent::Response(
-                self.material
-                    .proxy_call()
-                    .call(token, ())
-                    .await
-                    .map_err(|err| {
-                        self.pubsub.post(AuthenticateWithTokenProxyState::ProxyCall(
-                            AuthProxyCallEvent::ServiceError(err),
-                        ))
-                    })?,
-            ),
-        )))
+        let auth = self
+            .infra
+            .proxy_call()
+            .call(info, token, auth)
+            .await
+            .map_err(|err| self.logger.proxy_error(err))?;
+
+        Ok(self.logger.authenticated(auth))
     }
 }

@@ -1,19 +1,21 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/node"
 
-import { VNodeContent } from "../../../../../../common/x_preact/vnode"
-
-import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { icon_change } from "../../../../../../x_content/icon"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { takeLongtimeField, ValidationMessage } from "../../../../../../common/x_preact/design/form"
+import {
+    takeLongtimeField,
+    ValidateBoardMessage,
+} from "../../../../../../common/x_preact/design/form"
 
 import { remoteCommonErrorReason } from "../../../../../../common/util/remote/x_error/reason"
 
-import { LoginIdField } from "../../../../login_id/input/x_preact/field"
+import { AuthUserLoginIdField } from "../../../../login_id/input/field/x_preact/input"
 import { EditButton } from "../../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../../common/x_preact/button/edit_success_button"
 import { SendButton } from "../../../../../../common/x_preact/button/send_button"
@@ -27,24 +29,24 @@ import { RequestResetTokenError } from "../data"
 type Props = Readonly<{
     requestToken: RequestResetTokenAction
 }>
-export function RequestResetTokenProfile(props: Props): VNode {
-    const editableState = useApplicationState(props.requestToken.editable.state)
+export function RequestResetTokenProfile(props: Props): PreactNode {
+    const editableState = useAtom(props.requestToken.editable.state)
 
     return box({
         form: true,
         title: "パスワードリセット",
         ...(editableState.isEditable
             ? {
-                  body: h(LoginIdField, {
+                  body: h(AuthUserLoginIdField, {
                       field: props.requestToken.loginId,
                       help: ["確認のため、ログインIDを入力します"],
                   }),
                   footer: [
                       buttons({
                           left: h(Submit, {}),
-                          right: h(Clear, {}),
+                          right: h(Reset, {}),
                       }),
-                      h(ValidationMessage, props.requestToken.validate),
+                      h(ValidateBoardMessage, { state: props.requestToken.validate }),
                       h(Message, {}),
                       buttons({
                           right: h(Close, {}),
@@ -57,8 +59,8 @@ export function RequestResetTokenProfile(props: Props): VNode {
               }),
     })
 
-    function Edit(_props: unknown): VNode {
-        const requestTokenState = useApplicationState(props.requestToken.state)
+    function Edit(_props: unknown): PreactNode {
+        const requestTokenState = useAtom(props.requestToken.state)
 
         const label = "トークン送信"
         if (requestTokenState.type === "success") {
@@ -69,21 +71,17 @@ export function RequestResetTokenProfile(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.edit()
+            props.requestToken.editable.open()
         }
     }
 
-    function Submit(_props: unknown): VNode {
-        const requestTokenState = useApplicationState(props.requestToken.state)
-        const validateState = useApplicationState(props.requestToken.validate.state)
-        const observeState = useApplicationState(props.requestToken.observe.state)
-
+    function Submit(_props: unknown): PreactNode {
         return h(SendButton, {
             label: "トークン送信",
             icon: icon_change,
-            isConnecting: requestTokenState.type === "try",
-            validateState,
-            observeState,
+            connect: props.requestToken.connect,
+            validate: props.requestToken.validate,
+            observe: props.requestToken.observe,
             onClick,
         })
 
@@ -93,17 +91,18 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
 
-    function Clear(_props: unknown): VNode {
-        const observeState = useApplicationState(props.requestToken.observe.state)
-
-        return h(ClearChangesButton, { observeState, onClick })
+    function Reset(_props: unknown): PreactNode {
+        return h(ClearChangesButton, {
+            observe: props.requestToken.observe,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.clear()
+            props.requestToken.reset()
         }
     }
-    function Close(_props: unknown): VNode {
+    function Close(_props: unknown): PreactNode {
         return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
@@ -112,8 +111,8 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
 
-    function Message(_props: unknown): VNode {
-        const requestTokenState = useApplicationState(props.requestToken.state)
+    function Message(_props: unknown): PreactNode {
+        const requestTokenState = useAtom(props.requestToken.state)
 
         switch (requestTokenState.type) {
             case "initial":
@@ -130,8 +129,8 @@ export function RequestResetTokenProfile(props: Props): VNode {
                 return fieldHelp_error(requestTokenError(requestTokenState.err))
         }
     }
-    function SuccessMessage(_props: unknown): VNode {
-        const requestTokenState = useApplicationState(props.requestToken.state)
+    function SuccessMessage(_props: unknown): PreactNode {
+        const requestTokenState = useAtom(props.requestToken.state)
 
         switch (requestTokenState.type) {
             case "success":
@@ -153,7 +152,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
     }
 }
 
-function requestTokenError(err: RequestResetTokenError): readonly VNodeContent[] {
+function requestTokenError(err: RequestResetTokenError): readonly PreactContent[] {
     switch (err.type) {
         case "invalid-reset":
             return ["ログインIDが登録されていないか、トークンの送信先が登録されていません"]

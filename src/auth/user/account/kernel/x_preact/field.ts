@@ -1,9 +1,9 @@
 import { html } from "htm/preact"
-import { VNodeContent } from "../../../../../common/x_preact/vnode"
+import { PreactContent } from "../../../../../common/x_preact/node"
 
 import { authPermissionLabel } from "../../../../../x_content/permission"
 
-import { CheckboxBoardContent } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
+import { CheckboxBoardContent } from "../../../../../common/util/board/input/x_preact/checkbox"
 import { label_gray, label_info } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { AuthPermission } from "../../../kernel/data"
@@ -13,7 +13,7 @@ type Props<K extends AuthUserField> = Readonly<{ [key in K]: TypeAuthUser<K> }>
 
 export function authPermissionGranted({
     granted,
-}: Readonly<{ granted: readonly AuthPermission[] }>): VNodeContent {
+}: Readonly<{ granted: readonly AuthPermission[] }>): PreactContent {
     if (granted.length === 0) {
         return label_gray("権限なし")
     }
@@ -22,7 +22,7 @@ export function authPermissionGranted({
     })}`
 }
 
-export function authUserMemo(data: Props<"memo">): VNodeContent {
+export function authUserMemo(data: Props<"memo">): PreactContent {
     return data.memo
 }
 

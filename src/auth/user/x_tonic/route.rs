@@ -3,18 +3,9 @@ use crate::auth::user::{
     password::x_tonic::route::AuthPasswordServer,
 };
 
+#[derive(Default)]
 pub struct AuthUserServer {
     pub account: AccountServer,
     pub login_id: LoginIdServer,
     pub password: AuthPasswordServer,
-}
-
-impl AuthUserServer {
-    pub const fn new() -> Self {
-        Self {
-            account: AccountServer,
-            login_id: LoginIdServer,
-            password: AuthPasswordServer::new(),
-        }
-    }
 }

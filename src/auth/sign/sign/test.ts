@@ -1,18 +1,18 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../z_vendor/getto-atom/test_helper"
 
-import { newResetPasswordConfig } from "../../user/password/reset/reset/init/config"
-import { newAuthenticatePasswordConfig } from "../../user/password/authenticate/init/config"
-import { newCheckAuthTicketConfig } from "../../ticket/authenticate/init/config"
-import { newRequestResetTokenConfig } from "../../user/password/reset/request_token/init/config"
+import { newResetPasswordConfig } from "../../user/password/reset/reset/detail/config"
+import { newAuthenticatePasswordConfig } from "../../user/password/authenticate/detail/config"
+import { newCheckAuthTicketConfig } from "../../ticket/authenticate/detail/config"
+import { newRequestResetTokenConfig } from "../../user/password/reset/request_token/detail/config"
 
-import { mockResetPasswordShell } from "../../user/password/reset/reset/init/mock"
-import { mockGetScriptPathShell } from "../get_script_path/init/mock"
+import { mockResetPasswordShell } from "../../user/password/reset/reset/detail/mock"
+import { mockGetScriptPathShell } from "../get_script_path/detail/mock"
 import { mockRemoteInfraError } from "../../../common/util/remote/mock"
-import { mockSignActionShell } from "./init/mock"
+import { mockSignActionShell } from "./detail/mock"
 
-import { initMemoryDB } from "../../../common/util/repository/init/memory"
-import { newClock } from "../../../common/util/clock/init"
+import { initMemoryDB } from "../../../common/util/repository/detail/memory"
+import { newClock } from "../../../common/util/clock/detail"
 
 import { initSignAction, SignAction } from "./action"
 import { initAuthenticateWithTokenAction } from "../../ticket/authenticate/action"
@@ -25,56 +25,59 @@ import { AuthTicket } from "../../ticket/kernel/data"
 test("redirect password authenticate", async () => {
     const { action } = standard(standard_URL())
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            const state = await action.state.ignitionState
-            switch (state.type) {
-                case "authTicket-check":
-                    await state.action.state.ignitionState
-            }
-            return state
-        }),
-    ).toMatchObject([{ type: "authTicket-check" }, { type: "password-authenticate" }])
+    const result = observeAtom(action.state)
+
+    const state = await action.state.ignitionState
+    switch (state.type) {
+        case "authTicket-check":
+            await state.action.state.ignitionState
+    }
+
+    expect(result()).toMatchObject([
+        { type: "authTicket-check" },
+        { type: "password-authenticate" },
+    ])
 })
 
 test("static privacy policy", async () => {
     const { action } = standard(static_privacyPolicy_URL())
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            const state = await action.state.ignitionState
-            switch (state.type) {
-                case "authTicket-check":
-                    await state.action.state.ignitionState
-            }
-            return state
-        }),
-    ).toMatchObject([{ type: "authTicket-check" }, { type: "static-privacyPolicy" }])
+    const result = observeAtom(action.state)
+
+    const state = await action.state.ignitionState
+    switch (state.type) {
+        case "authTicket-check":
+            await state.action.state.ignitionState
+    }
+
+    expect(result()).toMatchObject([{ type: "authTicket-check" }, { type: "static-privacyPolicy" }])
 })
 
 test("password reset request token", async () => {
     const { action } = standard(passwordReset_requestToken_URL())
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            const state = await action.state.ignitionState
-            switch (state.type) {
-                case "authTicket-check":
-                    await state.action.state.ignitionState
-            }
-            return state
-        }),
-    ).toMatchObject([{ type: "authTicket-check" }, { type: "password-reset-requestToken" }])
+    const result = observeAtom(action.state)
+
+    const state = await action.state.ignitionState
+    switch (state.type) {
+        case "authTicket-check":
+            await state.action.state.ignitionState
+    }
+
+    expect(result()).toMatchObject([
+        { type: "authTicket-check" },
+        { type: "password-reset-requestToken" },
+    ])
 })
 
 test("password reset", async () => {
     const { action } = standard(passwordReset_reset_URL())
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toMatchObject([{ type: "password-reset" }])
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toMatchObject([{ type: "password-reset" }])
 })
 
 function standard(currentURL: URL) {

@@ -1,10 +1,12 @@
 use tonic::{Response, Status};
 
-use crate::common::api::response::tonic::ServiceResponder;
-
 use crate::auth::ticket::y_protobuf::service::{
     AuthPermissionGrantedPb, AuthTokenPb, AuthenticateTokenPb, AuthorizeTokenPb, CdnTokenPb,
 };
+
+use crate::common::api::response::x_tonic::ServiceResponder;
+
+use crate::x_content::permission::AuthPermission;
 
 use crate::auth::{
     kernel::data::ExpireDateTime,
@@ -77,6 +79,17 @@ impl Into<AuthPermissionGrantedPb> for AuthPermissionGranted {
         AuthPermissionGrantedPb {
             permissions: self.extract().into_iter().collect(),
         }
+    }
+}
+
+impl Into<AuthPermissionGranted> for AuthPermissionGrantedPb {
+    fn into(self) -> AuthPermissionGranted {
+        AuthPermissionGranted::restore(
+            self.permissions
+                .into_iter()
+                .filter_map(AuthPermission::convert)
+                .collect(),
+        )
     }
 }
 

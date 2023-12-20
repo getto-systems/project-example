@@ -1,23 +1,42 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../common/util/timer/helper"
 
+import { restoreLoginId } from "../../login_id/kernel/convert"
+import { restoreAuthUserField } from "../kernel/convert"
+
+import { initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import {
+    LoadState,
+    loadState_loaded,
+    loadState_loading,
+    mapLoadState,
+} from "../../../../common/util/load/data"
+import { initLoadableListAtomUpdater } from "../../../../common/util/list/action"
 import { UnregisterAuthUserAccountAction, initUnregisterAuthUserAccountAction } from "./action"
 
-import { restoreLoginId } from "../../login_id/input/convert"
-
 import { UnregisterAuthUserAccountRemote } from "./infra"
+
+import { AuthUserAccount } from "../kernel/data"
 
 test("submit", async () => {
     const { unregister } = standard()
 
-    expect(
-        await observeApplicationState(unregister.state, async () => {
-            return unregister.submit()
-        }),
-    ).toEqual([
+    const result = observeAtom(unregister.state)
+
+    await unregister.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
-        { type: "success", data: { loginId: "user-id" } },
+        {
+            type: "success",
+            data: {
+                loginId: restoreLoginId("user-id"),
+                granted: [],
+                resetTokenDestination: { type: "none" },
+                memo: restoreAuthUserField("initial-memo"),
+            },
+        },
     ])
 })
 
@@ -25,14 +44,22 @@ test("submit; take long time", async () => {
     // wait for take longtime timeout
     const { unregister } = takeLongtime_elements()
 
-    expect(
-        await observeApplicationState(unregister.state, async () => {
-            return unregister.submit()
-        }),
-    ).toEqual([
+    const result = observeAtom(unregister.state)
+
+    await unregister.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
-        { type: "success", data: { loginId: "user-id" } },
+        {
+            type: "success",
+            data: {
+                loginId: restoreLoginId("user-id"),
+                granted: [],
+                resetTokenDestination: { type: "none" },
+                memo: restoreAuthUserField("initial-memo"),
+            },
+        },
     ])
 })
 
@@ -46,21 +73,36 @@ function takeLongtime_elements() {
 function initResource(modifyUserRemote: UnregisterAuthUserAccountRemote): Readonly<{
     unregister: UnregisterAuthUserAccountAction
 }> {
-    const unregister = initUnregisterAuthUserAccountAction({
-        infra: {
-            unregisterUserRemote: modifyUserRemote,
-        },
-        config: {
-            takeLongtimeThreshold: { wait_millisecond: 32 },
-        },
+    const list = initAtom<LoadState<readonly AuthUserAccount[]>>({
+        initialState: loadState_loading(),
     })
+    const data = mapAtom(list.state, (list) => mapLoadState(list, (list) => list[0]))
+    const unregister = initUnregisterAuthUserAccountAction(
+        data,
+        initLoadableListAtomUpdater(list),
+        {
+            infra: {
+                unregisterUserRemote: modifyUserRemote,
+            },
+            config: {
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+            },
+        },
+    )
 
-    unregister.handler.focus({
-        loginId: restoreLoginId("user-id"),
-    })
+    list.post(
+        loadState_loaded([
+            {
+                loginId: restoreLoginId("user-id"),
+                granted: [],
+                resetTokenDestination: { type: "none" },
+                memo: restoreAuthUserField("initial-memo"),
+            },
+        ]),
+    )
 
     return {
-        unregister: unregister.action,
+        unregister,
     }
 }
 

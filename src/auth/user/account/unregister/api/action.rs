@@ -1,159 +1,68 @@
-use getto_application::{data::MethodResult, infra::ActionStatePubSub};
+mod detail;
 
-use crate::common::proxy::action::CoreProxyParams;
-
-use crate::auth::ticket::authorize::proxy::{authorize, AuthorizeEvent, AuthorizeInfra};
+use std::sync::Arc;
 
 use crate::auth::user::account::unregister::infra::{
-    DiscardAuthTicketRepository, UnregisterAuthUserAccountFieldsExtract,
-    UnregisterAuthUserAccountRepository,
+    UnregisterAuthUserAccountFieldsExtract, UnregisterAuthUserAccountInfra,
+    UnregisterAuthUserAccountLogger, UnregisterAuthUserAccountRepository,
 };
 
-use crate::{
-    auth::{
-        ticket::kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
-        user::login_id::kernel::data::ValidateLoginIdError,
+use crate::auth::{
+    ticket::kernel::data::AuthPermissionRequired,
+    user::account::unregister::data::{
+        UnregisterAuthUserAccountError, UnregisterAuthUserAccountSuccess,
     },
-    common::api::repository::data::RepositoryError,
 };
 
-pub enum UnregisterAuthUserAccountState {
-    Authorize(AuthorizeEvent),
-    UnregisterUser(UnregisterAuthUserAccountEvent),
+pub struct UnregisterAuthUserAccountAction<M: UnregisterAuthUserAccountInfra> {
+    infra: M,
+    logger: Arc<dyn UnregisterAuthUserAccountLogger>,
 }
 
-impl std::fmt::Display for UnregisterAuthUserAccountState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Authorize(event) => event.fmt(f),
-            Self::UnregisterUser(event) => event.fmt(f),
-        }
-    }
-}
+pub struct UnregisterAuthUserAccountInfo;
 
-pub trait UnregisterAuthUserAccountMaterial {
-    type Authorize: AuthorizeInfra;
-
-    type TicketRepository: DiscardAuthTicketRepository;
-    type UserRepository: UnregisterAuthUserAccountRepository;
-
-    fn authorize(&self) -> &Self::Authorize;
-
-    fn ticket_repository(&self) -> &Self::TicketRepository;
-    fn user_repository(&self) -> &Self::UserRepository;
-}
-
-pub struct UnregisterAuthUserAccountAction<M: UnregisterAuthUserAccountMaterial> {
-    pub info: UnregisterAuthUserAccountActionInfo,
-    pubsub: ActionStatePubSub<UnregisterAuthUserAccountState>,
-    material: M,
-}
-
-pub struct UnregisterAuthUserAccountActionInfo;
-
-impl UnregisterAuthUserAccountActionInfo {
-    pub const fn name(&self) -> &'static str {
-        "auth.user.account.unregister"
-    }
-
-    pub fn required(&self) -> AuthPermissionRequired {
+impl UnregisterAuthUserAccountInfo {
+    pub fn required() -> AuthPermissionRequired {
         AuthPermissionRequired::user()
     }
-
-    pub fn params(&self) -> CoreProxyParams {
-        (self.name(), self.required())
-    }
 }
 
-impl<M: UnregisterAuthUserAccountMaterial> UnregisterAuthUserAccountAction<M> {
-    pub fn with_material(material: M) -> Self {
-        Self {
-            info: UnregisterAuthUserAccountActionInfo,
-            pubsub: ActionStatePubSub::new(),
-            material,
-        }
-    }
-
-    pub fn subscribe(
-        &mut self,
-        handler: impl 'static + Fn(&UnregisterAuthUserAccountState) + Send + Sync,
-    ) {
-        self.pubsub.subscribe(handler);
-    }
-
-    pub async fn ignite(
-        self,
-        token: impl AuthorizeTokenExtract,
+impl<M: UnregisterAuthUserAccountInfra> UnregisterAuthUserAccountAction<M> {
+    pub async fn unregister(
+        &self,
         fields: impl UnregisterAuthUserAccountFieldsExtract,
-    ) -> MethodResult<UnregisterAuthUserAccountState> {
-        authorize(
-            self.material.authorize(),
-            (token, self.info.required()),
-            |event| {
-                self.pubsub
-                    .post(UnregisterAuthUserAccountState::Authorize(event))
-            },
-        )
-        .await?;
+    ) -> Result<UnregisterAuthUserAccountSuccess, UnregisterAuthUserAccountError> {
+        self.logger.try_to_unregister_auth_user_account();
 
-        unregister_user(&self.material, fields, |event| {
-            self.pubsub
-                .post(UnregisterAuthUserAccountState::UnregisterUser(event))
-        })
-        .await
-    }
-}
+        let fields = fields
+            .convert()
+            .map_err(|err| self.logger.invalid_request(err))?;
 
-pub enum UnregisterAuthUserAccountEvent {
-    Success,
-    Invalid(ValidateLoginIdError),
-    RepositoryError(RepositoryError),
-}
+        let user_id = self
+            .infra
+            .repository()
+            .lookup_user_id(&fields.login_id)
+            .await
+            .map_err(|err| self.logger.failed_to_lookup_user_id(err))?
+            .ok_or_else(|| {
+                self.logger
+                    .user_id_not_found(UnregisterAuthUserAccountError::NotFound)
+            })?;
 
-mod unregister_auth_user_account_event {
-    use super::UnregisterAuthUserAccountEvent;
-
-    const SUCCESS: &'static str = "unregister auth user account success";
-    const ERROR: &'static str = "unregister auth user account error";
-
-    impl std::fmt::Display for UnregisterAuthUserAccountEvent {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            match self {
-                Self::Success => write!(f, "{}", SUCCESS),
-                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
-                Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
-            }
-        }
-    }
-}
-
-async fn unregister_user<S>(
-    infra: &impl UnregisterAuthUserAccountMaterial,
-    fields: impl UnregisterAuthUserAccountFieldsExtract,
-    post: impl Fn(UnregisterAuthUserAccountEvent) -> S,
-) -> MethodResult<S> {
-    let fields = fields
-        .convert()
-        .map_err(|err| post(UnregisterAuthUserAccountEvent::Invalid(err)))?;
-
-    if let Some(user_id) = infra
-        .user_repository()
-        .lookup_user_id(&fields.login_id)
-        .await
-        .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?
-    {
-        infra
-            .user_repository()
+        self.infra
+            .repository()
             .unregister_user(&user_id, &fields.login_id)
             .await
-            .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?;
+            .map_err(|err| self.logger.failed_to_unregister_user(err))?;
 
-        infra
-            .ticket_repository()
-            .discard_all(&user_id)
+        self.infra
+            .repository()
+            .discard_all_ticket(&user_id)
             .await
-            .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?;
-    }
+            .map_err(|err| self.logger.failed_to_discard_all_ticket(err))?;
 
-    Ok(post(UnregisterAuthUserAccountEvent::Success))
+        Ok(self
+            .logger
+            .succeed_to_unregister_auth_user_account(UnregisterAuthUserAccountSuccess))
+    }
 }

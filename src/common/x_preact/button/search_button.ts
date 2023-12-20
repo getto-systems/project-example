@@ -1,26 +1,36 @@
 import { html } from "htm/preact"
-import { VNode } from "preact"
+import { PreactContent, PreactNode } from "../node"
 
-import { VNodeContent } from "../vnode"
+import { useAtom } from "../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { button_search } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_search, icon_spinner } from "../../../x_content/icon"
 import { iconHtml } from "../../util/icon/x_preact/icon"
 
-import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
+import { Atom } from "../../../z_vendor/getto-atom/atom"
+import { ObserveBoardState } from "../../util/board/observe/action"
 
 import { Icon } from "../../util/icon/data"
+import { ConnectState } from "../../util/connect/data"
 
-type Props = Readonly<{
-    label?: VNodeContent
+export function SearchButton({
+    label,
+    icon,
+    connect,
+    observe,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     icon?: Icon
-    isConnecting: boolean
-    observeState: ObserveBoardState
+    connect: Atom<ConnectState>
+    observe: Atom<ObserveBoardState>
     onClick: { (e: Event): void }
-}>
-export function SearchButton({ isConnecting, observeState, label, icon, onClick }: Props): VNode {
-    if (isConnecting) {
+}>): PreactNode {
+    const connectState = useAtom(connect)
+    const observeState = useAtom(observe)
+
+    if (connectState.isConnecting) {
         return button_search({ state: "connect", label: iconLabel(icon_spinner) })
     }
 
@@ -30,7 +40,7 @@ export function SearchButton({ isConnecting, observeState, label, icon, onClick 
         onClick,
     })
 
-    function iconLabel(icon: Icon): VNode {
+    function iconLabel(icon: Icon): PreactNode {
         return html`${label || "検索"} ${iconHtml(icon)}`
     }
 }

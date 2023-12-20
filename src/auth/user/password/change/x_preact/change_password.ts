@@ -1,14 +1,15 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../../../common/x_preact/node"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidateBoardMessage } from "../../../../../common/x_preact/design/form"
 
 import { changePasswordError } from "./helper"
-import { PasswordField } from "../../input/x_preact/input"
+import { AuthUserPasswordField } from "../../input/field/x_preact/input"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
 import { CloseButton } from "../../../../../common/x_preact/button/close_button"
 import { ChangeButton } from "../../../../../common/x_preact/button/change_button"
@@ -20,8 +21,8 @@ import { ChangePasswordAction } from "../action"
 type Props = Readonly<{
     change: ChangePasswordAction
 }>
-export function ChangePassword(props: Props): VNode {
-    const editableState = useApplicationState(props.change.editable.state)
+export function ChangePassword(props: Props): PreactNode {
+    const editableState = useAtom(props.change.editable.state)
 
     return box({
         form: true,
@@ -29,13 +30,13 @@ export function ChangePassword(props: Props): VNode {
         ...(editableState.isEditable
             ? {
                   body: [
-                      h(PasswordField, {
+                      h(AuthUserPasswordField, {
                           field: props.change.currentPassword,
                           title: "現在のパスワード",
                           help: ["変更前のパスワードを入力します"],
                           autocomplete: "current-password",
                       }),
-                      h(PasswordField, {
+                      h(AuthUserPasswordField, {
                           field: props.change.newPassword,
                           title: "新しいパスワード",
                           help: ["今後はこのパスワードになります"],
@@ -43,8 +44,8 @@ export function ChangePassword(props: Props): VNode {
                       }),
                   ],
                   footer: [
-                      buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
-                      h(ValidationMessage, props.change.validate),
+                      buttons({ left: h(Submit, {}), right: h(Reset, {}) }),
+                      h(ValidateBoardMessage, { state: props.change.validate }),
                       h(Message, {}),
                       buttons({ right: h(Close, {}) }),
                   ],
@@ -54,8 +55,8 @@ export function ChangePassword(props: Props): VNode {
               }),
     })
 
-    function Edit(_props: unknown): VNode {
-        const changeState = useApplicationState(props.change.state)
+    function Edit(_props: unknown): PreactNode {
+        const changeState = useAtom(props.change.state)
 
         if (changeState.type === "success") {
             return h(EditSuccessButton, { onClick })
@@ -65,19 +66,15 @@ export function ChangePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.edit()
+            props.change.editable.open()
         }
     }
 
-    function Submit(_props: unknown): VNode {
-        const changeState = useApplicationState(props.change.state)
-        const validateState = useApplicationState(props.change.validate.state)
-        const observeState = useApplicationState(props.change.observe.state)
-
+    function Submit(_props: unknown): PreactNode {
         return h(ChangeButton, {
-            isConnecting: changeState.type === "try",
-            validateState,
-            observeState,
+            connect: props.change.connect,
+            validate: props.change.validate,
+            observe: props.change.observe,
             onClick,
         })
 
@@ -87,18 +84,19 @@ export function ChangePassword(props: Props): VNode {
         }
     }
 
-    function Clear(_props: unknown): VNode {
-        const observeState = useApplicationState(props.change.observe.state)
-
-        return h(ClearChangesButton, { observeState, onClick })
+    function Reset(_props: unknown): PreactNode {
+        return h(ClearChangesButton, {
+            observe: props.change.observe,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.clear()
+            props.change.reset()
         }
     }
 
-    function Close(_props: unknown): VNode {
+    function Close(_props: unknown): PreactNode {
         return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
@@ -107,8 +105,8 @@ export function ChangePassword(props: Props): VNode {
         }
     }
 
-    function Message(_props: unknown): VNode {
-        const changeState = useApplicationState(props.change.state)
+    function Message(_props: unknown): PreactNode {
+        const changeState = useAtom(props.change.state)
 
         switch (changeState.type) {
             case "initial":

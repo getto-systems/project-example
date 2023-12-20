@@ -1,30 +1,18 @@
-import { initTextFieldAction, TextFieldAction } from "../../../../../common/util/input/field/text"
-import {
-    initMultipleFieldAction,
-    MultipleFieldAction,
-} from "../../../../../common/util/input/field/multiple"
+import { authUserTextConverter, AuthUserTextFieldName } from "./convert"
 
-import { authUserTextConverter, AuthUserTextField } from "./convert"
+import { initTextFieldBoard, TextFieldBoard } from "../../../../../common/util/board/field/action"
+import { BoardInitializer } from "../../../../../common/util/board/input/action"
 
 import { TypeAuthUser } from "../../kernel/data"
-import { AuthPermission } from "../../../kernel/data"
+import { ValidateTextError } from "../../../../../common/util/validate/data"
 
-export type AuthUserTextFieldAction<K extends AuthUserTextField> = TextFieldAction<TypeAuthUser<K>>
+export type AuthUserTextField<K extends AuthUserTextFieldName> = TextFieldBoard<
+    TypeAuthUser<K>,
+    readonly ValidateTextError[]
+>
 
-export function initAuthUserTextFieldAction<K extends AuthUserTextField>(
+export function initAuthUserTextField<K extends AuthUserTextFieldName>(
     key: K,
-): AuthUserTextFieldAction<K> {
-    return initTextFieldAction({ convert: authUserTextConverter(key) })
-}
-
-// TODO ticket の下に移動したい
-export type AuthPermissionGrantedFieldAction = MultipleFieldAction<AuthPermission>
-
-export function initAuthPermissionGrantedFieldAction(): Readonly<{
-    input: AuthPermissionGrantedFieldAction
-    setOptions: { (state: readonly AuthPermission[]): void }
-}> {
-    return initMultipleFieldAction({
-        convert: (data) => data,
-    })
+): [AuthUserTextField<K>, BoardInitializer<TypeAuthUser<K>>] {
+    return initTextFieldBoard({ convert: authUserTextConverter(key) })
 }

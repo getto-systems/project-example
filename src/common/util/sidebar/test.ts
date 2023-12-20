@@ -1,24 +1,23 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../z_vendor/getto-atom/test_helper"
 
-import { initMemoryDB } from "../repository/init/memory"
+import { initMemoryDB } from "../repository/detail/memory"
 
 import { searchSidebarRepositoryConverter } from "./convert"
-import { convertDB } from "../repository/init/convert"
+import { convertDB } from "../repository/detail/convert"
 
 import { initToggleSidebarAction, ToggleSidebarAction } from "./action"
 
 test("toggle sidebar", async () => {
     const { sidebar } = standard()
 
-    expect(
-        await observeApplicationState(sidebar.state, async () => {
-            await sidebar.state.ignitionState
-            await sidebar.fold()
-            await sidebar.expand()
-            return sidebar.state.currentState()
-        }),
-    ).toEqual([
+    const result = observeAtom(sidebar.state)
+
+    await sidebar.state.ignitionState
+    await sidebar.fold()
+    await sidebar.expand()
+
+    expect(result()).toEqual([
         { type: "success", state: { isExpand: true } },
         { type: "success", state: { isExpand: false } },
         { type: "success", state: { isExpand: true } },

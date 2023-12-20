@@ -1,27 +1,44 @@
+use std::sync::Arc;
+
 use actix_web::{
     get,
     web::{Data, Path},
-    HttpRequest, Responder,
+    HttpRequest, HttpResponse,
 };
 
-use getto_application::helper::flatten;
+use crate::x_outside_feature::proxy::feature::ProxyAppFeature;
 
-use crate::x_outside_feature::proxy::{feature::ProxyAppFeature, logger::ProxyLogger};
+use crate::common::api::{
+    feature::AsInfra, logger::detail::StdoutJsonLogger, response::x_actix_web::ProxyResponder,
+};
 
-use crate::auth::user::account::search::proxy::init::ActiveSearchAuthUserAccountProxyMaterial;
+use crate::auth::{
+    ticket::authorize::action::CheckAuthorizeTokenAction,
+    user::account::search::proxy::action::SearchAuthUserAccountProxyAction,
+};
 
-use crate::common::api::{logger::infra::Logger, response::actix_web::ProxyResponder};
+use crate::common::api::request::data::RequestInfo;
 
 #[get("/search/{body}")]
-async fn service_search(
+async fn service_search_user(
     feature: Data<ProxyAppFeature>,
     request: HttpRequest,
-    info: Path<String>,
-) -> impl Responder {
-    let (request_id, logger) = ProxyLogger::default(&feature, &request);
+    path: Path<String>,
+) -> HttpResponse {
+    async {
+        let info = RequestInfo::from_request(&request);
+        let logger = Arc::new(StdoutJsonLogger::with_request(info.clone()));
 
-    let mut action = ActiveSearchAuthUserAccountProxyMaterial::action(&feature, request_id);
-    action.subscribe(move |state| logger.log(state));
+        let infra = CheckAuthorizeTokenAction::live(feature.as_infra())
+            .with_logger(logger.clone())
+            .pick_authorized_infra(&feature, &request)
+            .await?;
 
-    flatten(action.ignite(&request, info.into_inner()).await).respond_to()
+        SearchAuthUserAccountProxyAction::live(infra)
+            .with_logger(logger)
+            .call(info, &request, path.into_inner())
+            .await
+    }
+    .await
+    .respond_to()
 }

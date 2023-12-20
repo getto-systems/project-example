@@ -1,14 +1,3 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../../z_vendor/getto-application/action/action"
-
-import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
-import { PasswordFieldAction, initPasswordFieldAction } from "../../input/action"
-import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardAction } from "../../../../../z_vendor/getto-application/board/observe_board/action"
-import { initRegisterField } from "../../../../../common/util/register/action"
-
 import { checkTakeLongtime } from "../../../../../common/util/timer/helper"
 
 import { getScriptPath } from "../../../../sign/get_script_path/method"
@@ -19,24 +8,32 @@ import {
     StartContinuousRenewEvent,
 } from "../../../../ticket/authenticate/method"
 
-import { GetScriptPathConfig, GetScriptPathShell } from "../../../../sign/get_script_path/infra"
+import { Atom, initAtom, mapAtom } from "../../../../../z_vendor/getto-atom/atom"
+import { ValidateBoardState } from "../../../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../../../common/util/board/observe/action"
+import { composeRegisterFieldBoard } from "../../../../../common/util/board/field/action"
+import { PasswordField, initPasswordField } from "../../input/field/action"
+
 import { WaitTime } from "../../../../../common/util/config/infra"
+import { GetScriptPathConfig, GetScriptPathShell } from "../../../../sign/get_script_path/infra"
 import { ResetPasswordRemote, ResetTokenDetecter } from "./infra"
 
 import { LoadScriptError, ConvertScriptPathResult } from "../../../../sign/get_script_path/data"
 import { ResetPasswordError, ResetPasswordFields } from "./data"
 import { AuthTicket } from "../../../../ticket/kernel/data"
-import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
+import { ConvertBoardResult } from "../../../../../common/util/board/kernel/data"
 import { RepositoryError } from "../../../../../common/util/repository/data"
+import { ConnectState } from "../../../../../common/util/connect/data"
 
 export interface ResetPasswordAction {
-    readonly state: ApplicationState<ResetPasswordState>
-    readonly loginId: LoginIdFieldAction
-    readonly password: PasswordFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<ResetPasswordState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
 
-    clear(): void
+    readonly newPassword: PasswordField
+
+    reset(): void
     submit(): Promise<ResetPasswordState>
     loadError(err: LoadScriptError): Promise<ResetPasswordState>
 }
@@ -73,79 +70,74 @@ export type ResetPasswordConfig = Readonly<{
     GetScriptPathConfig
 
 export function initResetPasswordAction(material: ResetPasswordMaterial): ResetPasswordAction {
-    const { state, post } = initApplicationState({ initialState })
-
-    const loginId = initLoginIdFieldAction()
-    const password = initPasswordFieldAction()
-
-    const convert = (): ConvertBoardResult<ResetPasswordFields> => {
-        const result = {
-            loginId: loginId.validate.check(),
-            password: password.validate.check(),
+    const resetPassword = initAtom({ initialState })
+    async function registerWithCurrentState(): Promise<ResetPasswordState> {
+        const fields = currentFields()
+        if (!fields.valid) {
+            return resetPassword.state.currentState()
         }
-        if (!result.loginId.valid || !result.password.valid) {
+        const result = await resetAuthUserPassword(material, fields.value, resetPassword.post)
+        if (!result.success) {
+            return result.state
+        }
+        return startContinuousRenew(
+            material,
+            { hasTicket: true, ticket: result.ticket },
+            (event) => {
+                switch (event.type) {
+                    case "succeed-to-start-continuous-renew":
+                        return resetPassword.post({
+                            type: "try-to-load",
+                            scriptPath: getScriptPath(material),
+                        })
+                    default:
+                        return resetPassword.post(event)
+                }
+            },
+        )
+    }
+    async function loadError(err: LoadScriptError): Promise<ResetPasswordState> {
+        return resetPassword.post({ type: "load-error", err })
+    }
+
+    const newPassword = initPasswordField()
+
+    const currentFields = (): ConvertBoardResult<ResetPasswordFields> => {
+        const result = {
+            newPassword: newPassword[0].validate.currentState(),
+        }
+        if (!result.newPassword.valid) {
             return { valid: false }
         }
         return {
             valid: true,
             value: {
-                loginId: result.loginId.value,
-                newPassword: result.password.value,
+                newPassword: result.newPassword.value,
             },
         }
     }
 
-    const { validate, observe, clear } = initRegisterField(
-        [
-            ["loginId", loginId],
-            ["password", password],
-        ],
-        convert,
-    )
+    const { validate, observe, reset } = composeRegisterFieldBoard([newPassword])
+
+    const connect = mapAtom(resetPassword.state, (state): ConnectState => {
+        if (state.type === "try-to-reset") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
+    })
 
     return {
-        state,
-
-        loginId,
-        password,
-
+        state: resetPassword.state,
+        connect,
         validate,
         observe,
 
-        clear,
+        newPassword: newPassword[0],
 
-        async submit(): Promise<ResetPasswordState> {
-            const fields = convert()
-            if (!fields.valid) {
-                return state.currentState()
-            }
-            const result = await reset(material, fields.value, post)
-            if (!result.success) {
-                return result.state
-            }
-            return start(result.ticket)
-        },
-        async loadError(err: LoadScriptError): Promise<ResetPasswordState> {
-            return post({ type: "load-error", err })
-        },
-    }
-
-    async function start(ticket: AuthTicket): Promise<ResetPasswordState> {
-        return await startContinuousRenew(material, { hasTicket: true, ticket }, (event) => {
-            switch (event.type) {
-                case "succeed-to-start-continuous-renew":
-                    return post({
-                        type: "try-to-load",
-                        scriptPath: scriptPath(),
-                    })
-                default:
-                    return post(event)
-            }
-        })
-    }
-
-    function scriptPath() {
-        return getScriptPath(material)
+        reset,
+        submit: registerWithCurrentState,
+        loadError,
     }
 }
 
@@ -158,7 +150,7 @@ type ResetResult<S> =
     | Readonly<{ success: true; ticket: AuthTicket }>
     | Readonly<{ success: false; state: S }>
 
-async function reset<S>(
+async function resetAuthUserPassword<S>(
     { infra, shell, config }: ResetPasswordMaterial,
     fields: ResetPasswordFields,
     post: Post<ResetEvent, S>,

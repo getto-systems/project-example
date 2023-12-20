@@ -1,11 +1,11 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../../common/util/timer/helper"
 
-import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
+import { mockSingleBoardStore } from "../../../../../common/util/board/input/test_helper"
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "./infra"
-import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
+import { SingleBoardStore } from "../../../../../common/util/board/input/infra"
 import { initRequestResetTokenAction, RequestResetTokenAction } from "./action"
 
 const VALID_LOGIN = { loginId: "login-id" } as const
@@ -13,26 +13,26 @@ const VALID_LOGIN = { loginId: "login-id" } as const
 test("submit valid login-id", async () => {
     const { action, store } = standard()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
+    const result = observeAtom(action.state)
 
-            return action.submit()
-        }),
-    ).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
+    store.loginId.set(VALID_LOGIN.loginId)
+
+    await action.submit()
+
+    expect(result()).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
 })
 
 test("submit valid login-id; with take longtime", async () => {
     // wait for take longtime timeout
     const { action, store } = takeLongtime()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
+    const result = observeAtom(action.state)
 
-            return action.submit()
-        }),
-    ).toEqual([
+    store.loginId.set(VALID_LOGIN.loginId)
+
+    await action.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
         { type: "success" },
@@ -42,11 +42,11 @@ test("submit valid login-id; with take longtime", async () => {
 test("submit without fields", async () => {
     const { action } = standard()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.submit()
-        }),
-    ).toEqual([])
+    const result = observeAtom(action.state)
+
+    await action.submit()
+
+    expect(result()).toEqual([])
 })
 
 test("edit", () => {
@@ -54,7 +54,7 @@ test("edit", () => {
 
     store.loginId.set(VALID_LOGIN.loginId)
 
-    action.edit()
+    action.editable.open()
 
     expect(store.loginId.get()).toEqual("")
 })
@@ -69,7 +69,7 @@ function takeLongtime() {
 function initResource(requestTokenRemote: RequestResetTokenRemote): Readonly<{
     action: RequestResetTokenAction
     store: Readonly<{
-        loginId: BoardValueStore
+        loginId: SingleBoardStore
     }>
 }> {
     const action = initRequestResetTokenAction({
@@ -82,7 +82,7 @@ function initResource(requestTokenRemote: RequestResetTokenRemote): Readonly<{
     })
 
     const store = {
-        loginId: mockBoardValueStore(action.loginId.input),
+        loginId: mockSingleBoardStore(action.loginId.input),
     }
 
     return { action, store }

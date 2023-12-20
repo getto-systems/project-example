@@ -1,20 +1,19 @@
 import { html } from "htm/preact"
-import { VNode } from "preact"
+import { PreactContent, PreactNode } from "../node"
 
-import { VNodeContent } from "../vnode"
+import { useAtom } from "../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { fieldHelp, fieldHelp_error } from "../../../z_vendor/getto-css/preact/design/form"
-import { VectorButton } from "../../../z_vendor/getto-application/board/input/x_preact/vector"
+import { VectorButton } from "../../util/board/input/x_preact/vector"
 
 import { VectorAddButton } from "../button/vector_add_button"
 import { VectorRemoveButton } from "../button/vector_remove_button"
 import { VectorUndoRemoveButton } from "../button/vector_undo_remove_button"
 
-import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
-import { ApplicationState } from "../../../z_vendor/getto-application/action/action"
-import { useApplicationState } from "../../../z_vendor/getto-application/action/x_preact/hooks"
+import { Atom } from "../../../z_vendor/getto-atom/atom"
+import { ValidateBoardState } from "../../util/board/validate/action"
 
-export function takeLongtimeField(label: VNodeContent): VNode {
+export function takeLongtimeField(label: PreactContent): PreactNode {
     return fieldHelp({
         help: [
             html`${label}に時間がかかっています`,
@@ -24,19 +23,15 @@ export function takeLongtimeField(label: VNodeContent): VNode {
     })
 }
 
-export function ValidationMessage(
-    props: Readonly<{ state: ApplicationState<ValidateBoardState> }>,
-): VNode {
-    const validateState = useApplicationState(props.state)
+export function ValidateBoardMessage(
+    props: Readonly<{ state: Atom<ValidateBoardState> }>,
+): PreactNode {
+    const validateState = useAtom(props.state)
 
-    switch (validateState) {
-        case "initial":
-        case "valid":
-            return html``
-
-        case "invalid":
-            return fieldHelp_error(["正しく入力されていません"])
+    if (validateState.valid) {
+        return html``
     }
+    return fieldHelp_error(["正しく入力されていません"])
 }
 
 export function vectorButton(): VectorButton {

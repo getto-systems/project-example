@@ -16,6 +16,7 @@ impl ServiceAuthorizeToken {
     }
 }
 
+#[derive(Debug)]
 pub enum ServiceAuthorizeError {
     InfraError(String),
 }
@@ -28,6 +29,7 @@ impl std::fmt::Display for ServiceAuthorizeError {
     }
 }
 
+#[derive(Debug)]
 pub enum ServiceConnectError {
     UrlParseError(ParseError),
     InvalidUrlError,
@@ -44,6 +46,7 @@ impl std::fmt::Display for ServiceConnectError {
     }
 }
 
+#[derive(Debug)]
 pub enum ServiceMetadataError {
     MetadataError(MetadataError),
     InvalidMetadataValue(InvalidMetadataValue),

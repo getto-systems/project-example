@@ -1,50 +1,48 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
-import {
-    InputBoardAction,
-    initMultipleInputBoardAction,
-} from "../../../../z_vendor/getto-application/board/input/action"
+import { Atom, initAtom } from "../../../../z_vendor/getto-atom/atom"
+import { loadState_loaded } from "../../load/data"
+import { MultipleFilterBoard, initMultipleFilterBoard } from "../../board/filter/action"
 
 import { SearchColumnsRepository } from "./infra"
-import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { RepositoryError } from "../../repository/data"
+import { TableDataCell } from "../../../../z_vendor/getto-table/preact/core"
 
-export interface SearchColumnsAction {
-    readonly state: ApplicationState<SearchColumnsState>
-    readonly input: InputBoardAction<MultipleBoardValueStore>
-}
+export type SearchColumnsBoard = MultipleFilterBoard<TableDataCell, string> &
+    Readonly<{
+        state: Atom<SearchColumnsState>
+    }>
+
+export type SearchColumnsState =
+    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 export type SearchColumnsInfra = Readonly<{
     columnsRepository: SearchColumnsRepository
 }>
 
-export type SearchColumnsState =
-    | Readonly<{ type: "columns"; visibleKeys: readonly string[] }>
-    | Readonly<{ type: "repository-error"; err: RepositoryError }>
-
-export function initSearchColumnsAction(
+export function initSearchColumnsBoard(
     infra: SearchColumnsInfra,
-    initial: readonly string[],
-): SearchColumnsAction {
-    const { state, post } = initApplicationState({
-        initialState: { type: "columns", visibleKeys: initial },
+    columns: readonly TableDataCell[],
+): SearchColumnsBoard {
+    const [board, initializer] = initMultipleFilterBoard({
+        initial: columns.filter((column) => column.isInitiallyVisible).map((column) => column.key),
+        options: initAtom({ initialState: loadState_loaded(columns) }).state,
+        toFilter: (option) => option.key,
+        toValue: (option) => option.key,
+    })
+
+    const { state, post } = initAtom<SearchColumnsState>({
+        initialState: { type: "success" },
         ignite: load,
     })
 
-    const { input, store, subscriber } = initMultipleInputBoardAction()
-
-    subscriber.subscribe(() => {
-        save(store.get())
+    board.value.subscribe((value) => {
+        save(value)
     })
 
-    store.set(initial)
-
     return {
+        ...board,
         state,
-        input,
     }
 
     async function save(columns: readonly string[]): Promise<SearchColumnsState> {
@@ -53,7 +51,7 @@ export function initSearchColumnsAction(
         if (!result.success) {
             return post({ type: "repository-error", err: result.err })
         }
-        return post({ type: "columns", visibleKeys: store.get() })
+        return post({ type: "success" })
     }
 
     async function load(): Promise<SearchColumnsState> {
@@ -64,18 +62,12 @@ export function initSearchColumnsAction(
             return post({ type: "repository-error", err: columnsResult.err })
         }
         if (columnsResult.found) {
-            store.set(columnsResult.value)
+            initializer.init(
+                columns
+                    .filter((column) => columnsResult.value.includes(column.key))
+                    .map((column) => column.key),
+            )
         }
-        return post({ type: "columns", visibleKeys: store.get() })
-    }
-}
-
-export function visibleKeys(state: SearchColumnsState): readonly string[] {
-    switch (state.type) {
-        case "repository-error":
-            return []
-
-        case "columns":
-            return state.visibleKeys
+        return post({ type: "success" })
     }
 }

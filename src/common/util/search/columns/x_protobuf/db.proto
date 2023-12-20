@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package z_lib.search.columns.db;
+package common.util.search.columns.db;
 
 message ColumnsPb {
   repeated string columns = 1;

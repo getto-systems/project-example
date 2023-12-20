@@ -1,19 +1,19 @@
 import { newWorkerBackgroundOutsideFeature } from "../../../../../x_outside_feature/worker"
 
-import { newChangePasswordWorkerHandler } from "../../../../../auth/user/password/change/init/worker/background"
-import { newRequestResetTokenWorkerHandler } from "../../../../../auth/user/password/reset/request_token/init/worker/background"
+import { newChangePasswordWorkerHandler } from "../../../../../auth/user/password/change/detail/worker/background"
+import { newRequestResetTokenWorkerHandler } from "../../../../../auth/user/password/reset/request_token/detail/worker/background"
 
-import { WorkerBackgroundHandler } from "../../../../../z_vendor/getto-application/action/worker/background"
+import { WorkerBackgroundHandler } from "../../../../../common/util/worker/background"
 
 import { ProfileForegroundMessage, ProfileBackgroundMessage } from "./message"
 import {
     ChangePasswordProxyMessage,
     ChangePasswordProxyResponse,
-} from "../../../../../auth/user/password/change/init/worker/message"
+} from "../../../../../auth/user/password/change/detail/worker/message"
 import {
     RequestResetTokenProxyMessage,
     RequestResetTokenProxyResponse,
-} from "../../../../../auth/user/password/reset/request_token/init/worker/message"
+} from "../../../../../auth/user/password/reset/request_token/detail/worker/message"
 
 newBackground()
 

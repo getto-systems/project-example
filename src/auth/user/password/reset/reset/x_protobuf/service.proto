@@ -9,8 +9,7 @@ service ResetPasswordPb {
 }
 message ResetPasswordRequestPb {
     string reset_token = 1;
-    string login_id = 2;
-    string new_password = 3;
+    string new_password = 2;
 }
 message ResetPasswordResponsePb {
     bool success = 1;
