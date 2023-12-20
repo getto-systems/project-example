@@ -1,25 +1,24 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../../common/util/timer/helper"
 
-import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
+import { mockSingleBoardStore } from "../../../../../common/util/board/input/test_helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../common/util/clock/mock"
-import { mockSecureServerURL } from "../../../../sign/get_script_path/init/mock"
-import { mockResetPasswordShell } from "./init/mock"
-import { initMemoryDB } from "../../../../../common/util/repository/init/memory"
+import { mockSecureServerURL } from "../../../../sign/get_script_path/detail/mock"
+import { mockResetPasswordShell } from "./detail/mock"
+import { initMemoryDB } from "../../../../../common/util/repository/detail/memory"
 
 import { authTicketRepositoryConverter } from "../../../../ticket/kernel/convert"
 import { convertCheckRemote } from "../../../../ticket/authenticate/convert"
-import { convertDB } from "../../../../../common/util/repository/init/convert"
+import { convertDB } from "../../../../../common/util/repository/detail/convert"
 
 import { Clock } from "../../../../../common/util/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "./infra"
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../../ticket/kernel/infra"
 import { CheckAuthTicketRemote } from "../../../../ticket/authenticate/infra"
-import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
+import { SingleBoardStore } from "../../../../../common/util/board/input/infra"
 
 import { initResetPasswordAction, ResetPasswordAction } from "./action"
-import { LoadScriptError } from "../../../../sign/get_script_path/data"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -30,7 +29,7 @@ const CONTINUOUS_RENEW_START_AT = new Date("2020-01-01 10:00:01")
 // renew ごとに次の時刻に移行
 const CONTINUOUS_RENEW_AT = [new Date("2020-01-01 10:01:00"), new Date("2020-01-01 11:00:00")]
 
-const VALID_LOGIN = { loginId: "login-id", password: "password" } as const
+const VALID_LOGIN = { newPassword: "password" } as const
 
 test("submit valid login-id and password", async () => {
     const { clock, action, store } = standard()
@@ -43,13 +42,13 @@ test("submit valid login-id and password", async () => {
         }
     })
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
-            store.password.set(VALID_LOGIN.password)
-            return action.submit()
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    store.newPassword.set(VALID_LOGIN.newPassword)
+
+    await action.submit()
+
+    expect(result()).toEqual([
         { type: "try-to-reset", hasTakenLongtime: false },
         {
             type: "try-to-load",
@@ -73,13 +72,13 @@ test("submit valid login-id and password; with take longtime", async () => {
         }
     })
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
-            store.password.set(VALID_LOGIN.password)
-            return action.submit()
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    store.newPassword.set(VALID_LOGIN.newPassword)
+
+    await action.submit()
+
+    expect(result()).toEqual([
         { type: "try-to-reset", hasTakenLongtime: false },
         { type: "try-to-reset", hasTakenLongtime: true },
         {
@@ -95,57 +94,55 @@ test("submit valid login-id and password; with take longtime", async () => {
 test("submit without fields", async () => {
     const { action } = standard()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.submit()
-        }),
-    ).toEqual([])
+    const result = observeAtom(action.state)
+
+    await action.submit()
+
+    expect(result()).toEqual([])
 })
 
 test("submit without resetToken", async () => {
     const { action, store } = noResetToken()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
-            store.password.set(VALID_LOGIN.password)
-            return action.submit()
-        }),
-    ).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
+    const result = observeAtom(action.state)
+
+    store.newPassword.set(VALID_LOGIN.newPassword)
+
+    await action.submit()
+
+    expect(result()).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
 })
 test("submit with empty resetToken", async () => {
     const { action, store } = emptyResetToken()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            store.loginId.set(VALID_LOGIN.loginId)
-            store.password.set(VALID_LOGIN.password)
-            return action.submit()
-        }),
-    ).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
+    const result = observeAtom(action.state)
+
+    store.newPassword.set(VALID_LOGIN.newPassword)
+
+    await action.submit()
+
+    expect(result()).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
 })
 
-test("clear", () => {
+test("reset", () => {
     const { action, store } = standard()
 
-    store.loginId.set(VALID_LOGIN.loginId)
-    store.password.set(VALID_LOGIN.password)
-    action.clear()
+    store.newPassword.set(VALID_LOGIN.newPassword)
+    action.reset()
 
-    expect(store.loginId.get()).toEqual("")
-    expect(store.password.get()).toEqual("")
+    expect(store.newPassword.get()).toEqual("")
 })
 
 test("load error", async () => {
     const { action } = standard()
 
-    const err: LoadScriptError = { type: "infra-error", err: "load error" }
+    const result = observeAtom(action.state)
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.loadError(err)
-        }),
-    ).toEqual([{ type: "load-error", err }])
+    await action.loadError({ type: "infra-error", err: "load error" })
+
+    expect(result()).toEqual([
+        { type: "load-error", err: { type: "infra-error", err: "load error" } },
+    ])
 })
 
 function standard() {
@@ -201,8 +198,7 @@ function initResource(
 ): Readonly<{
     action: ResetPasswordAction
     store: Readonly<{
-        loginId: BoardValueStore
-        password: BoardValueStore
+        newPassword: SingleBoardStore
     }>
 }> {
     const ticketRepository = standard_ticketRepository()
@@ -224,8 +220,7 @@ function initResource(
     })
 
     const store = {
-        loginId: mockBoardValueStore(action.loginId.input),
-        password: mockBoardValueStore(action.password.input),
+        newPassword: mockSingleBoardStore(action.newPassword.input),
     }
 
     return { action, store }

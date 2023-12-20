@@ -1,18 +1,15 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../common/util/timer/helper"
 import {
-    mockBoardValueStore,
-    mockMultipleBoardValueStore,
-} from "../../../../z_vendor/getto-application/board/input/test_helper"
+    mockSingleBoardStore,
+    mockMultipleBoardStore,
+} from "../../../../common/util/board/input/test_helper"
 
 import { RegisterAuthUserAccountAction, initRegisterAuthUserAccountAction } from "./action"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
-import {
-    BoardValueStore,
-    MultipleBoardValueStore,
-} from "../../../../z_vendor/getto-application/board/input/infra"
+import { SingleBoardStore, MultipleBoardStore } from "../../../../common/util/board/input/infra"
 
 const VALID_INFO = {
     loginId: "login-id",
@@ -24,17 +21,17 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { register, store } = standard()
 
-    expect(
-        await observeApplicationState(register.state, async () => {
-            store.loginId.set(VALID_INFO.loginId)
-            store.granted.set(VALID_INFO.granted)
-            store.resetTokenDestinationType.set("email")
-            store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
-            store.memo.set(VALID_INFO.memo)
+    const result = observeAtom(register.state)
 
-            return register.submit()
-        }),
-    ).toEqual([
+    store.loginId.set(VALID_INFO.loginId)
+    store.granted.set(VALID_INFO.granted)
+    store.resetTokenDestinationType.set("email")
+    store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+    store.memo.set(VALID_INFO.memo)
+
+    await register.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         {
             type: "success",
@@ -53,17 +50,17 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { register, store } = takeLongtime_elements()
 
-    expect(
-        await observeApplicationState(register.state, async () => {
-            store.loginId.set(VALID_INFO.loginId)
-            store.granted.set(VALID_INFO.granted)
-            store.resetTokenDestinationType.set("email")
-            store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
-            store.memo.set(VALID_INFO.memo)
+    const result = observeAtom(register.state)
 
-            return register.submit()
-        }),
-    ).toEqual([
+    store.loginId.set(VALID_INFO.loginId)
+    store.granted.set(VALID_INFO.granted)
+    store.resetTokenDestinationType.set("email")
+    store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+    store.memo.set(VALID_INFO.memo)
+
+    await register.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
         {
@@ -79,7 +76,7 @@ test("submit valid login-id; take long time", async () => {
     ])
 })
 
-test("clear", () => {
+test("reset", () => {
     const { register, store } = standard()
 
     store.loginId.set(VALID_INFO.loginId)
@@ -88,11 +85,11 @@ test("clear", () => {
     store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
     store.memo.set(VALID_INFO.memo)
 
-    register.clear()
+    register.reset()
 
     expect(store.loginId.get()).toEqual("")
     expect(store.granted.get()).toEqual([])
-    expect(store.resetTokenDestinationType.get()).toEqual("none")
+    expect(store.resetTokenDestinationType.get()).toEqual("")
     expect(store.resetTokenDestinationEmail.get()).toEqual("")
     expect(store.memo.get()).toEqual("")
 })
@@ -107,14 +104,14 @@ function takeLongtime_elements() {
 function initResource(registerUserRemote: RegisterAuthUserAccountRemote): Readonly<{
     register: RegisterAuthUserAccountAction
     store: Readonly<{
-        loginId: BoardValueStore
-        granted: MultipleBoardValueStore
-        resetTokenDestinationType: BoardValueStore
-        resetTokenDestinationEmail: BoardValueStore
-        memo: BoardValueStore
+        loginId: SingleBoardStore
+        granted: MultipleBoardStore
+        resetTokenDestinationType: SingleBoardStore
+        resetTokenDestinationEmail: SingleBoardStore
+        memo: SingleBoardStore
     }>
 }> {
-    const register = initRegisterAuthUserAccountAction({
+    const [register, _updater] = initRegisterAuthUserAccountAction({
         infra: {
             registerUserRemote,
         },
@@ -125,13 +122,13 @@ function initResource(registerUserRemote: RegisterAuthUserAccountRemote): Readon
     })
 
     const store = {
-        loginId: mockBoardValueStore(register.loginId.input),
-        granted: mockMultipleBoardValueStore(register.granted.input),
-        resetTokenDestinationType: mockBoardValueStore(
-            register.resetTokenDestination.destinationType,
+        loginId: mockSingleBoardStore(register.loginId.input),
+        granted: mockMultipleBoardStore(register.granted.input),
+        resetTokenDestinationType: mockSingleBoardStore(register.resetTokenDestination.type.input),
+        resetTokenDestinationEmail: mockSingleBoardStore(
+            register.resetTokenDestination.email.input,
         ),
-        resetTokenDestinationEmail: mockBoardValueStore(register.resetTokenDestination.email),
-        memo: mockBoardValueStore(register.memo.input),
+        memo: mockSingleBoardStore(register.memo.input),
     }
 
     return {

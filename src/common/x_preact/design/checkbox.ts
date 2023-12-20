@@ -1,8 +1,9 @@
-import { PrepareElementState } from "../../util/prepare/data"
-import { CheckboxBoardContent } from "../../../z_vendor/getto-application/board/input/x_preact/checkbox"
+import { CheckboxBoardContent } from "../../util/board/input/x_preact/checkbox"
+
+import { LoadState } from "../../util/load/data"
 
 export function checkboxOptions<T>(
-    state: PrepareElementState<readonly T[]>,
+    state: LoadState<readonly T[]>,
     option: { (value: T): CheckboxBoardContent },
 ): readonly CheckboxBoardContent[] {
     if (state.isLoad) {

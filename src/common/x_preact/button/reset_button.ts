@@ -1,17 +1,23 @@
-import { VNode } from "preact"
+import { PreactContent, PreactNode } from "../vnode"
 
-import { VNodeContent } from "../vnode"
+import { useAtom } from "../../../z_vendor/getto-atom/x_preact/hooks"
 
-import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
+import { Atom } from "../../../z_vendor/getto-atom/atom"
+import { ObserveBoardState } from "../../util/board/observe/action"
 
 import { button_disabled, button_undo } from "../../../z_vendor/getto-css/preact/design/form"
 
-type Props = Readonly<{
-    observeState: ObserveBoardState
-    label?: VNodeContent
+export function ResetButton({
+    observe,
+    label,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
+    observe: Atom<ObserveBoardState>
     onClick: { (e: Event): void }
-}>
-export function ResetButton({ observeState, label, onClick }: Props): VNode {
+}>): PreactNode {
+    const observeState = useAtom(observe)
+
     const buttonLabel = label || "変更前に戻す"
 
     if (observeState.hasChanged) {

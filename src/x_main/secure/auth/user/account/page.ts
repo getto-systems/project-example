@@ -1,6 +1,7 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
+import { PreactNode } from "../../../../../common/x_preact/vnode"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import {
     appLayout,
@@ -29,7 +30,7 @@ import { isSidebarExpand } from "../../../../../common/util/sidebar/x_preact/hel
 
 import { ManageUserAccountPageResource } from "./resource"
 
-export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNode {
+export function ManageUserAccountPage(props: ManageUserAccountPageResource): PreactNode {
     const pageTitle = "ユーザー"
     const focusedTitle = "ユーザー詳細"
     const sidebarTitle = "一覧"
@@ -37,8 +38,8 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
     useDocumentTitle(pageTitle)
     const err = useNotifyUnexpectedError(props)
 
-    const sidebarState = useApplicationState(props.sidebar.state)
-    const focusState = useApplicationState(props.search.list.focus.state)
+    const sidebarState = useAtom(props.sidebar.state)
+    const isFocused = useAtom(props.search.focus.isSomeEntryFocused)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -48,18 +49,8 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
         siteInfo,
         header: [],
         menu: h(DisplayOutlineMenu, props),
-        ...(focusState.type === "close"
+        ...(isFocused
             ? {
-                  main: appMain({
-                      header: mainHeader([
-                          mainTitle(pageTitle),
-                          h(DisplayOutlineBreadcrumbList, props),
-                      ]),
-                      body: mainBody(h(SearchAuthUserAccount, props)),
-                      copyright,
-                  }),
-              }
-            : {
                   main: appMain({
                       header: mainHeader([
                           h(MainTitleWithSidebar, {
@@ -78,6 +69,16 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
                             copyright,
                         })
                       : undefined,
+              }
+            : {
+                  main: appMain({
+                      header: mainHeader([
+                          mainTitle(pageTitle),
+                          h(DisplayOutlineBreadcrumbList, props),
+                      ]),
+                      body: mainBody(h(SearchAuthUserAccount, props)),
+                      copyright,
+                  }),
               }),
     })
 }

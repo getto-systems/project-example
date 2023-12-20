@@ -1,85 +1,66 @@
 import { test, expect, describe } from "vitest"
 
-import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
-import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
-import { restoreAuthUserField } from "../../kernel/convert"
+import { observeAtom } from "../../../../../z_vendor/getto-atom/test_helper"
+import { mockSingleBoardStore } from "../../../../../common/util/board/input/test_helper"
 
-import { initAuthUserTextFieldAction } from "./action"
+import { initAuthUserTextField } from "./action"
 
 const fields = [{ name: "memo", maxLength: 255 }] as const
 
 describe.each(fields)("$name", ({ name, maxLength }) => {
     test("validate; valid input", async () => {
-        const { action, store } = standard()
+        const { field, store } = standard()
 
-        expect(
-            await observeApplicationState(action.validate.state, async () => {
-                store.set("valid")
-                return action.validate.state.currentState()
-            }),
-        ).toEqual([{ type: "validated", result: { valid: true, value: "valid" } }])
+        const result = observeAtom(field.validate)
+
+        store.set("valid")
+
+        expect(result()).toEqual([{ valid: true, value: "valid" }])
     })
 
     test("validate; invalid : too-long", async () => {
-        const { action, store } = standard()
+        const { field, store } = standard()
 
-        expect(
-            await observeApplicationState(action.validate.state, async () => {
-                store.set("a".repeat(maxLength + 1))
-                return action.validate.state.currentState()
-            }),
-        ).toEqual([
-            {
-                type: "validated",
-                result: { valid: false, err: [{ type: "too-long", maxLength }] },
-            },
-        ])
+        const result = observeAtom(field.validate)
+
+        store.set("a".repeat(maxLength + 1))
+
+        expect(result()).toEqual([{ valid: false, err: [{ type: "too-long", maxLength }] }])
     })
 
     test("validate; valid : just max-length", async () => {
-        const { action, store } = standard()
+        const { field, store } = standard()
 
-        expect(
-            await observeApplicationState(action.validate.state, async () => {
-                store.set("a".repeat(maxLength))
-                return action.validate.state.currentState()
-            }),
-        ).toEqual([{ type: "validated", result: { valid: true, value: "a".repeat(maxLength) } }])
+        const result = observeAtom(field.validate)
+
+        store.set("a".repeat(maxLength))
+
+        expect(result()).toEqual([{ valid: true, value: "a".repeat(maxLength) }])
     })
 
     test("observe; has changed", async () => {
-        const { action, store } = standard()
+        const { field, store } = standard()
 
-        expect(
-            await observeApplicationState(action.observe.state, async () => {
-                store.set("changed")
-                return action.observe.state.currentState()
-            }),
-        ).toEqual([{ hasChanged: true }])
+        const result = observeAtom(field.observe)
+
+        store.set("changed")
+
+        expect(result()).toEqual([{ hasChanged: true }])
     })
 
     test("reset", () => {
-        const { action, store } = standard()
+        const { initializer, store } = standard()
 
         store.set("valid")
-        action.reset(restoreAuthUserField(""))
-
-        expect(store.get()).toEqual("")
-    })
-
-    test("clear", () => {
-        const { action, store } = standard()
-
-        store.set("valid")
-        action.clear()
+        initializer.reset()
 
         expect(store.get()).toEqual("")
     })
 
     function standard() {
-        const action = initAuthUserTextFieldAction(name)
-        const store = mockBoardValueStore(action.input)
+        const [field, initializer] = initAuthUserTextField(name)
+        const store = mockSingleBoardStore(field.input)
 
-        return { action, store }
+        return { field, initializer, store }
     }
 })

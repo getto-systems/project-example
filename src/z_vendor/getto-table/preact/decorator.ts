@@ -1,4 +1,4 @@
-import { VNodeContent } from "./common"
+import { PreactContent } from "./common"
 
 import { decorateAlign } from "./decorator/align"
 import { decorateHorizontalBorder } from "./decorator/border"
@@ -26,7 +26,7 @@ export type TableDataContentDecoratorProvider =
     | Readonly<{ type: "decorate"; decorator: TableDataContentDecorator }>
 
 export interface TableDataContentDecorator {
-    (label: VNodeContent): VNodeContent
+    (label: PreactContent): PreactContent
 }
 
 export interface TableDataHorizontalBorderProvider<R> {
@@ -38,10 +38,10 @@ export type TableDataSummaryProvider<M> =
     | Readonly<{ type: "content"; content: TableDataSummaryContentProvider<M> }>
 
 export interface TableDataContentProvider {
-    (): VNodeContent
+    (): PreactContent
 }
 export interface TableDataSummaryContentProvider<M> {
-    (model: M): VNodeContent
+    (model: M): PreactContent
 }
 
 export type TableDataStyleDecorator =
@@ -103,9 +103,9 @@ export function decorateRowStyle(
 }
 
 export function decorateContent(
-    content: VNodeContent,
+    content: PreactContent,
     decorator: TableDataContentDecoratorProvider,
-): VNodeContent {
+): PreactContent {
     switch (decorator.type) {
         case "none":
             return content

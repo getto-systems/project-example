@@ -1,11 +1,9 @@
-use crate::common::outline::load::infra::OutlineMenuBadgeRepository;
-
 use crate::{
     common::api::repository::data::RepositoryError,
-    common::outline::load::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
+    common::outline::load::data::OutlineMenuBadgeCount,
 };
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum OutlineMenuBadgePath {
     Index,
 }
@@ -22,39 +20,55 @@ impl OutlineMenuBadgePath {
     }
 }
 
-#[async_trait::async_trait]
-pub trait OutlineMenuExampleBadgeRepository {
-    async fn index(&self) -> Result<OutlineMenuBadgeCount, RepositoryError>;
+pub struct GatherOutlineMenuBadgeAction {
+    example: GatherExampleMenuBadgeAction,
 }
 
-pub struct ActiveOutlineMenuBadgeRepository {
-    example: ActiveOutlineMenuExampleBadgeRepository,
+impl GatherOutlineMenuBadgeAction {
+    pub async fn gather(
+        &self,
+    ) -> Result<Vec<(OutlineMenuBadgePath, OutlineMenuBadgeCount)>, RepositoryError> {
+        Ok(vec![(
+            OutlineMenuBadgePath::Index,
+            self.example.menu_badge_count().await?,
+        )])
+    }
 }
 
-impl ActiveOutlineMenuBadgeRepository {
-    pub const fn new() -> Self {
-        Self {
-            example: ActiveOutlineMenuExampleBadgeRepository,
+struct GatherExampleMenuBadgeAction;
+
+impl GatherExampleMenuBadgeAction {
+    async fn menu_badge_count(&self) -> Result<OutlineMenuBadgeCount, RepositoryError> {
+        Ok(OutlineMenuBadgeCount::restore(0))
+    }
+}
+
+mod x_tonic {
+    use std::sync::Arc;
+
+    use crate::x_outside_feature::core::feature::CoreAppFeature;
+
+    use crate::common::api::{logger::detail::StdoutJsonLogger, request::data::RequestInfo};
+
+    impl super::GatherOutlineMenuBadgeAction {
+        pub fn live(
+            _feature: &Arc<CoreAppFeature>,
+            _info: RequestInfo,
+            _logger: &Arc<StdoutJsonLogger>,
+        ) -> Self {
+            Self {
+                example: super::GatherExampleMenuBadgeAction,
+            }
         }
     }
 }
 
-#[async_trait::async_trait]
-impl OutlineMenuBadgeRepository for ActiveOutlineMenuBadgeRepository {
-    async fn load_menu_badge(&self) -> Result<OutlineMenuBadge, RepositoryError> {
-        let mut badge = OutlineMenuBadge::new();
-
-        badge.set(OutlineMenuBadgePath::Index, self.example.index().await?);
-
-        Ok(badge)
-    }
-}
-
-struct ActiveOutlineMenuExampleBadgeRepository;
-
-#[async_trait::async_trait]
-impl OutlineMenuExampleBadgeRepository for ActiveOutlineMenuExampleBadgeRepository {
-    async fn index(&self) -> Result<OutlineMenuBadgeCount, RepositoryError> {
-        Ok(OutlineMenuBadgeCount::restore(0))
+mod test {
+    impl super::GatherOutlineMenuBadgeAction {
+        pub fn mock() -> Self {
+            Self {
+                example: super::GatherExampleMenuBadgeAction,
+            }
+        }
     }
 }

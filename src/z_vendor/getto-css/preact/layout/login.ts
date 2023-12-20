@@ -1,15 +1,13 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
-
-import { VNodeContent } from "../common"
+import { PreactContent, PreactNode } from "../common"
 
 import { form } from "../design/form"
 
 import { SiteInfo } from "../../site"
 
-export type LoginBoxContent = Readonly<{ title: VNodeContent; body: VNodeContent }> &
-    Partial<{ footer: VNodeContent; form: boolean }>
-export function loginBox(siteInfo: SiteInfo, content: LoginBoxContent): VNode {
+export type LoginBoxContent = Readonly<{ title: PreactContent; body: PreactContent }> &
+    Partial<{ footer: PreactContent; form: boolean }>
+export function loginBox(siteInfo: SiteInfo, content: LoginBoxContent): PreactNode {
     return html`<aside class="layout__login">
         <section class="loginBox">
             ${logo(siteInfo)}
@@ -23,20 +21,20 @@ export function loginBox(siteInfo: SiteInfo, content: LoginBoxContent): VNode {
         </section>
     </aside>`
 
-    function logo({ brand, title, subTitle }: SiteInfo): VNode {
+    function logo({ brand, title, subTitle }: SiteInfo): PreactNode {
         return html`<header class="loginBox__logo">
             <cite class="loginBox__logo__brand">${brand}</cite>
             <strong class="loginBox__logo__title">${title}</strong>
             <cite class="loginBox__logo__subTitle">${subTitle}</cite>
         </header>`
     }
-    function body(): VNodeContent {
+    function body(): PreactContent {
         if (content.form) {
             return form(content.body)
         }
         return content.body
     }
-    function footer(): VNodeContent {
+    function footer(): PreactContent {
         if (content.footer) {
             return content.footer
         }

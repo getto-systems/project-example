@@ -1,6 +1,6 @@
 use crate::common::api::validate::data::ValidateTextError;
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LoginId(String);
 
 impl LoginId {

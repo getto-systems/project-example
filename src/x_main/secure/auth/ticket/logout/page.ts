@@ -1,4 +1,5 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
+import { PreactNode } from "../../../../../common/x_preact/vnode"
 
 import { useNotifyUnexpectedError } from "../../../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../../../common/x_preact/hooks"
@@ -20,7 +21,7 @@ import { Logout } from "../../../../../auth/ticket/logout/x_preact/logout"
 
 import { LogoutPageResource } from "./resource"
 
-export function LogoutPage(props: LogoutPageResource): VNode {
+export function LogoutPage(props: LogoutPageResource): PreactNode {
     const pageTitle = "ログアウト" as const
 
     useDocumentTitle(pageTitle)

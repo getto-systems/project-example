@@ -1,130 +1,99 @@
-use getto_application::{data::MethodResult, infra::ActionStatePubSub};
+mod detail;
 
-use crate::common::proxy::action::CoreProxyParams;
-
-use crate::auth::ticket::authorize::proxy::{authorize, AuthorizeEvent, AuthorizeInfra};
+use std::{collections::HashMap, sync::Arc};
 
 use crate::auth::user::account::search::infra::{
-    SearchAuthUserAccountFilterExtract, SearchAuthUserAccountRepository,
+    SearchAuthUserAccountFilterExtract, SearchAuthUserAccountInfra, SearchAuthUserAccountLogger,
+    SearchAuthUserAccountRepository,
 };
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
-        user::account::search::data::AuthUserAccountSearch,
+        ticket::kernel::data::AuthPermissionRequired,
+        user::{
+            account::{
+                kernel::data::{AuthUserAccount, AuthUserAccountAttrs},
+                search::data::{AuthUserAccountSearch, SearchAuthUserAccountSortKey},
+            },
+            login_id::kernel::data::LoginId,
+            password::reset::kernel::data::ResetPasswordTokenDestination,
+        },
     },
-    common::api::repository::data::RepositoryError,
+    common::api::{
+        repository::data::RepositoryError,
+        search::data::{Search, SearchLimit, SearchSorterNormal},
+    },
 };
 
-pub enum SearchAuthUserAccountState {
-    Authorize(AuthorizeEvent),
-    Search(SearchAuthUserAccountEvent),
+pub struct SearchAuthUserAccountAction<M: SearchAuthUserAccountInfra> {
+    infra: M,
+    logger: Arc<dyn SearchAuthUserAccountLogger>,
 }
 
-impl std::fmt::Display for SearchAuthUserAccountState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Authorize(event) => event.fmt(f),
-            Self::Search(event) => event.fmt(f),
-        }
-    }
-}
+pub struct SearchAuthUserAccountInfo;
 
-pub trait SearchAuthUserAccountMaterial {
-    type Authorize: AuthorizeInfra;
-    type UserRepository: SearchAuthUserAccountRepository;
-
-    fn authorize(&self) -> &Self::Authorize;
-    fn user_repository(&self) -> &Self::UserRepository;
-}
-
-pub struct SearchAuthUserAccountAction<M: SearchAuthUserAccountMaterial> {
-    pub info: SearchAuthUserAccountActionInfo,
-    pubsub: ActionStatePubSub<SearchAuthUserAccountState>,
-    material: M,
-}
-
-pub struct SearchAuthUserAccountActionInfo;
-
-impl SearchAuthUserAccountActionInfo {
-    pub const fn name(&self) -> &'static str {
-        "auth.user.account.search"
-    }
-
-    pub fn required(&self) -> AuthPermissionRequired {
+impl SearchAuthUserAccountInfo {
+    pub fn required() -> AuthPermissionRequired {
         AuthPermissionRequired::user()
     }
-
-    pub fn params(&self) -> CoreProxyParams {
-        (self.name(), self.required())
-    }
 }
 
-impl<M: SearchAuthUserAccountMaterial> SearchAuthUserAccountAction<M> {
-    pub fn with_material(material: M) -> Self {
-        Self {
-            info: SearchAuthUserAccountActionInfo,
-            pubsub: ActionStatePubSub::new(),
-            material,
-        }
-    }
-
-    pub fn subscribe(
-        &mut self,
-        handler: impl 'static + Fn(&SearchAuthUserAccountState) + Send + Sync,
-    ) {
-        self.pubsub.subscribe(handler);
-    }
-
-    pub async fn ignite(
-        self,
-        token: impl AuthorizeTokenExtract,
+impl<M: SearchAuthUserAccountInfra> SearchAuthUserAccountAction<M> {
+    pub async fn search(
+        &self,
         filter: impl SearchAuthUserAccountFilterExtract,
-    ) -> MethodResult<SearchAuthUserAccountState> {
-        authorize(
-            self.material.authorize(),
-            (token, self.info.required()),
-            |event| {
-                self.pubsub
-                    .post(SearchAuthUserAccountState::Authorize(event))
+    ) -> Result<AuthUserAccountSearch, RepositoryError> {
+        self.logger.try_to_search_auth_user_account();
+
+        let filter = filter.convert();
+
+        // 業務用アプリケーションなので、ユーザー数はたかだか 1000 程度
+        // 全てのデータを取得してフィルタ、ソートする
+        let mut destinations: HashMap<LoginId, ResetPasswordTokenDestination> = self
+            .infra
+            .repository()
+            .find_all_reset_token_destination()
+            .await?
+            .into_iter()
+            .collect();
+
+        let users: Vec<AuthUserAccount> = self
+            .infra
+            .repository()
+            .find_all_user()
+            .await?
+            .into_iter()
+            .map(|(login_id, granted, memo)| {
+                let destination = destinations.remove(&login_id);
+                AuthUserAccount {
+                    login_id,
+                    attrs: AuthUserAccountAttrs {
+                        granted: granted.unwrap_or_default(),
+                        memo: memo.unwrap_or_default(),
+                    },
+                    reset_token_destination: destination.unwrap_or_default(),
+                }
+            })
+            .collect();
+
+        let (users, page) = users.search(
+            filter.search,
+            SearchLimit::default(),
+            |model| filter.props.is_match(model),
+            |key| match key {
+                SearchAuthUserAccountSortKey::LoginId => (
+                    SearchSorterNormal,
+                    Box::new(|model| model.login_id.clone().extract()),
+                ),
             },
-        )
-        .await?;
+        )?;
 
-        search_user_account(&self.material, filter, |event| {
-            self.pubsub.post(SearchAuthUserAccountState::Search(event))
-        })
-        .await
+        Ok(self
+            .logger
+            .succeed_to_search_auth_user_account(AuthUserAccountSearch {
+                page,
+                sort: filter.search.sort,
+                users,
+            }))
     }
-}
-
-pub enum SearchAuthUserAccountEvent {
-    Success(AuthUserAccountSearch),
-    RepositoryError(RepositoryError),
-}
-
-const SUCCESS: &'static str = "search user account success";
-const ERROR: &'static str = "search user account error";
-
-impl std::fmt::Display for SearchAuthUserAccountEvent {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Success(_) => write!(f, "{}", SUCCESS),
-            Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
-        }
-    }
-}
-
-async fn search_user_account<S>(
-    infra: &impl SearchAuthUserAccountMaterial,
-    filter: impl SearchAuthUserAccountFilterExtract,
-    post: impl Fn(SearchAuthUserAccountEvent) -> S,
-) -> MethodResult<S> {
-    let response = infra
-        .user_repository()
-        .search(filter.convert())
-        .await
-        .map_err(|err| post(SearchAuthUserAccountEvent::RepositoryError(err)))?;
-
-    Ok(post(SearchAuthUserAccountEvent::Success(response)))
 }

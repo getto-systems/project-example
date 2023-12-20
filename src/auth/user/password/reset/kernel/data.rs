@@ -16,7 +16,6 @@ impl ResetPasswordId {
 pub struct ResetPasswordToken(String);
 
 impl ResetPasswordToken {
-    // TODO convert ではなく、AuthenticateToken と同じように扱いたい
     pub fn convert(
         value: impl ResetPasswordTokenExtract,
     ) -> Result<Self, ValidateResetPasswordTokenError> {
@@ -62,6 +61,21 @@ impl std::fmt::Display for ResetPasswordTokenDestination {
         match self {
             Self::None => write!(f, "reset token destination: none"),
             Self::Email(email) => write!(f, "reset token destination: {}", email),
+        }
+    }
+}
+
+impl Default for ResetPasswordTokenDestination {
+    fn default() -> Self {
+        Self::None
+    }
+}
+
+impl From<Option<ResetPasswordTokenDestinationEmail>> for ResetPasswordTokenDestination {
+    fn from(value: Option<ResetPasswordTokenDestinationEmail>) -> Self {
+        match value {
+            None => Self::None,
+            Some(email) => Self::Email(email),
         }
     }
 }

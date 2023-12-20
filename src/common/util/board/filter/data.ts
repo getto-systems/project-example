@@ -1,0 +1,5 @@
+export type SingleFilterBoardValue = [] | [string]
+export type SelectFilterBoardValue = [] | [string]
+export type SelectFilterBoardFilter<F> = [] | [F]
+export type MultipleFilterBoardValue = string[]
+export type MultipleFilterBoardFilter<F> = F[]

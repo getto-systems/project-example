@@ -1,7 +1,4 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 
 import { versionStringConverter } from "../kernel/convert"
 import { versionConfigConverter } from "./convert"
@@ -21,7 +18,7 @@ import {
 } from "./data"
 
 export interface FindNextVersionAction {
-    readonly state: ApplicationState<FindNextVersionState>
+    readonly state: Atom<FindNextVersionState>
 }
 
 export type FindNextVersionState = Readonly<{ type: "initial" }> | FindNextVersionEvent
@@ -48,7 +45,7 @@ export type FindNextVersionConfig = Readonly<{
 export function initFindNextVersionAction(
     material: FindNextVersionMaterial,
 ): FindNextVersionAction {
-    const { state, post } = initApplicationState({
+    const { state, post } = initAtom({
         initialState,
         ignite: (): Promise<FindNextVersionState> => findNextVersion(material, post),
     })

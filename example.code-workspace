@@ -4,10 +4,6 @@
             "path": "src"
         },
         {
-            "name": "api/vendor",
-            "path": "api/vendor"
-        },
-        {
             "name": "api/setup",
             "path": "api/setup"
         },

@@ -1,30 +1,39 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../common/util/timer/helper"
 
-import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
+import { mockSingleBoardStore } from "../../../../common/util/board/input/test_helper"
+import { restoreLoginId } from "../../login_id/kernel/convert"
+import { restoreAuthUserField } from "../../account/kernel/convert"
 
+import { initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import {
+    LoadState,
+    loadState_loaded,
+    loadState_loading,
+    mapLoadState,
+} from "../../../../common/util/load/data"
 import { OverwritePasswordAction, initOverwritePasswordAction } from "./action"
 
-import { restoreLoginId } from "../../login_id/input/convert"
-
 import { OverwritePasswordRemote, ChangePasswordRemoteResult } from "./infra"
-import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { SingleBoardStore } from "../../../../common/util/board/input/infra"
+
+import { AuthUserAccount } from "../../account/kernel/data"
 
 const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-password" } as const
 
 test("submit valid new-password", async () => {
     const { overwrite, store } = standard()
 
-    expect(
-        await observeApplicationState(overwrite.state, async () => {
-            store.newPassword.set(VALID_PASSWORD.newPassword)
+    const result = observeAtom(overwrite.state)
 
-            return overwrite.submit()
-        }),
-    ).toEqual([
+    store.newPassword.set(VALID_PASSWORD.newPassword)
+
+    await overwrite.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
-        { type: "success", data: { loginId: "user-id" } },
+        { type: "success" },
         { type: "initial" },
     ])
 })
@@ -33,16 +42,16 @@ test("submit valid login-id and password; take long time", async () => {
     // wait for take longtime timeout
     const { overwrite, store } = takeLongtime_elements()
 
-    expect(
-        await observeApplicationState(overwrite.state, async () => {
-            store.newPassword.set(VALID_PASSWORD.newPassword)
+    const result = observeAtom(overwrite.state)
 
-            return overwrite.submit()
-        }),
-    ).toEqual([
+    store.newPassword.set(VALID_PASSWORD.newPassword)
+
+    await overwrite.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
-        { type: "success", data: { loginId: "user-id" } },
+        { type: "success" },
         { type: "initial" },
     ])
 })
@@ -50,11 +59,11 @@ test("submit valid login-id and password; take long time", async () => {
 test("submit without fields", async () => {
     const { overwrite } = standard()
 
-    expect(
-        await observeApplicationState(overwrite.state, async () => {
-            return overwrite.submit()
-        }),
-    ).toEqual([])
+    const result = observeAtom(overwrite.state)
+
+    await overwrite.submit()
+
+    expect(result()).toEqual([])
 })
 
 test("reset", () => {
@@ -77,10 +86,14 @@ function takeLongtime_elements() {
 function initResource(overwritePasswordRemote: OverwritePasswordRemote): Readonly<{
     overwrite: OverwritePasswordAction
     store: Readonly<{
-        newPassword: BoardValueStore
+        newPassword: SingleBoardStore
     }>
 }> {
-    const overwrite = initOverwritePasswordAction({
+    const list = initAtom<LoadState<readonly AuthUserAccount[]>>({
+        initialState: loadState_loading(),
+    })
+    const data = mapAtom(list.state, (list) => mapLoadState(list, (list) => list[0]))
+    const overwrite = initOverwritePasswordAction(data, {
         infra: {
             overwritePasswordRemote,
         },
@@ -90,14 +103,21 @@ function initResource(overwritePasswordRemote: OverwritePasswordRemote): Readonl
         },
     })
 
-    overwrite.handler.focus({
-        loginId: restoreLoginId("user-id"),
-    })
+    list.post(
+        loadState_loaded([
+            {
+                loginId: restoreLoginId("user-id"),
+                granted: [],
+                resetTokenDestination: { type: "none" },
+                memo: restoreAuthUserField("initial-memo"),
+            },
+        ]),
+    )
 
     return {
-        overwrite: overwrite.action,
+        overwrite,
         store: {
-            newPassword: mockBoardValueStore(overwrite.action.newPassword.input),
+            newPassword: mockSingleBoardStore(overwrite.newPassword.input),
         },
     }
 }

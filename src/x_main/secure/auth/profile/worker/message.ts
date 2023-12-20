@@ -1,11 +1,11 @@
 import {
     ChangePasswordProxyMessage,
     ChangePasswordProxyResponse,
-} from "../../../../../auth/user/password/change/init/worker/message"
+} from "../../../../../auth/user/password/change/detail/worker/message"
 import {
     RequestResetTokenProxyMessage,
     RequestResetTokenProxyResponse,
-} from "../../../../../auth/user/password/reset/request_token/init/worker/message"
+} from "../../../../../auth/user/password/reset/request_token/detail/worker/message"
 
 export type ProfileForegroundMessage =
     | Readonly<{ type: "password-change"; message: ChangePasswordProxyMessage }>

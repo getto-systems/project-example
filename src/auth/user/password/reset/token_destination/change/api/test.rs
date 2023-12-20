@@ -1,223 +1,183 @@
-use getto_application_test::ApplicationActionStateHolder;
+use std::sync::Arc;
+
 use pretty_assertions::assert_eq;
 
-use crate::auth::{
-    ticket::{
-        authorize::init::test::StaticAuthorizeInfra,
-        kernel::init::request::test::StaticAuthorizeToken,
-    },
-    user::{
-        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
-        password::reset::token_destination::change::init::test::{
-            StaticChangeResetTokenDestinationFields, StaticChangeResetTokenDestinationMaterial,
-        },
-    },
+use crate::x_content::permission::AuthPermission;
+
+use crate::{
+    auth::user::kernel::detail::repository::memory::{login_id::MapLoginId, StoreLoginId},
+    common::api::feature::AsInfra,
 };
 
-use crate::auth::user::password::reset::token_destination::change::action::ChangeResetTokenDestinationAction;
+use crate::auth::user::password::reset::token_destination::change::action::{
+    ChangeResetTokenDestinationAction, ChangeResetTokenDestinationInfo,
+};
 
 use crate::auth::user::password::reset::token_destination::change::infra::ChangeResetTokenDestinationFields;
 
-use crate::{
-    auth::user::{
-        kernel::data::AuthUserId,
+use crate::auth::{
+    ticket::kernel::data::{AuthPermissionGranted, AuthPermissionRequired},
+    user::{
+        kernel::data::{AuthUser, AuthUserId},
         login_id::kernel::data::LoginId,
         password::reset::{
-            kernel::data::{
-                ResetPasswordTokenDestination, ResetPasswordTokenDestinationEmail,
-                ValidateResetPasswordTokenDestinationError,
-            },
-            token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
+            kernel::data::{ResetPasswordTokenDestination, ResetPasswordTokenDestinationEmail},
+            token_destination::change::data::ChangeResetTokenDestinationError,
         },
     },
-    common::api::validate::data::ValidateTextError,
 };
 
 #[tokio::test]
 async fn info() {
-    let store = TestStore::new();
-    let material = StaticChangeResetTokenDestinationMaterial {
-        authorize: StaticAuthorizeInfra::new(operator_user_id()),
-        destination_repository: standard_destination_repository(&store),
-    };
-
-    let action = ChangeResetTokenDestinationAction::with_material(material);
-
-    let (name, required) = action.info.params();
     assert_eq!(
-        format!("{}; {}", name, required),
-        "auth.user.password.reset.token-destination.change; require: some [auth-user]",
+        ChangeResetTokenDestinationInfo::required(),
+        AuthPermissionRequired::user(),
     );
 }
 
 #[tokio::test]
-async fn success_change_destination() {
-    let holder = ApplicationActionStateHolder::new();
-
-    let store = TestStore::new();
-    let material = StaticChangeResetTokenDestinationMaterial {
-        authorize: StaticAuthorizeInfra::new(operator_user_id()),
-        destination_repository: standard_destination_repository(&store),
-    };
-    let fields =
-        StaticChangeResetTokenDestinationFields::Valid(ChangeResetTokenDestinationFields {
-            login_id: stored_login_id(),
-            from: stored_destination(),
-            to: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
-                "new-destination@example.com".to_owned(),
+async fn success() -> Result<(), ChangeResetTokenDestinationError> {
+    let feature = feature(Infra {
+        user: vec![(
+            AuthUser {
+                user_id: AuthUserId::restore("user-id".to_owned()),
+                granted: AuthPermissionGranted::restore(
+                    vec![AuthPermission::AuthUser].into_iter().collect(),
+                ),
+            },
+            LoginId::restore("login-id".to_owned()),
+            ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+                "destination@example.com".to_owned(),
             )),
-        });
+        )],
+    });
+    let action = ChangeResetTokenDestinationAction::mock(feature.as_infra());
 
-    let mut action = ChangeResetTokenDestinationAction::with_material(material);
-    action.subscribe(holder.handler());
+    let fields = ChangeResetTokenDestinationFields {
+        login_id: LoginId::restore("login-id".to_owned()),
+        from: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+            "destination@example.com".to_owned(),
+        )),
+        to: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+            "new-destination@example.com".to_owned(),
+        )),
+    };
 
-    let result = action.ignite(StaticAuthorizeToken, fields).await;
-    assert_eq!(
-        holder.extract(),
-        vec![
-            "try to proxy call: auth.ticket.authorize.clarify(require: some [auth-user])",
-            "proxy call success",
-            "change reset token destination success",
-        ]
-    );
-    assert!(result.is_ok());
+    action.change(fields).await?;
+
+    Ok(())
 }
 
 #[tokio::test]
-async fn error_conflict_changes() {
-    let holder = ApplicationActionStateHolder::new();
+async fn success_with_no_destination() -> Result<(), ChangeResetTokenDestinationError> {
+    let feature = feature(Infra {
+        user: vec![(
+            AuthUser {
+                user_id: AuthUserId::restore("user-id".to_owned()),
+                granted: AuthPermissionGranted::restore(
+                    vec![AuthPermission::AuthUser].into_iter().collect(),
+                ),
+            },
+            LoginId::restore("login-id".to_owned()),
+            ResetPasswordTokenDestination::None,
+        )],
+    });
+    let action = ChangeResetTokenDestinationAction::mock(feature.as_infra());
 
-    let store = TestStore::new();
-    let material = StaticChangeResetTokenDestinationMaterial {
-        authorize: StaticAuthorizeInfra::new(operator_user_id()),
-        destination_repository: standard_destination_repository(&store),
+    let fields = ChangeResetTokenDestinationFields {
+        login_id: LoginId::restore("login-id".to_owned()),
+        from: ResetPasswordTokenDestination::None,
+        to: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+            "new-destination@example.com".to_owned(),
+        )),
     };
-    let fields =
-        StaticChangeResetTokenDestinationFields::Valid(ChangeResetTokenDestinationFields {
-            login_id: stored_login_id(),
-            from: ResetPasswordTokenDestination::Email(
-                ResetPasswordTokenDestinationEmail::restore("UNKNOWN@example.com".to_owned()),
-            ),
-            to: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
-                "new-destination@example.com".to_owned(),
-            )),
-        });
 
-    let mut action = ChangeResetTokenDestinationAction::with_material(material);
-    action.subscribe(holder.handler());
+    action.change(fields).await?;
 
-    let result = action.ignite(StaticAuthorizeToken, fields).await;
-    assert_eq!(
-        holder.extract(),
-        vec![
-            "try to proxy call: auth.ticket.authorize.clarify(require: some [auth-user])",
-            "proxy call success",
-            "change reset token destination error; changes conflicted",
-        ]
-    );
-    assert!(result.is_err());
+    Ok(())
 }
 
 #[tokio::test]
-async fn error_not_found() {
-    let holder = ApplicationActionStateHolder::new();
+async fn error_user_not_found() {
+    let feature = feature(Infra {
+        user: vec![(
+            AuthUser {
+                user_id: AuthUserId::restore("user-id".to_owned()),
+                granted: AuthPermissionGranted::restore(
+                    vec![AuthPermission::AuthUser].into_iter().collect(),
+                ),
+            },
+            LoginId::restore("login-id".to_owned()),
+            ResetPasswordTokenDestination::None,
+        )],
+    });
+    let action = ChangeResetTokenDestinationAction::mock(feature.as_infra());
 
-    let store = TestStore::new();
-    let material = StaticChangeResetTokenDestinationMaterial {
-        authorize: StaticAuthorizeInfra::new(operator_user_id()),
-        destination_repository: no_destination_repository(&store),
+    let fields = ChangeResetTokenDestinationFields {
+        login_id: LoginId::restore("UNKNOWN-login-id".to_owned()),
+        from: ResetPasswordTokenDestination::None,
+        to: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+            "new-destination@example.com".to_owned(),
+        )),
     };
-    let fields =
-        StaticChangeResetTokenDestinationFields::Valid(ChangeResetTokenDestinationFields {
-            login_id: stored_login_id(),
-            from: stored_destination(),
-            to: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
-                "new-destination@example.com".to_owned(),
-            )),
-        });
 
-    let mut action = ChangeResetTokenDestinationAction::with_material(material);
-    action.subscribe(holder.handler());
+    let err = action.change(fields).await.unwrap_err();
 
-    let result = action.ignite(StaticAuthorizeToken, fields).await;
     assert_eq!(
-        holder.extract(),
-        vec![
-            "try to proxy call: auth.ticket.authorize.clarify(require: some [auth-user])",
-            "proxy call success",
-            "change reset token destination error; not found",
-        ]
-    );
-    assert!(result.is_err());
-}
-
-#[tokio::test]
-async fn error_invalid_email() {
-    let holder = ApplicationActionStateHolder::new();
-
-    let store = TestStore::new();
-    let material = StaticChangeResetTokenDestinationMaterial {
-        authorize: StaticAuthorizeInfra::new(operator_user_id()),
-        destination_repository: standard_destination_repository(&store),
-    };
-    let fields = StaticChangeResetTokenDestinationFields::Invalid(
-        ValidateChangeResetTokenDestinationFieldsError::InvalidTo(
-            ValidateResetPasswordTokenDestinationError::Email(ValidateTextError::TooLong),
-        ),
-    );
-
-    let mut action = ChangeResetTokenDestinationAction::with_material(material);
-    action.subscribe(holder.handler());
-
-    let result = action.ignite(StaticAuthorizeToken, fields).await;
-    assert_eq!(
-        holder.extract(),
-        vec![
-            "try to proxy call: auth.ticket.authorize.clarify(require: some [auth-user])",
-            "proxy call success",
-            "change reset token destination error; invalid; to: reset-token-destination: email: too long",
-        ],
-    );
-    assert!(result.is_err());
-}
-
-struct TestStore {
-    destination: MemoryAuthUserStore,
-}
-
-impl TestStore {
-    fn new() -> Self {
-        Self {
-            destination: MemoryAuthUserStore::new(),
-        }
-    }
-}
-
-fn standard_destination_repository<'a>(store: &'a TestStore) -> MemoryAuthUserRepository<'a> {
-    MemoryAuthUserRepository::with_user_id_and_destination(
-        &store.destination,
-        stored_login_id(),
-        stored_user_id(),
-        stored_destination(),
+        format!("{}", err),
+        format!("{}", ChangeResetTokenDestinationError::NotFound),
     )
 }
 
-fn no_destination_repository<'a>(store: &'a TestStore) -> MemoryAuthUserRepository<'a> {
-    MemoryAuthUserRepository::with_user_id(&store.destination, stored_login_id(), stored_user_id())
+#[tokio::test]
+async fn error_conflict() {
+    let feature = feature(Infra {
+        user: vec![(
+            AuthUser {
+                user_id: AuthUserId::restore("user-id".to_owned()),
+                granted: AuthPermissionGranted::restore(
+                    vec![AuthPermission::AuthUser].into_iter().collect(),
+                ),
+            },
+            LoginId::restore("login-id".to_owned()),
+            ResetPasswordTokenDestination::None,
+        )],
+    });
+    let action = ChangeResetTokenDestinationAction::mock(feature.as_infra());
+
+    let fields = ChangeResetTokenDestinationFields {
+        login_id: LoginId::restore("login-id".to_owned()),
+        from: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+            "destination@example.com".to_owned(),
+        )),
+        to: ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+            "new-destination@example.com".to_owned(),
+        )),
+    };
+
+    let err = action.change(fields).await.unwrap_err();
+
+    assert_eq!(
+        format!("{}", err),
+        format!("{}", ChangeResetTokenDestinationError::Conflict),
+    )
 }
 
-fn stored_login_id() -> LoginId {
-    LoginId::restore("login-id".into())
-}
-fn stored_user_id() -> AuthUserId {
-    AuthUserId::restore("user-id".into())
-}
-fn stored_destination() -> ResetPasswordTokenDestination {
-    ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
-        "destination@example.com".to_owned(),
-    ))
+struct Infra {
+    user: Vec<(AuthUser, LoginId, ResetPasswordTokenDestination)>,
 }
 
-fn operator_user_id() -> AuthUserId {
-    AuthUserId::restore("operator-user-id".to_owned())
+fn feature(infra: Infra) -> Arc<StoreLoginId> {
+    let login_id_store = Arc::new(StoreLoginId::default());
+
+    for (user, login_id, reset_token_destination) in infra.user {
+        MapLoginId::insert_entry(
+            &login_id_store,
+            login_id.clone(),
+            user.user_id.clone(),
+            reset_token_destination,
+        );
+    }
+
+    login_id_store
 }

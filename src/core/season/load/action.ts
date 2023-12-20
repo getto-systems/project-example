@@ -1,22 +1,17 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../common/util/clock/infra"
 
-import { Season } from "../kernel/data"
+import { DetectedSeason } from "../kernel/data"
 import { RepositoryError } from "../../../common/util/repository/data"
 
 export interface LoadSeasonAction {
-    readonly state: ApplicationState<LoadSeasonState>
+    readonly state: Atom<LoadSeasonState>
     load(): Promise<LoadSeasonState>
 }
 
 export type LoadSeasonMaterial = Readonly<{
-    defaultSeason: Season
-    availableSeasons: readonly Season[]
     seasonRepository: SeasonRepository
     clock: Clock
 }>
@@ -26,10 +21,7 @@ export type LoadSeasonState = Readonly<{ type: "initial" }> | LoadSeasonEvent
 const initialState: LoadSeasonState = { type: "initial" }
 
 export function initLoadSeasonAction(material: LoadSeasonMaterial): LoadSeasonAction {
-    const { state, post } = initApplicationState({
-        initialState,
-        ignite: () => load(),
-    })
+    const { state, post } = initAtom({ initialState, ignite: load })
     return { state, load }
 
     function load(): Promise<LoadSeasonState> {
@@ -39,27 +31,22 @@ export function initLoadSeasonAction(material: LoadSeasonMaterial): LoadSeasonAc
 
 type LoadSeasonEvent =
     | Readonly<{ type: "failed"; err: RepositoryError }>
-    | Readonly<{
-          type: "success"
-          season: Season
-          default: boolean
-          availableSeasons: readonly Season[]
-      }>
+    | Readonly<{ type: "success"; season: DetectedSeason }>
 
 async function loadSeason<S>(
     infra: LoadSeasonMaterial,
     post: Post<LoadSeasonEvent, S>,
 ): Promise<S> {
-    const { clock, seasonRepository, defaultSeason, availableSeasons } = infra
+    const { clock, seasonRepository } = infra
 
     const result = await seasonRepository.get()
     if (!result.success) {
         return post({ type: "failed", err: result.err })
     }
     if (!result.found || result.value.expires < clock.now().getTime()) {
-        return post({ type: "success", season: defaultSeason, default: true, availableSeasons })
+        return post({ type: "success", season: { default: true } })
     }
-    return post({ type: "success", season: result.value.season, default: false, availableSeasons })
+    return post({ type: "success", season: { default: false, season: result.value.season } })
 }
 
 interface Post<E, S> {

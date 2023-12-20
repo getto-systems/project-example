@@ -1,18 +1,8 @@
-use crate::common::api::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature;
+use std::sync::{Arc, Mutex};
+
+use crate::common::api::service::detail::authorizer::GoogleServiceAuthorizerToken;
 
 pub struct CoreProxyOutsideFeature {
-    pub service: CommonOutsideService,
-}
-pub struct CommonOutsideService {
     pub service_url: &'static str,
-    pub google_authorizer: GoogleServiceAuthorizerOutsideFeature,
-}
-
-impl CommonOutsideService {
-    pub fn new(service_url: &'static str) -> Self {
-        Self {
-            service_url,
-            google_authorizer: GoogleServiceAuthorizerOutsideFeature::new(service_url),
-        }
-    }
+    pub google_authorize_store: Arc<Mutex<GoogleServiceAuthorizerToken>>,
 }

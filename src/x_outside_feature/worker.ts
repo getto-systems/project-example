@@ -1,4 +1,4 @@
-import { newWorker } from "../z_vendor/getto-application/action/worker/init"
+import { newWorker } from "../common/util/worker/detail"
 
 import {
     newCommonOutsideFeature,
@@ -7,7 +7,7 @@ import {
     ForegroundOutsideFeature,
 } from "./common"
 
-import { WorkerOutsideFeature } from "../z_vendor/getto-application/action/worker/feature"
+import { WorkerOutsideFeature } from "../common/util/worker/feature"
 
 type WorkerForegroundOutsideFeature = ForegroundOutsideFeature & WorkerOutsideFeature
 type WorkerBackgroundOutsideFeature = CommonOutsideFeature & WorkerOutsideFeature

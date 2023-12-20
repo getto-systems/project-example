@@ -1,6 +1,6 @@
 use crate::auth::data::AuthPermissionRequired;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AuthPermission {
     AuthUser,
 }

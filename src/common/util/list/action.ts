@@ -1,78 +1,107 @@
 import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
-import { ModifyFieldHandler } from "../modify/action"
+    Atom,
+    AtomConfig,
+    combineAtom,
+    initAtom,
+    mapAtomStateful,
+} from "../../../z_vendor/getto-atom/atom"
+import { loadState_loaded, LoadState } from "../load/data"
 
-import { PrepareElementState } from "../prepare/data"
 import { ScrollPosition } from "../scroll/data"
-import { DetectFocusListKeyResult, ListSearchedResult } from "./data"
+import { DetectFocusListKeyResult } from "./data"
 
-export interface ListRegisteredAction<T> extends ListAction<readonly T[]> {
-    readonly focus: FocusRegisteredAction<T>
+export interface LoadableListAtomUpdater<T> {
+    update(updater: (list: readonly T[]) => readonly T[]): void
 }
 
-export interface ListSearchedAction<T, M, E> extends ListAction<ListSearchedResult<T, M, E>> {
-    readonly focus: FocusSearchedAction<T>
-    readonly scroll: ScrollAction
-}
-
-interface ListAction<S> {
-    readonly state: ApplicationState<ListState<S>>
-}
-
-type ListState<S> = PrepareElementState<S>
-
-export interface FocusRegisteredAction<T> {
-    readonly state: ApplicationState<FocusState<T>>
-
-    onModify(handler: ModifyFieldHandler<T>): void
-
-    change(data: T): FocusState<T>
-    update(data: Partial<T>): FocusState<T>
-    remove(): FocusState<T>
-    close(): FocusState<T>
-}
-
-export interface FocusSearchedAction<T> {
-    readonly state: ApplicationState<FocusState<T>>
-
-    onModify(handler: ModifyFieldHandler<T>): void
-
-    change(data: T, position: ScrollPosition): FocusState<T>
-    update(data: Partial<T>): FocusState<T>
-    remove(): FocusState<T>
-    close(position: ScrollPosition): FocusState<T>
-}
-
-export type FocusState<T> =
-    | Readonly<{ type: "close"; isFocused: false }>
-    | Readonly<{ type: "close"; isFocused: true; data: T }>
-    | Readonly<{ type: "not-found" }>
-    | Readonly<{ type: "focus-change"; data: T }>
-    | Readonly<{ type: "data-update"; data: T }>
-    | Readonly<{ type: "data-remove" }>
-
-export type FocusedData<T> = Readonly<{ isFocused: false }> | Readonly<{ isFocused: true; data: T }>
-
-export function focusedData<T>(state: FocusState<T>): FocusedData<T> {
-    switch (state.type) {
-        case "close":
-            return state.isFocused ? { isFocused: true, data: state.data } : { isFocused: false }
-
-        case "not-found":
-        case "data-remove":
-            return { isFocused: false }
-
-        case "focus-change":
-        case "data-update":
-            return { isFocused: true, data: state.data }
+export function initLoadableListAtomUpdater<T>(
+    list: AtomConfig<LoadState<readonly T[]>>,
+): LoadableListAtomUpdater<T> {
+    return {
+        update: (updater: (list: readonly T[]) => readonly T[]) => {
+            const data = list.state.currentState()
+            if (data.isLoad) {
+                list.post(loadState_loaded(updater(data.data)))
+            }
+        },
     }
 }
 
-export interface ScrollAction {
-    readonly state: ApplicationState<ScrollState>
+export interface PushListAction<T> {
+    push(entry: T): void
 }
+
+export function initPushListAction<T>(
+    atom: AtomConfig<LoadState<readonly T[]>>,
+): PushListAction<T> {
+    return {
+        push(data: T): void {
+            const list = atom.state.currentState()
+            atom.post(loadState_loaded(list.isLoad ? [...list.data, data] : [data]))
+        },
+    }
+}
+
+export type FocusRegisterListAction<T> = Readonly<{
+    readonly state: Atom<LoadState<T>>
+    readonly isSomeEntryFocused: Atom<boolean>
+    readonly detect: Atom<DetectFocusListKeyResult>
+
+    isEntryFocused(entry: T, key: DetectFocusListKeyResult): boolean
+    focusTo(entry: T): void
+    close(): void
+}>
+
+export function initFocusRegisterListAction<T>(
+    list: Atom<LoadState<readonly T[]>>,
+    key: (data: T) => string,
+): FocusRegisterListAction<T> {
+    const detect = initAtom<DetectFocusListKeyResult>({ initialState: { found: false } })
+
+    const focus = combineAtom(list, detect.state, (list, detect): LoadState<T> => {
+        if (!detect.found) {
+            return { isLoad: false }
+        }
+        if (!list.isLoad) {
+            return { isLoad: false }
+        }
+        const found = list.data.find((item) => key(item) === detect.key)
+        if (found === undefined) {
+            return { isLoad: false }
+        }
+        return { isLoad: true, data: found }
+    })
+
+    return {
+        state: focus,
+        isSomeEntryFocused: mapAtomStateful(focus, (focus) => focus.isLoad),
+        detect: detect.state,
+
+        isEntryFocused(entry: T, detect: DetectFocusListKeyResult): boolean {
+            if (!detect.found) {
+                return false
+            }
+            return key(entry) === detect.key
+        },
+        focusTo(entry: T): void {
+            detect.post({ found: true, key: key(entry) })
+        },
+        close(): void {
+            detect.post({ found: false })
+        },
+    }
+}
+
+export type FocusModifyListAction<T> = Readonly<{
+    readonly state: Atom<LoadState<T>>
+    readonly isSomeEntryFocused: Atom<boolean>
+    readonly detect: Atom<DetectFocusListKeyResult>
+    readonly scroll: Atom<ScrollState>
+
+    isEntryFocused(entry: T, key: DetectFocusListKeyResult): boolean
+    focusTo(entry: T, position: ScrollPosition): void
+    close(position: ScrollPosition): void
+}>
 
 export type ScrollState =
     | Readonly<{ type: "initial" }>
@@ -80,350 +109,58 @@ export type ScrollState =
     | Readonly<{ type: "focus-change"; position: ScrollPosition }>
     | Readonly<{ type: "close"; position: ScrollPosition }>
 
-export interface ListRegisteredHandler<T> {
-    register(data: T): ListState<readonly T[]>
+export interface FocusModifyListInfra {
+    detect(): DetectFocusListKeyResult
+    update(state: DetectFocusListKeyResult): void
 }
 
-export function initListRegisteredAction<T>(): Readonly<{
-    action: ListRegisteredAction<T>
-    handler: ListRegisteredHandler<T>
-}> {
-    const { action, handler, mutate } = initListAction<T, readonly T[]>({
-        list: (state) => ({ isLoad: true, data: state }),
-        mutate: (_state, list) => list,
-    })
-    const focus = initFocusRegistered<T>({ list: handler })
+export function initFocusModifyListAction<T>(
+    list: Atom<LoadState<readonly T[]>>,
+    key: (data: T) => string,
+    infra: FocusModifyListInfra,
+): FocusModifyListAction<T> {
+    const initialFocus = infra.detect()
 
-    return {
-        action: { ...action, focus: focus.action },
-        handler: { register },
-    }
+    const detect = initAtom({ initialState: initialFocus })
+    detect.state.subscribe((state) => infra.update(state))
 
-    function register(data: T): ListState<readonly T[]> {
-        return mutate((element: ListState<readonly T[]>): ListState<readonly T[]> => {
-            return {
-                isLoad: true,
-                data: element.isLoad ? [data, ...element.data] : [data],
-            }
-        })
-    }
-}
-
-export type ListSearchedActionProps<T, M, E> = Readonly<{
-    initialSearch: Promise<PrepareElementState<ListSearchedResult<T, M, E>>>
-    detect: Readonly<{
-        get: () => DetectFocusListKeyResult
-        key: (data: T) => string
-    }>
-}>
-
-export interface ListSearchedHandler<T, M, E> {
-    load(data: ListState<ListSearchedResult<T, M, E>>): void
-}
-
-export function initListSearchedAction<T, M, E>(
-    props: ListSearchedActionProps<T, M, E>,
-): Readonly<{
-    action: ListSearchedAction<T, M, E>
-    handler: ListSearchedHandler<T, M, E>
-}> {
-    const { action, handler, mutate } = initListAction<T, ListSearchedResult<T, M, E>>({
-        ignite: detect,
-        list: (state) => {
-            switch (state.type) {
-                case "success":
-                    return { isLoad: true, data: state.response.list }
-
-                case "failed":
-                    return { isLoad: false }
-            }
-        },
-        mutate: (state, list) => {
-            switch (state.type) {
-                case "success":
-                    return {
-                        ...state,
-                        response: { ...state.response, list },
-                    }
-
-                case "failed":
-                    return state
-            }
-        },
+    const scroll = initAtom<ScrollState>({
+        initialState: { type: initialFocus.found ? "detect" : "initial" },
     })
 
-    const scroll = initScroll()
-    const focus = initFocusSearched<T>({
-        list: handler,
-        scroll: scroll.handler,
-    })
-
-    return {
-        action: {
-            ...action,
-            focus: focus.action,
-            scroll: scroll.action,
-        },
-        handler: { load },
-    }
-
-    async function detect(): Promise<ListState<ListSearchedResult<T, M, E>>> {
-        await props.initialSearch
-        const search = action.state.currentState()
-        if (search.isLoad && search.data.type === "success") {
-            const detected = props.detect.get()
-            if (detected.found) {
-                const item = search.data.response.list.find(
-                    (item) => props.detect.key(item) === detected.key,
-                )
-                focus.detect(item)
-            }
+    const focus = combineAtom(list, detect.state, (list, detect): LoadState<T> => {
+        if (!detect.found) {
+            return { isLoad: false }
         }
-        return search
-    }
-
-    function load(
-        data: ListState<ListSearchedResult<T, M, E>>,
-    ): ListState<ListSearchedResult<T, M, E>> {
-        return mutate(() => data)
-    }
-}
-
-type ListProps<T, S> = Readonly<{
-    ignite?: () => Promise<ListState<S>>
-    list: (state: S) => PrepareElementState<readonly T[]>
-    mutate: (state: S, list: readonly T[]) => S
-}>
-interface ListHandler<T> {
-    find(data: T): boolean
-    update(oldData: T, newData: T): void
-    remove(data: T): void
-}
-function initListAction<T, S>(
-    props: ListProps<T, S>,
-): Readonly<{
-    action: ListAction<S>
-    handler: ListHandler<T>
-    mutate: (f: (element: ListState<S>) => ListState<S>) => ListState<S>
-}> {
-    let element: ListState<S> = { isLoad: false }
-
-    const { state, post } = initApplicationState<ListState<S>>({
-        initialState: element,
-        ignite: props.ignite,
-    })
-
-    return {
-        action: { state },
-        handler: { find, update, remove },
-        mutate: (f) => {
-            element = f(element)
-            return post(element)
-        },
-    }
-
-    function find(data: T): boolean {
-        if (!element.isLoad) {
-            return false
-        }
-
-        const list = props.list(element.data)
         if (!list.isLoad) {
-            return false
+            return { isLoad: false }
         }
-
-        return list.data.find((item) => item === data) !== undefined
-    }
-
-    function update(oldData: T, newData: T): ListState<S> {
-        if (!element.isLoad) {
-            return element
+        const found = list.data.find((item) => key(item) === detect.key)
+        if (found === undefined) {
+            return { isLoad: false }
         }
-
-        const list = props.list(element.data)
-        if (!list.isLoad) {
-            return element
-        }
-
-        element = {
-            isLoad: true,
-            data: props.mutate(
-                element.data,
-                list.data.map((item) => (item === oldData ? newData : item)),
-            ),
-        }
-
-        return post(element)
-    }
-    function remove(data: T): ListState<S> {
-        if (!element.isLoad) {
-            return element
-        }
-
-        const list = props.list(element.data)
-        if (!list.isLoad) {
-            return element
-        }
-
-        element = {
-            isLoad: true,
-            data: props.mutate(
-                element.data,
-                list.data.filter((item) => item !== data),
-            ),
-        }
-
-        return post(element)
-    }
-}
-
-interface ScrollHandler {
-    detect(): void
-    change(position: ScrollPosition): void
-    close(position: ScrollPosition): void
-}
-
-function initScroll(): Readonly<{
-    action: ScrollAction
-    handler: ScrollHandler
-}> {
-    const { state, post } = initApplicationState<ScrollState>({
-        initialState: { type: "initial" },
+        return { isLoad: true, data: found }
     })
 
     return {
-        action: {
-            state,
-        },
-        handler: {
-            detect(): ScrollState {
-                return post({ type: "detect" })
-            },
-            change(position): ScrollState {
-                return post({ type: "focus-change", position })
-            },
-            close(position): ScrollState {
-                return post({ type: "close", position })
-            },
-        },
-    }
-}
+        state: focus,
+        isSomeEntryFocused: mapAtomStateful(focus, (focus) => focus.isLoad),
+        detect: detect.state,
+        scroll: scroll.state,
 
-type FocusRegisteredProps<T> = Readonly<{
-    list: ListHandler<T>
-}>
-
-function initFocusRegistered<T>(props: FocusRegisteredProps<T>): Readonly<{
-    action: FocusRegisteredAction<T>
-    detect(data: T | undefined): void
-}> {
-    return initFocus(props)
-}
-
-type FocusSearchedProps<T> = Readonly<{
-    list: ListHandler<T>
-    scroll: ScrollHandler
-}>
-
-function initFocusSearched<T>(props: FocusSearchedProps<T>): Readonly<{
-    action: FocusSearchedAction<T>
-    detect(data: T | undefined): void
-}> {
-    return initFocus(props)
-}
-
-type FocusProps<T> = Readonly<{
-    list: ListHandler<T>
-    scroll?: ScrollHandler
-}>
-
-function initFocus<T>(props: FocusProps<T>) {
-    const { state, post } = initApplicationState<FocusState<T>>({
-        initialState: { type: "close", isFocused: false },
-    })
-
-    let element: PrepareElementState<T> = { isLoad: false }
-
-    return {
-        action: { state, onModify, change, update, remove, close },
-        detect,
-    }
-
-    function onModify(handler: ModifyFieldHandler<T>): void {
-        state.subscribe((state): true => {
-            switch (state.type) {
-                case "focus-change":
-                    handler.focus(state.data)
-                    return true
-
-                case "data-update":
-                    handler.update(state.data)
-                    return true
-
-                case "close":
-                    handler.close()
-                    return true
-
-                case "not-found":
-                case "data-remove":
-                    return true
+        isEntryFocused(entry: T, detect: DetectFocusListKeyResult): boolean {
+            if (!detect.found) {
+                return false
             }
-        })
-    }
-
-    function detect(data: T | undefined): FocusState<T> {
-        if (data === undefined) {
-            return post({ type: "not-found" })
-        } else {
-            element = { isLoad: true, data }
-            props.scroll?.detect()
-            return post({ type: "focus-change", data })
-        }
-    }
-
-    function change(data: T, position?: ScrollPosition): FocusState<T> {
-        if (!props.list.find(data)) {
-            return not_found()
-        }
-
-        element = { isLoad: true, data }
-        if (position !== undefined) {
-            props.scroll?.change(position)
-        }
-        return post({ type: "focus-change", data })
-    }
-    function update(data: Partial<T>): FocusState<T> {
-        if (!element.isLoad) {
-            return state.currentState()
-        }
-
-        const newData = { ...element.data, ...data }
-        props.list.update(element.data, newData)
-
-        element = { isLoad: true, data: newData }
-        return post({ type: "data-update", data: newData })
-    }
-    function remove(): FocusState<T> {
-        if (element.isLoad) {
-            props.list.remove(element.data)
-        }
-
-        element = { isLoad: false }
-        return post({ type: "data-remove" })
-    }
-    function close(position?: ScrollPosition): FocusState<T> {
-        const focused: { isFocused: false } | { isFocused: true; data: T } = element.isLoad
-            ? { isFocused: true, data: element.data }
-            : { isFocused: false }
-
-        element = { isLoad: false }
-        if (position !== undefined) {
-            props.scroll?.close(position)
-        }
-        return post({ type: "close", ...focused })
-    }
-    function not_found(): FocusState<T> {
-        element = { isLoad: false }
-        return post({ type: "not-found" })
+            return key(entry) === detect.key
+        },
+        focusTo(entry: T, position: ScrollPosition): void {
+            detect.post({ found: true, key: key(entry) })
+            scroll.post({ type: "focus-change", position })
+        },
+        close(position: ScrollPosition): void {
+            detect.post({ found: false })
+            scroll.post({ type: "close", position })
+        },
     }
 }

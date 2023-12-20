@@ -1,10 +1,10 @@
 import {
-    TableDataCellKey,
+    TableDataKey,
     TableDataColumnRow,
     TableDataColumnTree,
     TableDataHeader,
     TableDataSummary,
-    TableDataView,
+    TableDataCell,
 } from "../core"
 
 import { TableDataMutable_base, TableDataMutable_tree } from "../mutable"
@@ -70,11 +70,11 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
         }
     }
 
-    initiallyVisibleCells(): readonly TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataKey[] {
         return tableCellInitiallyVisibleCells(this.content.cells)
     }
 
-    view(): readonly TableDataView[] {
+    view(): readonly TableDataCell[] {
         return tableCellView(this.content.cells)
     }
     header(

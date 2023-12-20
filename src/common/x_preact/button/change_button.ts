@@ -1,25 +1,27 @@
-import { h, VNode } from "preact"
-
-import { VNodeContent } from "../vnode"
+import { h } from "preact"
+import { PreactContent, PreactNode } from "../vnode"
 
 import { SendButton } from "./send_button"
 
 import { icon_change } from "../../../x_content/icon"
 
-import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
+import { Atom } from "../../../z_vendor/getto-atom/atom"
+import { ValidateBoardState } from "../../util/board/validate/action"
+import { ObserveBoardState } from "../../util/board/observe/action"
 
 import { Icon } from "../../util/icon/data"
+import { ConnectState } from "../../util/connect/data"
 
-type Props = Readonly<{
-    label?: VNodeContent
-    icon?: Icon
-    isConnecting: boolean
-    validateState: ValidateBoardState
-    observeState: ObserveBoardState
-    onClick: { (e: Event): void }
-}>
-export function ChangeButton(props: Props): VNode {
+export function ChangeButton(
+    props: Readonly<{
+        label?: PreactContent
+        icon?: Icon
+        connect: Atom<ConnectState>
+        validate: Atom<ValidateBoardState>
+        observe: Atom<ObserveBoardState>
+        onClick: { (e: Event): void }
+    }>,
+): PreactNode {
     return h(SendButton, {
         ...props,
         label: props.label || "変更",

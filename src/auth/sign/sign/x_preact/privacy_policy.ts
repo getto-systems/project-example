@@ -1,5 +1,5 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../../common/x_preact/vnode"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { buttons, field } from "../../../../z_vendor/getto-css/preact/design/form"
@@ -13,7 +13,7 @@ import { SignLink } from "../../nav/action"
 type Props = Readonly<{
     link: SignLink
 }>
-export function PrivacyPolicy(props: Props): VNode {
+export function PrivacyPolicy(props: Props): PreactNode {
     return loginBox(siteInfo, {
         title: "プライバシーポリシー",
         body: content_privacyPolicy.descriptions.map((description) =>
@@ -27,7 +27,7 @@ export function PrivacyPolicy(props: Props): VNode {
         footer: buttons({ left: loginLink(), right: resetLink() }),
     })
 
-    function loginLink(): VNode {
+    function loginLink(): PreactNode {
         return signNav(props.link.getNav_password_authenticate())
     }
     function resetLink() {

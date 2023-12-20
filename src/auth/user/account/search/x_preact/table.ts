@@ -1,7 +1,7 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../../../common/x_preact/vnode"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import {
     table,
@@ -13,41 +13,41 @@ import {
 import { emptyTable, takeLongtimeTable } from "../../../../../common/x_preact/design/table"
 
 import { SearchAuthUserAccountAction } from "../action"
-import { SearchColumnsAction, visibleKeys } from "../../../../../common/util/search/columns/action"
+import { SearchColumnsBoard } from "../../../../../common/util/search/columns/action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
 
 type Props = Readonly<{
     search: SearchAuthUserAccountAction
-    columns: SearchColumnsAction
+    columns: SearchColumnsBoard
     structure: SearchAuthUserAccountTableStructure
 }>
-export function SearchAuthUserAccountTable(props: Props): VNode {
-    const state = useApplicationState(props.search.state)
-    const listState = useApplicationState(props.search.list.state)
-    const columnsState = useApplicationState(props.columns.state)
+export function SearchAuthUserAccountTable(props: Props): PreactNode {
+    const connectState = useAtom(props.search.connect)
+    const listState = useAtom(props.search.list)
+    const visibleKeys = useAtom(props.columns.value)
 
-    if (state.type === "try" && state.hasTakenLongtime) {
+    if (connectState.isConnecting && connectState.hasTakenLongtime) {
         return takeLongtimeTable()
     }
 
-    if (!listState.isLoad || listState.data.type === "failed") {
+    if (!listState.isLoad) {
         return html``
     }
-    if (listState.data.response.page.count === 0) {
+    if (listState.data.length === 0) {
         return emptyTable()
     }
 
     const params = {
         summary: {},
-        visibleKeys: visibleKeys(columnsState),
+        visibleKeys,
     }
 
     const sticky = props.structure.sticky()
     return table(sticky, [
         thead(tableHeader({ sticky, header: props.structure.header(params) })),
         tbody(
-            listState.data.response.list.flatMap((row) =>
+            listState.data.flatMap((row) =>
                 tableColumn({ sticky, column: props.structure.column(params, row) }),
             ),
         ),

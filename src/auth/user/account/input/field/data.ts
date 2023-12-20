@@ -1,9 +1,9 @@
 import { ValidateTextError } from "../../../../../common/util/validate/data"
-import { ValidateBoardFieldResult } from "../../../../../z_vendor/getto-application/board/validate_field/data"
+import { ValidateBoardValue } from "../../../../../common/util/board/validate/data"
 import { TypeAuthUser } from "../../kernel/data"
-import { AuthUserTextField } from "./convert"
+import { AuthUserTextFieldName } from "./convert"
 
-export type ValidateAuthUserTextResult<K extends AuthUserTextField> = ValidateBoardFieldResult<
+export type ValidateAuthUserTextValue<K extends AuthUserTextFieldName> = ValidateBoardValue<
     TypeAuthUser<K>,
     readonly ValidateTextError[]
 >

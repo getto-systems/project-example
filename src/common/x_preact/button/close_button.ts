@@ -1,13 +1,13 @@
-import { VNode } from "preact"
-
-import { VNodeContent } from "../vnode"
+import { PreactContent, PreactNode } from "../vnode"
 
 import { button_cancel } from "../../../z_vendor/getto-css/preact/design/form"
 
-type Props = Readonly<{
-    label?: VNodeContent
+export function CloseButton({
+    label,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     onClick: { (e: Event): void }
-}>
-export function CloseButton({ label, onClick }: Props): VNode {
+}>): PreactNode {
     return button_cancel({ label: label || "閉じる", onClick })
 }

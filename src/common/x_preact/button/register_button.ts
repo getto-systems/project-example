@@ -1,55 +1,67 @@
 import { html } from "htm/preact"
-import { VNode } from "preact"
-
-import { VNodeContent } from "../vnode"
+import { PreactContent, PreactNode } from "../vnode"
 
 import { button_disabled, button_send } from "../../../z_vendor/getto-css/preact/design/form"
-
-import { icon_add, icon_spinner } from "../../../x_content/icon"
+import { icon_add, icon_ok, icon_spinner } from "../../../x_content/icon"
 import { iconHtml } from "../../util/icon/x_preact/icon"
 
-import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
+import { Atom } from "../../../z_vendor/getto-atom/atom"
+import { ValidateBoardState } from "../../util/board/validate/action"
+import { ObserveBoardState } from "../../util/board/observe/action"
 
 import { Icon } from "../../util/icon/data"
+import { ConnectState, SuccessState } from "../../util/connect/data"
+import { useAtom } from "../../../z_vendor/getto-atom/x_preact/hooks"
 
-type Props = Readonly<{
-    label?: VNodeContent
-    icon?: Icon
-    isConnecting: boolean
-    validateState: ValidateBoardState
-    observeState: ObserveBoardState
-    onClick: { (e: Event): void }
-}>
 export function RegisterButton({
-    isConnecting,
-    validateState,
-    observeState,
     label,
     icon,
+    successIcon,
+    success,
+    connect,
+    validate,
+    observe,
     onClick,
-}: Props): VNode {
+}: Readonly<{
+    label?: PreactContent
+    icon?: Icon
+    successIcon?: Icon
+    success: Atom<SuccessState>
+    connect: Atom<ConnectState>
+    validate: Atom<ValidateBoardState>
+    observe: Atom<ObserveBoardState>
+    onClick: { (e: Event): void }
+}>): PreactNode {
+    const successState = useAtom(success)
+    const connectState = useAtom(connect)
+    const validateState = useAtom(validate)
+    const observeState = useAtom(observe)
+
+    if (successState.isSuccess) {
+        return button_send({
+            state: "normal",
+            label: buttonLabel(successIcon || icon_ok),
+            onClick,
+        })
+    }
+
     const buttonIcon = icon || icon_add
 
-    if (isConnecting) {
+    if (connectState.isConnecting) {
         return button_send({ state: "connect", label: buttonLabel(icon_spinner) })
     }
 
-    switch (validateState) {
-        case "initial":
-            return button_send({ state: buttonState(), label: buttonLabel(buttonIcon), onClick })
-
-        case "valid":
-            return button_send({ state: buttonState(), label: buttonLabel(buttonIcon), onClick })
-
-        case "invalid":
-            return button_disabled({ label: buttonLabel(buttonIcon) })
+    if (!validateState.valid) {
+        return button_disabled({ label: buttonLabel(buttonIcon) })
     }
 
-    function buttonLabel(icon: Icon): VNode {
+    return button_send({
+        state: observeState.hasChanged ? "confirm" : "normal",
+        label: buttonLabel(buttonIcon),
+        onClick,
+    })
+
+    function buttonLabel(icon: Icon): PreactNode {
         return html`${label || "登録"} ${iconHtml(icon)}`
-    }
-    function buttonState(): "normal" | "confirm" {
-        return observeState.hasChanged ? "confirm" : "normal"
     }
 }

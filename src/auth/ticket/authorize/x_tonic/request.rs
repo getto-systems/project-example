@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::authorize::y_protobuf::service::ClarifyAuthorizeTokenRequestPb;
+use crate::auth::ticket::authorize::y_protobuf::service::AuthorizeRequestPb;
 
 use crate::x_content::{metadata::METADATA_AUTHORIZE_TOKEN, permission::AuthPermission};
 
@@ -16,7 +16,7 @@ use crate::auth::ticket::{
     },
 };
 
-impl AuthorizeFieldsExtract for (&MetadataMap, ClarifyAuthorizeTokenRequestPb) {
+impl AuthorizeFieldsExtract for (&MetadataMap, AuthorizeRequestPb) {
     fn convert(self) -> Result<AuthorizeFields, ValidateAuthorizeFieldsError> {
         Ok(AuthorizeFields {
             token: decode_token(self.0).map_err(ValidateAuthorizeFieldsError::Token)?,
@@ -36,7 +36,7 @@ fn decode_token(map: &MetadataMap) -> Result<AuthorizeToken, ValidateAuthorizeTo
 }
 
 fn decode_permission_required(
-    request: ClarifyAuthorizeTokenRequestPb,
+    request: AuthorizeRequestPb,
 ) -> Result<AuthPermissionRequired, ValidateAuthPermissionError> {
     if request.require_nothing {
         Ok(AuthPermissionRequired::Nothing)

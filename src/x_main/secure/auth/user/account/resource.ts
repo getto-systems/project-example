@@ -2,7 +2,7 @@ import { BaseResource } from "../../../base/resource"
 import { SearchAuthUserAccountAction } from "../../../../../auth/user/account/search/action"
 import { ToggleSidebarAction } from "../../../../../common/util/sidebar/action"
 import { DetailAuthUserAccountActions } from "../../../../../auth/user/account/kernel/x_preact/detail"
-import { SearchColumnsAction } from "../../../../../common/util/search/columns/action"
+import { SearchColumnsBoard } from "../../../../../common/util/search/columns/action"
 import { SearchAuthUserAccountTableStructure } from "../../../../../auth/user/account/search/x_preact/structure"
 
 export type ManageUserAccountPageResource = BaseResource &
@@ -10,6 +10,6 @@ export type ManageUserAccountPageResource = BaseResource &
     Readonly<{
         sidebar: ToggleSidebarAction
         search: SearchAuthUserAccountAction
-        columns: SearchColumnsAction
+        columns: SearchColumnsBoard
         structure: SearchAuthUserAccountTableStructure
     }>

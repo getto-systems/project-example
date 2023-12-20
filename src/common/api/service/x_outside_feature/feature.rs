@@ -1,4 +1,6 @@
-use crate::common::api::service::init::authorizer::{
+use std::sync::Mutex;
+
+use crate::common::api::service::detail::authorizer::{
     GoogleServiceAuthorizerStore, GoogleServiceAuthorizerToken,
 };
 
@@ -11,7 +13,7 @@ impl GoogleServiceAuthorizerOutsideFeature {
     pub fn new(service_url: &'static str) -> Self {
         Self {
             service_url,
-            store: GoogleServiceAuthorizerToken::new().to_store(),
+            store: Mutex::new(GoogleServiceAuthorizerToken::new()),
         }
     }
 }

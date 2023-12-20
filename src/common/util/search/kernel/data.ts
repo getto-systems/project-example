@@ -13,3 +13,7 @@ export type SearchPageResponse = Readonly<{
     limit: number
     count: number
 }>
+
+export type SearchPageResponseResult<E> =
+    | Readonly<{ isSuccess: true; page: SearchPageResponse }>
+    | Readonly<{ isSuccess: false; err: E }>

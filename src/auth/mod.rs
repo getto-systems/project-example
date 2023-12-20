@@ -9,30 +9,28 @@ pub mod x_tonic;
 pub mod data {
     pub use crate::auth::{
         kernel::data::{ExpansionLimitDuration, ExpireDuration},
-        ticket::kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
+        ticket::{
+            authorize::{
+                data::{
+                    AuthorizeSuccess, AuthorizeWithTokenError, CheckAuthorizeTokenError,
+                    CheckAuthorizeTokenSuccess,
+                },
+                proxy::data::AuthorizeProxyError,
+            },
+            kernel::{
+                aws::cloudfront::data::AwsCloudfrontKey,
+                data::{
+                    AuthPermissionRequired, AuthorizeTokenExtract, ValidateAuthorizeTokenError,
+                },
+            },
+        },
     };
 }
-pub mod method {
-    pub use crate::auth::ticket::authorize::method::{
-        authorize_with_token, AuthorizeWithTokenEvent, AuthorizeWithTokenInfra,
+pub mod action {
+    pub use crate::auth::ticket::authorize::{
+        action::CheckAuthorizeTokenAction, proxy::action::AuthorizeProxyAction,
     };
-
-    pub mod proxy {
-        pub use crate::auth::ticket::authorize::proxy::{
-            authorize, AuthorizeEvent, AuthorizeInfra,
-        };
-    }
 }
-pub mod init {
-    pub use crate::auth::ticket::authorize::init::{
-        ActiveAuthorizeInfra, ActiveAuthorizeWithTokenInfra,
-    };
-
-    #[cfg(test)]
-    pub mod test {
-        pub use crate::auth::ticket::{
-            authorize::init::test::{StaticAuthorizeInfra, StaticAuthorizeWithTokenInfra},
-            kernel::init::request::test::StaticAuthorizeToken,
-        };
-    }
+pub mod feature {
+    pub use crate::auth::kernel::feature::{AsAuthorizedInfra, AsCheckedInfra};
 }

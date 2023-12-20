@@ -1,7 +1,4 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 
 import { AuthTicketRepository } from "../kernel/infra"
 import { LogoutRemote } from "./infra"
@@ -10,7 +7,7 @@ import { RepositoryError } from "../../../common/util/repository/data"
 import { RemoteCommonError } from "../../../common/util/remote/data"
 
 export interface LogoutAction {
-    readonly state: ApplicationState<LogoutState>
+    readonly state: Atom<LogoutState>
     submit(): Promise<LogoutState>
 }
 
@@ -24,7 +21,7 @@ export type LogoutInfra = Readonly<{
 }>
 
 export function initLogoutAction(infra: LogoutInfra): LogoutAction {
-    const { state, post } = initApplicationState({ initialState })
+    const { state, post } = initAtom({ initialState })
     return {
         state,
         submit(): Promise<LogoutState> {

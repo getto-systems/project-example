@@ -1,7 +1,4 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 
 import { ToggleSidebarRepository } from "./infra"
 
@@ -9,7 +6,7 @@ import { SidebarExpand } from "./data"
 import { RepositoryError } from "../repository/data"
 
 export interface ToggleSidebarAction {
-    readonly state: ApplicationState<ToggleSidebarState>
+    readonly state: Atom<ToggleSidebarState>
     fold(): Promise<ToggleSidebarState>
     expand(): Promise<ToggleSidebarState>
 }
@@ -26,7 +23,7 @@ export function initToggleSidebarAction(
     infra: ToggleSidebarInfra,
     initialExpand: SidebarExpand,
 ): ToggleSidebarAction {
-    const { state, post } = initApplicationState({
+    const { state, post } = initAtom({
         initialState: { type: "success", state: initialExpand },
         ignite: async (): Promise<ToggleSidebarState> => {
             const { sidebarRepository } = infra

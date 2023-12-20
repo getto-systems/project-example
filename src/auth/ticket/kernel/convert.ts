@@ -1,4 +1,4 @@
-import { toGranted } from "../../user/account/input/granted/convert"
+import { toGranted } from "../../user/kernel/input/field/convert"
 
 import { RepositoryConverter } from "../../../common/util/repository/infra"
 import { AuthTicketRepositoryValue } from "./infra"

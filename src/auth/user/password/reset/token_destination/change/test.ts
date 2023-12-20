@@ -1,14 +1,25 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../../../common/util/timer/helper"
-import { mockBoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/test_helper"
+import { mockSingleBoardStore } from "../../../../../../common/util/board/input/test_helper"
 
+import { restoreLoginId } from "../../../../login_id/kernel/convert"
+import { restoreAuthUserField } from "../../../../account/kernel/convert"
+
+import { initAtom, mapAtom } from "../../../../../../z_vendor/getto-atom/atom"
+import {
+    LoadState,
+    loadState_loaded,
+    loadState_loading,
+    mapLoadState,
+} from "../../../../../../common/util/load/data"
 import { ChangeResetTokenDestinationAction, initChangeResetTokenDestinationAction } from "./action"
-
-import { restoreLoginId } from "../../../../login_id/input/convert"
+import { initLoadableListAtomUpdater } from "../../../../../../common/util/list/action"
 
 import { ChangeResetTokenDestinationRemote } from "./infra"
-import { BoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/infra"
+import { SingleBoardStore } from "../../../../../../common/util/board/input/infra"
+
+import { AuthUserAccount } from "../../../../account/kernel/data"
 
 const VALID_INFO = {
     destinationType: "email",
@@ -18,20 +29,22 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { change, store } = standard()
 
-    expect(
-        await observeApplicationState(change.state, async () => {
-            store.destinationType.set(VALID_INFO.destinationType)
-            store.email.set(VALID_INFO.email)
+    const result = observeAtom(change.state)
 
-            return change.submit()
-        }),
-    ).toEqual([
+    store.destinationType.set(VALID_INFO.destinationType)
+    store.email.set(VALID_INFO.email)
+
+    await change.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         {
             type: "success",
             data: {
                 loginId: "user-id",
+                granted: [],
                 resetTokenDestination: { type: "email", email: "user@example.com" },
+                memo: restoreAuthUserField("initial-memo"),
             },
         },
         { type: "initial" },
@@ -42,21 +55,23 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { change, store } = takeLongtime_elements()
 
-    expect(
-        await observeApplicationState(change.state, async () => {
-            store.destinationType.set(VALID_INFO.destinationType)
-            store.email.set(VALID_INFO.email)
+    const result = observeAtom(change.state)
 
-            return change.submit()
-        }),
-    ).toEqual([
+    store.destinationType.set(VALID_INFO.destinationType)
+    store.email.set(VALID_INFO.email)
+
+    await change.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
         {
             type: "success",
             data: {
                 loginId: "user-id",
+                granted: [],
                 resetTokenDestination: { type: "email", email: "user@example.com" },
+                memo: restoreAuthUserField("initial-memo"),
             },
         },
         { type: "initial" },
@@ -66,14 +81,14 @@ test("submit valid login-id; take long time", async () => {
 test("submit with invalid value; empty email", async () => {
     const { change, store } = standard()
 
-    expect(
-        await observeApplicationState(change.state, async () => {
-            store.destinationType.set("email")
-            store.email.set("")
+    const result = observeAtom(change.state)
 
-            return change.submit()
-        }),
-    ).toEqual([])
+    store.destinationType.set("email")
+    store.email.set("")
+
+    await change.submit()
+
+    expect(result()).toEqual([])
 })
 
 test("reset", () => {
@@ -98,11 +113,15 @@ function takeLongtime_elements() {
 function initResource(modifyUserRemote: ChangeResetTokenDestinationRemote): Readonly<{
     change: ChangeResetTokenDestinationAction
     store: Readonly<{
-        destinationType: BoardValueStore
-        email: BoardValueStore
+        destinationType: SingleBoardStore
+        email: SingleBoardStore
     }>
 }> {
-    const change = initChangeResetTokenDestinationAction({
+    const list = initAtom<LoadState<readonly AuthUserAccount[]>>({
+        initialState: loadState_loading(),
+    })
+    const data = mapAtom(list.state, (list) => mapLoadState(list, (list) => list[0]))
+    const change = initChangeResetTokenDestinationAction(data, initLoadableListAtomUpdater(list), {
         infra: {
             changeDestinationRemote: modifyUserRemote,
         },
@@ -112,16 +131,22 @@ function initResource(modifyUserRemote: ChangeResetTokenDestinationRemote): Read
         },
     })
 
-    change.handler.focus({
-        loginId: restoreLoginId("user-id"),
-        resetTokenDestination: { type: "none" },
-    })
+    list.post(
+        loadState_loaded([
+            {
+                loginId: restoreLoginId("user-id"),
+                granted: [],
+                resetTokenDestination: { type: "none" },
+                memo: restoreAuthUserField("initial-memo"),
+            },
+        ]),
+    )
 
     return {
-        change: change.action,
+        change,
         store: {
-            destinationType: mockBoardValueStore(change.action.destination.destinationType),
-            email: mockBoardValueStore(change.action.destination.email),
+            destinationType: mockSingleBoardStore(change.destination.type.input),
+            email: mockSingleBoardStore(change.destination.email.input),
         },
     }
 }

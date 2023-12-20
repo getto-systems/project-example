@@ -4,9 +4,9 @@ import { ProfilePage } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
 
-import { newBaseResource } from "../../base/init/resource"
-import { newChangePasswordAction } from "../../../../auth/user/password/change/init/resource"
-import { newRequestResetTokenAction } from "../../../../auth/user/password/reset/request_token/init/resource"
+import { newBaseResource } from "../../base/detail/resource"
+import { newChangePasswordAction } from "../../../../auth/user/password/change/detail/resource"
+import { newRequestResetTokenAction } from "../../../../auth/user/password/reset/request_token/detail/resource"
 
 import { ProfilePageResource } from "./resource"
 

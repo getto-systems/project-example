@@ -1,65 +1,24 @@
-import { h, VNode } from "preact"
-import { html } from "htm/preact"
+import { h } from "preact"
+import { PreactNode } from "../../../../../common/x_preact/vnode"
 
 import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
-
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
-
-import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
-import { pagerCount, pagerParams } from "../../../../../common/x_preact/design/table"
-
-import { SearchOffset } from "../../../../../common/util/search/offset/x_preact/offset"
-import { LoadButton } from "../../../../../common/x_preact/button/load_button"
+import { SearchPager } from "../../../../../common/util/search/offset/x_preact/offset"
 
 import { SearchAuthUserAccountAction } from "../action"
 
-import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/table"
-import { SearchPageResponse } from "../../../../../common/util/search/kernel/data"
 import { RemoteCommonError } from "../../../../../common/util/remote/data"
 
 type Props = Readonly<{
     search: SearchAuthUserAccountAction
 }>
-export function SearchAuthUserAccountPager(props: Props): VNode {
-    const state = useApplicationState(props.search.list.state)
-
-    if (!state.isLoad) {
-        return html``
-    }
-
-    switch (state.data.type) {
-        case "success":
-            return pagerForm({ page: state.data.response.page })
-
-        case "failed":
-            return fieldHelp_error(searchError(state.data.err))
-    }
-
-    type Content = Readonly<{
-        page: SearchPageResponse
-    }>
-    function pagerForm({ page }: Content): VNode {
-        return h(SearchOffset, {
-            field: props.search.offset,
-            count: pagerCount(page.count),
-            options: pagerOptions(pagerParams(page)),
-            button: button(),
-        })
-
-        function button(): VNode {
-            return h(LoadButton, { onClick })
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.search.load()
-            }
-        }
-    }
-}
-
-function searchError(err: RemoteCommonError) {
-    return remoteCommonErrorReason(err, (reason) => [
-        `${reason.message}により検索に失敗しました`,
-        ...reason.detail,
-    ])
+export function SearchAuthUserAccountPager(props: Props): PreactNode {
+    return h(SearchPager<RemoteCommonError>, {
+        search: props.search,
+        error: (err) => {
+            return remoteCommonErrorReason(err, (reason) => [
+                `${reason.message}により検索に失敗しました`,
+                ...reason.detail,
+            ])
+        },
+    })
 }

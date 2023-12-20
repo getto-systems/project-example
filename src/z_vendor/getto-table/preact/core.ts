@@ -1,26 +1,23 @@
-import { VNodeContent, VNodeKey } from "./common"
+import { PreactContent, PreactKey } from "./common"
 
 import { TableDataClassName, TableDataFullStyle, TableDataSticky } from "./style"
 
 export interface TableStructure<M, R> {
-    initialVisibleCells(): readonly TableDataCellKey[]
-
-    view(): readonly TableDataView[]
+    sticky(): TableDataSticky
+    allCells(): readonly TableDataCell[]
     header(params: TableDataParams<M>): TableDataHeaderRow
     summary(params: TableDataParams<M>): TableDataSummaryRow
     column(params: TableDataParams<M>, row: R): TableDataColumnRow
     footer(params: TableDataParams<M>): TableDataFooterRow
-
-    sticky(): TableDataSticky
 }
 
+export type TableDataKey = string
 export type TableDataParams<M> = Readonly<{ summary: M }> &
-    Partial<{ visibleKeys: readonly TableDataCellKey[] }>
-export type TableDataCellKey = string
+    Partial<{ visibleKeys: readonly TableDataKey[] }>
 
-export type TableDataView = Readonly<{
-    key: TableDataCellKey
-    content: VNodeContent
+export type TableDataCell = Readonly<{
+    key: TableDataKey
+    content: PreactContent
     isInitiallyVisible: boolean
 }>
 
@@ -31,25 +28,25 @@ export type TableDataHeader =
 
 export type TableDataHeaderSimple = Readonly<{
     type: "simple"
-    key: VNodeKey
+    key: PreactKey
     style: TableDataFullStyle
-    content: VNodeContent
+    content: PreactContent
     height: 1
     length: 1
 }>
 export type TableDataHeaderExpansion = Readonly<{
     type: "expansion"
-    key: VNodeKey
+    key: PreactKey
     style: TableDataFullStyle
-    content: VNodeContent
+    content: PreactContent
     height: 1
     length: number
 }>
 export type TableDataHeaderGroup = Readonly<{
     type: "group"
-    key: VNodeKey
+    key: PreactKey
     style: TableDataFullStyle
-    content: VNodeContent
+    content: PreactContent
     children: readonly TableDataHeader[]
     height: number
     length: number
@@ -59,18 +56,18 @@ export type TableDataSummary = TableDataSummarySimple | TableDataSummaryExpansio
 
 export type TableDataSummarySimple =
     | (TableDataSummarySimple_base & Readonly<{ type: "empty" }>)
-    | (TableDataSummarySimple_base & Readonly<{ type: "simple"; content: VNodeContent }>)
+    | (TableDataSummarySimple_base & Readonly<{ type: "simple"; content: PreactContent }>)
 type TableDataSummarySimple_base = Readonly<{
-    key: VNodeKey
+    key: PreactKey
     style: TableDataFullStyle
     length: 1
 }>
 
 export type TableDataSummaryExpansion =
     | (TableDataSummaryExpansion_base & Readonly<{ type: "empty-expansion" }>)
-    | (TableDataSummaryExpansion_base & Readonly<{ type: "expansion"; content: VNodeContent }>)
+    | (TableDataSummaryExpansion_base & Readonly<{ type: "expansion"; content: PreactContent }>)
 type TableDataSummaryExpansion_base = Readonly<{
-    key: VNodeKey
+    key: PreactKey
     style: TableDataFullStyle
     length: number
 }>
@@ -79,15 +76,15 @@ export type TableDataColumn = TableDataColumnSimple | TableDataColumnExpansion |
 
 export type TableDataColumnSimple = Readonly<{
     type: "simple"
-    key: VNodeKey
+    key: PreactKey
     style: TableDataFullStyle
-    content: VNodeContent
+    content: PreactContent
     length: 1
     height: 1
 }>
 export type TableDataColumnExpansion = Readonly<{
     type: "expansion"
-    key: VNodeKey
+    key: PreactKey
     style: TableDataFullStyle
     length: number
     height: 1
@@ -102,7 +99,7 @@ export type TableDataColumnTree = Readonly<{
 }>
 
 export type TableCellTreePaddingContent = Readonly<{
-    key: VNodeKey
+    key: PreactKey
     rowHeight: number
     column: TableDataColumnTree
 }>
@@ -113,24 +110,24 @@ export type TableDataHeaderRow = Readonly<{
     headers: readonly TableDataHeader[]
 }>
 export type TableDataSummaryRow = Readonly<{
-    key: VNodeKey
+    key: PreactKey
     className: TableDataClassName
     summaries: readonly TableDataSummary[]
 }>
 export type TableDataColumnRow = Readonly<{
-    key: VNodeKey
+    key: PreactKey
     className: TableDataClassName
     columns: readonly TableDataColumn[]
 }>
 export type TableDataFooterRow = Readonly<{
-    key: VNodeKey
+    key: PreactKey
     className: TableDataClassName
     footers: readonly TableDataSummary[]
 }>
 
 export interface TableDataHeaderKeyProvider {
-    (index: number): VNodeKey
+    (index: number): PreactKey
 }
 export interface TableDataKeyProvider {
-    (): VNodeKey
+    (): PreactKey
 }

@@ -1,6 +1,8 @@
 import { VNode } from "preact"
 
-export type VNodeContent = VNodeEntry | readonly VNodeEntry[]
-type VNodeEntry = string | number | VNode
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PreactNode = VNode<any>
+export type PreactContent = PreactEntry | readonly PreactEntry[]
+type PreactEntry = string | number | PreactNode
 
-export type VNodeKey = string | number
+export type PreactKey = string | number

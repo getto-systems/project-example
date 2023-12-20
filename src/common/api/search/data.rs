@@ -1,5 +1,52 @@
 use std::num::TryFromIntError;
 
+use crate::common::api::repository::data::RepositoryError;
+
+pub trait Search<K: Copy, T>: Sized {
+    fn search<D, S>(
+        self,
+        filter: SearchProps<K>,
+        limit: SearchLimit,
+        matcher: impl FnMut(&T) -> bool,
+        key: impl FnOnce(K) -> (D, Box<dyn FnMut(&T) -> S>),
+    ) -> Result<(Self, SearchPage), RepositoryError>
+    where
+        D: SearchSorter,
+        S: Ord;
+}
+
+#[derive(Clone, Copy)]
+pub struct SearchProps<K: Copy> {
+    pub offset: SearchOffsetValue,
+    pub sort: SearchSort<K>,
+}
+
+pub trait SearchSorter {
+    fn sort(&self, order: SearchSortOrder) -> SearchSortDirection;
+}
+
+pub struct SearchSorterNormal;
+
+impl SearchSorter for SearchSorterNormal {
+    fn sort(&self, order: SearchSortOrder) -> SearchSortDirection {
+        match order {
+            SearchSortOrder::Normal => SearchSortDirection::Asc,
+            SearchSortOrder::Reverse => SearchSortDirection::Desc,
+        }
+    }
+}
+
+pub struct SearchSorterReverse;
+
+impl SearchSorter for SearchSorterReverse {
+    fn sort(&self, order: SearchSortOrder) -> SearchSortDirection {
+        match order {
+            SearchSortOrder::Normal => SearchSortDirection::Desc,
+            SearchSortOrder::Reverse => SearchSortDirection::Asc,
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct SearchPage {
     pub offset: SearchOffset,
@@ -121,7 +168,7 @@ impl std::fmt::Display for ValidateSearchLimitError {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct SearchCount(i32);
 
 impl SearchCount {
@@ -146,12 +193,13 @@ pub trait SearchCountExtract<E> {
     fn convert(self) -> Result<i32, E>;
 }
 
-pub struct SearchSort<K> {
+#[derive(Clone, Copy)]
+pub struct SearchSort<K: Copy> {
     pub key: K,
     pub order: SearchSortOrder,
 }
 
-impl<K: Default> Default for SearchSort<K> {
+impl<K: Default + Copy> Default for SearchSort<K> {
     fn default() -> Self {
         Self {
             key: Default::default(),

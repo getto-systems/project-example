@@ -1,36 +1,32 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
-
 import { checkTakeLongtime, ticker } from "../../../../common/util/timer/helper"
+import { emptyLoginId } from "../kernel/convert"
 
-import { initLoginIdFieldAction, LoginIdFieldAction } from "../input/action"
-import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
-import {
-    initModifyField,
-    modifyField,
-    ModifyFieldHandler,
-} from "../../../../common/util/modify/action"
-
-import { ChangeLoginIdError, OverwriteLoginIdFields } from "./data"
-import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
+import { Atom, initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import { LoadState } from "../../../../common/util/load/data"
+import { EditableBoardAction } from "../../../../common/util/board/editable/action"
+import { ValidateBoardState } from "../../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../../common/util/board/observe/action"
+import { composeModifyFieldBoard } from "../../../../common/util/board/field/action"
+import { LoadableListAtomUpdater } from "../../../../common/util/list/action"
+import { initLoginIdField, LoginIdField } from "../input/field/action"
 
 import { OverwriteLoginIdRemote } from "./infra"
 import { WaitTime } from "../../../../common/util/config/infra"
 
+import { ConvertBoardResult } from "../../../../common/util/board/kernel/data"
+import { ChangeLoginIdError, OverwriteLoginIdFields } from "./data"
 import { LoginId } from "../kernel/data"
+import { AuthUserAccount } from "../../account/kernel/data"
+import { ConnectState } from "../../../../common/util/connect/data"
 
 export interface OverwriteLoginIdAction {
-    readonly state: ApplicationState<OverwriteLoginIdState>
-    readonly newLoginId: LoginIdFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<OverwriteLoginIdState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
     readonly editable: EditableBoardAction
 
-    onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void
+    readonly newLoginId: LoginIdField
 
     reset(): void
     submit(): Promise<OverwriteLoginIdState>
@@ -56,17 +52,30 @@ export type OverwriteLoginIdConfig = Readonly<{
     resetToInitialTimeout: WaitTime
 }>
 
-export function initOverwriteLoginIdAction(material: OverwriteLoginIdMaterial): Readonly<{
-    action: OverwriteLoginIdAction
-    handler: ModifyFieldHandler<OverwriteLoginIdEntry>
-}> {
-    const { state, post } = initApplicationState({ initialState })
+export function initOverwriteLoginIdAction(
+    data: Atom<LoadState<AuthUserAccount>>,
+    updater: LoadableListAtomUpdater<AuthUserAccount>,
+    material: OverwriteLoginIdMaterial,
+): OverwriteLoginIdAction {
+    const modify = initAtom({ initialState })
+    async function modifyWithCurrentState(): Promise<OverwriteLoginIdState> {
+        const element = data.currentState()
+        if (!element.isLoad) {
+            return modify.state.currentState()
+        }
 
-    const newLoginId = initLoginIdFieldAction()
+        const fields = currentFields()
+        if (!fields.valid) {
+            return modify.state.currentState()
+        }
+        return overwriteLoginId(material, element.data, fields.value, modify.post)
+    }
 
-    const convert = (): ConvertBoardResult<OverwriteLoginIdFields> => {
+    const newLoginId = initLoginIdField()
+
+    const currentFields = (): ConvertBoardResult<OverwriteLoginIdFields> => {
         const result = {
-            newLoginId: newLoginId.validate.check(),
+            newLoginId: newLoginId[0].validate.currentState(),
         }
         if (!result.newLoginId.valid) {
             return { valid: false }
@@ -79,64 +88,51 @@ export function initOverwriteLoginIdAction(material: OverwriteLoginIdMaterial): 
         }
     }
 
-    const { validate, observe, editable, data, handler, reset } = initModifyField(
-        [modifyField("newLoginId", newLoginId, (_data: OverwriteLoginIdEntry) => "")],
-        convert,
-    )
+    const { editable, validate, observe, reset } = composeModifyFieldBoard(data, [
+        [newLoginId, (_data: AuthUserAccount) => emptyLoginId()],
+    ])
 
-    onSuccess(() => {
-        editable.close()
+    modify.state.subscribe((state) => {
+        if (state.type === "success") {
+            updater.update((list) =>
+                list.map((item) => {
+                    return item.loginId === state.data.loginId ? state.data : item
+                }),
+            )
+        }
+    })
+
+    const connect = mapAtom(modify.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
     })
 
     return {
-        action: {
-            state,
+        state: modify.state,
+        connect,
+        validate,
+        observe,
+        editable,
 
-            newLoginId,
+        newLoginId: newLoginId[0],
 
-            validate,
-            observe,
-            editable,
-
-            reset,
-
-            onSuccess,
-
-            async submit(): Promise<OverwriteLoginIdState> {
-                const element = data()
-                if (!element.isLoad) {
-                    return state.currentState()
-                }
-
-                const fields = convert()
-                if (!fields.valid) {
-                    return state.currentState()
-                }
-
-                return overwriteLoginId(material, element.data, fields.value, post)
-            },
-        },
-        handler,
-    }
-
-    function onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void {
-        state.subscribe((state) => {
-            if (state.type === "success") {
-                handler(state.data)
-            }
-        })
+        reset,
+        submit: modifyWithCurrentState,
     }
 }
 
 type OverwriteLoginIdEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeLoginIdError }>
-    | Readonly<{ type: "success"; data: OverwriteLoginIdEntry }>
+    | Readonly<{ type: "success"; data: AuthUserAccount }>
     | Readonly<{ type: "initial" }>
 
 async function overwriteLoginId<S>(
     { infra, config }: OverwriteLoginIdMaterial,
-    user: Readonly<{ loginId: LoginId }>,
+    user: AuthUserAccount,
     fields: OverwriteLoginIdFields,
     post: Post<OverwriteLoginIdEvent, S>,
 ): Promise<S> {
@@ -154,7 +150,7 @@ async function overwriteLoginId<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", data: { loginId: fields.newLoginId } })
+    post({ type: "success", data: { ...user, loginId: fields.newLoginId } })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

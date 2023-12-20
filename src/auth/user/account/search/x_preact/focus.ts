@@ -1,44 +1,40 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../../../common/x_preact/vnode"
 
-import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
+
+import { box, box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_gray } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { DetailAuthUserAccount, DetailAuthUserAccountActions } from "../../kernel/x_preact/detail"
-import { BackToListButton } from "../../../../../common/x_preact/button/back_to_list_button"
+import { BackLink } from "../../../../../common/x_preact/button/back_link"
 
 import { SearchAuthUserAccountAction } from "../action"
-
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 type Props = DetailAuthUserAccountActions &
     Readonly<{
         search: SearchAuthUserAccountAction
     }>
-export function FocusAuthUserAccount(props: Props): VNode {
-    return html`${[container([box_grow({ body: backToListButton() })]), h(Content, {})]}`
+export function FocusAuthUserAccount(props: Props): PreactNode {
+    return html`${[container([box({ body: backLink() })]), h(Content, {})]}`
 
-    function Content(_props: unknown): VNode {
-        const focusState = useApplicationState(props.search.list.focus.state)
-        switch (focusState.type) {
-            case "not-found":
-                return container([
-                    box_grow({ body: notice_gray(["指定されたユーザーが見つかりませんでした"]) }),
-                ])
-
-            case "data-remove":
-                return container([box_grow({ body: notice_gray(["このデータは削除されました"]) })])
-
-            default:
-                return h(DetailAuthUserAccount, props)
+    function Content(_props: unknown): PreactNode {
+        const isFocused = useAtom(props.search.focus.isSomeEntryFocused)
+        if (isFocused) {
+            return h(DetailAuthUserAccount, props)
+        } else {
+            return container([
+                box_grow({ body: notice_gray(["指定されたデータが見つかりませんでした"]) }),
+            ])
         }
     }
 
-    function backToListButton(): VNode {
-        return h(BackToListButton, { onClick })
+    function backLink(): PreactNode {
+        return h(BackLink, { onClick })
 
         function onClick() {
-            props.search.list.focus.close({ y: document.getElementById("sidebar")?.scrollTop || 0 })
+            props.search.focus.close({ y: document.getElementById("sidebar")?.scrollTop || 0 })
         }
     }
 }

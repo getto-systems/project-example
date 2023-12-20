@@ -11,8 +11,11 @@ service SearchAuthUserAccountPb {
 message SearchAuthUserAccountRequestPb {
     int32 offset = 1;
     common.api.search.service.SearchSortPb sort = 2;
-    repeated string login_id = 3;
-    repeated string granted = 4;
+    SearchAuthUserAccountFilterPb filter = 3;
+}
+message SearchAuthUserAccountFilterPb {
+    repeated string login_id = 1;
+    repeated string granted = 2;
 }
 message SearchAuthUserAccountResponsePb {
     common.api.search.service.SearchPagePb page = 1;

@@ -2,14 +2,14 @@ syntax = "proto3";
 
 package common.outline.load.service;
 
-service LoadMenuBadgePb {
-    rpc LoadMenuBadge (LoadMenuBadgeRequestPb) returns (LoadMenuBadgeResponsePb);
+service LoadOutlineMenuBadgePb {
+    rpc Load (LoadOutlineMenuBadgeRequestPb) returns (LoadOutlineMenuBadgeResponsePb);
 }
-message LoadMenuBadgeRequestPb {}
-message LoadMenuBadgeResponsePb {
-    repeated LoadMenuBadgeEntryPb items = 1;
+message LoadOutlineMenuBadgeRequestPb {}
+message LoadOutlineMenuBadgeResponsePb {
+    repeated MenuBadgePb items = 1;
 }
-message LoadMenuBadgeEntryPb {
+message MenuBadgePb {
     string path = 1;
     int32 count = 2;
 }

@@ -1,35 +1,38 @@
-import { h, VNode } from "preact"
-import { VNodeContent } from "../../../../../../z_vendor/getto-css/preact/common"
+import { h } from "preact"
+import { useAtom } from "../../../../../../z_vendor/getto-atom/x_preact/hooks"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/vnode"
 
 import { label, search_double } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { checkboxOptions } from "../../../../../../common/x_preact/design/checkbox"
 
-import { CheckboxBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
+import { CheckboxBoard } from "../../../../../../common/util/board/input/x_preact/checkbox"
 import { authPermissionCheckboxContent } from "../../../kernel/x_preact/field"
 
-import { AuthPermissionGrantedFilterAction } from "../action"
-
-import { ALL_AUTH_PERMISSIONS } from "../../../../../../x_content/permission"
+import { MultipleFilterBoard } from "../../../../../../common/util/board/filter/action"
 
 import { AUTH_USER_ACCOUNT } from "../../../kernel/data"
-import { prepared } from "../../../../../../common/util/prepare/data"
+import { AuthPermission } from "../../../../kernel/data"
 
-type Props = Readonly<{
-    field: AuthPermissionGrantedFilterAction
+type MultipleProps<T, F> = Readonly<{
+    filter: MultipleFilterBoard<T, F>
 }> &
     Partial<{
-        title: VNodeContent
-        help: readonly VNodeContent[]
+        title: PreactContent
+        help: readonly PreactContent[]
     }>
 
-export function AuthPermissionGrantedFilter(props: Props): VNode {
+export function AuthPermissionGrantedFilter(
+    props: MultipleProps<AuthPermission, AuthPermission>,
+): PreactNode {
+    const options = useAtom(props.filter.options)
+
     return search_double({
         label: label,
         title: props.title || AUTH_USER_ACCOUNT["granted"],
         help: props.help,
         body: h(CheckboxBoard, {
-            input: props.field.input,
-            options: checkboxOptions(prepared(ALL_AUTH_PERMISSIONS), authPermissionCheckboxContent),
+            input: props.filter.input,
+            options: checkboxOptions(options, authPermissionCheckboxContent),
         }),
     })
 }

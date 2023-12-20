@@ -1,50 +1,41 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
-
 import { checkTakeLongtime, ticker } from "../../../../common/util/timer/helper"
 
-import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import {
-    AuthUserTextFieldAction,
-    AuthPermissionGrantedFieldAction,
-    initAuthUserTextFieldAction,
-    initAuthPermissionGrantedFieldAction,
-} from "../input/field/action"
-import {
-    initModifyField,
-    modifyField,
-    ModifyFieldHandler,
-} from "../../../../common/util/modify/action"
-import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
-
 import { ALL_AUTH_PERMISSIONS } from "../../../../x_content/permission"
+
+import { Atom, initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import { LoadState, loadState_loaded } from "../../../../common/util/load/data"
+import { AuthUserTextField, initAuthUserTextField } from "../input/field/action"
+import {
+    AuthPermissionGrantedField,
+    initAuthPermissionGrantedField,
+} from "../../kernel/input/field/action"
+import { EditableBoardAction } from "../../../../common/util/board/editable/action"
+import { ValidateBoardState } from "../../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../../common/util/board/observe/action"
+import { LoadableListAtomUpdater } from "../../../../common/util/list/action"
+import { composeModifyFieldBoard } from "../../../../common/util/board/field/action"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../common/util/config/infra"
 
+import { ConvertBoardResult } from "../../../../common/util/board/kernel/data"
+import { AuthUserAccount } from "../kernel/data"
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
-import { LoginId } from "../../login_id/kernel/data"
-import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
+import { ConnectState } from "../../../../common/util/connect/data"
 
 export interface ModifyAuthUserAccountAction {
-    readonly state: ApplicationState<ModifyAuthUserAccountState>
-    readonly memo: AuthUserTextFieldAction<"memo">
-    readonly granted: AuthPermissionGrantedFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<ModifyAuthUserAccountState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
     readonly editable: EditableBoardAction
 
-    onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void
+    readonly memo: AuthUserTextField<"memo">
+    readonly granted: AuthPermissionGrantedField
 
     reset(): void
     submit(): Promise<ModifyAuthUserAccountState>
 }
-
-export type ModifyAuthUserAccountEntry = Readonly<{ loginId: LoginId }> &
-    ModifyAuthUserAccountFields
 
 export type ModifyAuthUserAccountState = ModifyUserEvent
 
@@ -64,99 +55,94 @@ export type ModifyAuthUserAccountConfig = Readonly<{
     resetToInitialTimeout: WaitTime
 }>
 
-export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountMaterial): Readonly<{
-    action: ModifyAuthUserAccountAction
-    handler: ModifyFieldHandler<ModifyAuthUserAccountEntry>
-}> {
-    const { state, post } = initApplicationState({ initialState })
-
-    const memo = initAuthUserTextFieldAction("memo")
-    const granted = initAuthPermissionGrantedFieldAction()
-
-    const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
-        const result = {
-            granted: granted.input.validate.check(),
-            memo: memo.validate.check(),
+export function initModifyAuthUserAccountAction(
+    data: Atom<LoadState<AuthUserAccount>>,
+    updater: LoadableListAtomUpdater<AuthUserAccount>,
+    material: ModifyAuthUserAccountMaterial,
+): ModifyAuthUserAccountAction {
+    const modify = initAtom({ initialState })
+    async function modifyWithCurrentState(): Promise<ModifyAuthUserAccountState> {
+        const element = data.currentState()
+        if (!element.isLoad) {
+            return modify.state.currentState()
         }
-        if (!result.granted.valid || !result.memo.valid) {
+
+        const fields = currentFields()
+        if (!fields.valid) {
+            return modify.state.currentState()
+        }
+        return modifyAuthUser(material, element.data, fields.value, modify.post)
+    }
+
+    const grantedOptions = initAtom({ initialState: loadState_loaded(ALL_AUTH_PERMISSIONS) })
+
+    const memo = initAuthUserTextField("memo")
+    const granted = initAuthPermissionGrantedField(grantedOptions.state)
+
+    const currentFields = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
+        const result = {
+            memo: memo[0].validate.currentState(),
+            granted: granted[0].validate.currentState(),
+        }
+        if (!result.memo.valid || !result.granted.valid) {
             return { valid: false }
         }
         return {
             valid: true,
             value: {
-                granted: result.granted.value,
                 memo: result.memo.value,
+                granted: result.granted.value,
             },
         }
     }
 
-    const { validate, observe, editable, data, handler, reset } = initModifyField(
-        [
-            modifyField("memo", memo, (data: ModifyAuthUserAccountEntry) => data.memo),
-            modifyField(
-                "granted",
-                granted.input,
-                (data: ModifyAuthUserAccountEntry) => data.granted,
-            ),
-        ],
-        convert,
-    )
+    const { editable, validate, observe, reset } = composeModifyFieldBoard(data, [
+        [memo, (data: AuthUserAccount) => data.memo],
+        [granted, (data: AuthUserAccount) => data.granted],
+    ])
 
-    granted.setOptions(ALL_AUTH_PERMISSIONS)
+    modify.state.subscribe((state) => {
+        if (state.type === "success") {
+            updater.update((list) =>
+                list.map((item) => {
+                    return item.loginId === state.data.loginId ? state.data : item
+                }),
+            )
+        }
+    })
 
-    onSuccess(() => {
-        editable.close()
+    const connect = mapAtom(modify.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
     })
 
     return {
-        action: {
-            state,
+        state: modify.state,
+        connect,
+        validate,
+        observe,
+        editable,
 
-            memo,
-            granted: granted.input,
+        memo: memo[0],
+        granted: granted[0],
 
-            validate,
-            observe,
-            editable,
-
-            onSuccess,
-            reset,
-
-            async submit(): Promise<ModifyAuthUserAccountState> {
-                const element = data()
-                if (!element.isLoad) {
-                    return state.currentState()
-                }
-
-                const fields = convert()
-                if (!fields.valid) {
-                    return state.currentState()
-                }
-
-                return modifyUser(material, element.data, fields.value, post)
-            },
-        },
-        handler,
-    }
-
-    function onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void {
-        state.subscribe((state) => {
-            if (state.type === "success") {
-                handler(state.data)
-            }
-        })
+        reset,
+        submit: modifyWithCurrentState,
     }
 }
 
 type ModifyUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ModifyAuthUserAccountError }>
-    | Readonly<{ type: "success"; data: ModifyAuthUserAccountEntry }>
+    | Readonly<{ type: "success"; data: AuthUserAccount }>
     | Readonly<{ type: "initial" }>
 
-async function modifyUser<S>(
+async function modifyAuthUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
-    user: ModifyAuthUserAccountEntry,
+    user: AuthUserAccount,
     fields: ModifyAuthUserAccountFields,
     post: Post<ModifyUserEvent, S>,
 ): Promise<S> {

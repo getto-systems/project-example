@@ -1,14 +1,15 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../../../common/x_preact/vnode"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidateBoardMessage } from "../../../../../common/x_preact/design/form"
 
 import { changeLoginIdError } from "./helper"
-import { LoginIdField } from "../../input/x_preact/field"
+import { AuthUserLoginIdField } from "../../input/field/x_preact/input"
 import { EditButton } from "../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
@@ -20,15 +21,15 @@ import { OverwriteLoginIdAction } from "../action"
 type Props = Readonly<{
     overwrite: OverwriteLoginIdAction
 }>
-export function OverwriteLoginId(props: Props): VNode {
-    const editableState = useApplicationState(props.overwrite.editable.state)
+export function OverwriteLoginId(props: Props): PreactNode {
+    const editableState = useAtom(props.overwrite.editable.state)
 
     return box({
         form: true,
         title: "ログインID変更",
         ...(editableState.isEditable
             ? {
-                  body: h(LoginIdField, {
+                  body: h(AuthUserLoginIdField, {
                       field: props.overwrite.newLoginId,
                       title: "新しいログインID",
                       help: ["管理者権限でログインIDを上書きします"],
@@ -36,7 +37,7 @@ export function OverwriteLoginId(props: Props): VNode {
                   }),
                   footer: [
                       buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
-                      h(ValidationMessage, props.overwrite.validate),
+                      h(ValidateBoardMessage, { state: props.overwrite.validate }),
                       h(Message, {}),
                       buttons({ right: h(Close, {}) }),
                   ],
@@ -44,8 +45,8 @@ export function OverwriteLoginId(props: Props): VNode {
             : { body: h(Edit, {}) }),
     })
 
-    function Edit(_props: unknown): VNode {
-        const state = useApplicationState(props.overwrite.state)
+    function Edit(_props: unknown): PreactNode {
+        const state = useAtom(props.overwrite.state)
         if (state.type === "success") {
             return h(EditSuccessButton, { onClick })
         } else {
@@ -58,15 +59,11 @@ export function OverwriteLoginId(props: Props): VNode {
         }
     }
 
-    function Submit(_props: unknown): VNode {
-        const overwriteState = useApplicationState(props.overwrite.state)
-        const validateState = useApplicationState(props.overwrite.validate.state)
-        const observeState = useApplicationState(props.overwrite.observe.state)
-
+    function Submit(_props: unknown): PreactNode {
         return h(ChangeButton, {
-            isConnecting: overwriteState.type === "try",
-            validateState,
-            observeState,
+            connect: props.overwrite.connect,
+            validate: props.overwrite.validate,
+            observe: props.overwrite.observe,
             onClick,
         })
 
@@ -76,17 +73,18 @@ export function OverwriteLoginId(props: Props): VNode {
         }
     }
 
-    function Clear(_props: unknown): VNode {
-        const observeState = useApplicationState(props.overwrite.observe.state)
-
-        return h(ClearChangesButton, { observeState, onClick })
+    function Clear(_props: unknown): PreactNode {
+        return h(ClearChangesButton, {
+            observe: props.overwrite.observe,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
             props.overwrite.reset()
         }
     }
-    function Close(_props: unknown): VNode {
+    function Close(_props: unknown): PreactNode {
         return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
@@ -95,8 +93,8 @@ export function OverwriteLoginId(props: Props): VNode {
         }
     }
 
-    function Message(_props: unknown): VNode {
-        const overwriteState = useApplicationState(props.overwrite.state)
+    function Message(_props: unknown): PreactNode {
+        const overwriteState = useAtom(props.overwrite.state)
 
         switch (overwriteState.type) {
             case "initial":

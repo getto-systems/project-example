@@ -1,34 +1,32 @@
 import { checkTakeLongtime } from "../../../../../common/util/timer/helper"
 
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../../z_vendor/getto-application/action/action"
-
-import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
-import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardAction } from "../../../../../z_vendor/getto-application/board/observe_board/action"
-import { initRegisterField } from "../../../../../common/util/register/action"
+import { Atom, initAtom, mapAtom } from "../../../../../z_vendor/getto-atom/atom"
+import { ValidateBoardState } from "../../../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../../../common/util/board/observe/action"
+import { composeRegisterFieldBoard } from "../../../../../common/util/board/field/action"
+import { LoginIdField, initLoginIdField } from "../../../login_id/input/field/action"
 import {
     EditableBoardAction,
     initEditableBoardAction,
-} from "../../../../../z_vendor/getto-application/board/editable/action"
+} from "../../../../../common/util/board/editable/action"
 
 import { RequestResetTokenRemote } from "./infra"
 import { WaitTime } from "../../../../../common/util/config/infra"
 
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
-import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
+import { ConvertBoardResult } from "../../../../../common/util/board/kernel/data"
+import { ConnectState } from "../../../../../common/util/connect/data"
 
 export interface RequestResetTokenAction {
-    readonly state: ApplicationState<RequestResetTokenState>
-    readonly loginId: LoginIdFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<RequestResetTokenState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
     readonly editable: EditableBoardAction
 
-    edit(): void
-    clear(): void
+    readonly loginId: LoginIdField
+
+    reset(): void
     submit(): Promise<RequestResetTokenState>
 }
 
@@ -52,61 +50,60 @@ const initialState: RequestResetTokenState = { type: "initial" }
 export function initRequestResetTokenAction(
     material: RequestResetTokenMaterial,
 ): RequestResetTokenAction {
-    const { state, post } = initApplicationState({ initialState })
-    const editable = initEditableBoardAction()
+    const request = initAtom({ initialState })
+    async function requestWithCurrentState(): Promise<RequestResetTokenState> {
+        const fields = currentFields()
+        if (!fields.valid) {
+            return request.state.currentState()
+        }
+        return requestResetToken(material, fields.value, request.post)
+    }
 
-    const loginId = initLoginIdFieldAction()
+    const loginId = initLoginIdField()
 
-    const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
-        const loginIdResult = loginId.validate.check()
-        if (!loginIdResult.valid) {
+    const currentFields = (): ConvertBoardResult<RequestResetTokenFields> => {
+        const result = {
+            loginId: loginId[0].validate.currentState(),
+        }
+        if (!result.loginId.valid) {
             return { valid: false }
         }
         return {
             valid: true,
             value: {
-                loginId: loginIdResult.value,
+                loginId: result.loginId.value,
             },
         }
     }
 
-    const { validate, observe, clear } = initRegisterField([["loginId", loginId]], convert)
+    const { validate, observe, reset } = composeRegisterFieldBoard([loginId])
 
-    onSuccess(() => {
-        editable.close()
+    const editable = initEditableBoardAction()
+    editable.state.subscribe((state) => {
+        if (state.isEditable) {
+            reset()
+        }
+    })
+
+    const connect = mapAtom(request.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
     })
 
     return {
-        state,
-
-        loginId,
-
+        state: request.state,
+        connect,
         validate,
         observe,
         editable,
 
-        clear,
-        edit(): void {
-            editable.open()
-            clear()
-        },
-        async submit(): Promise<RequestResetTokenState> {
-            const fields = convert()
-            if (!fields.valid) {
-                return state.currentState()
-            }
-            return requestResetToken(material, fields.value, post)
-        },
-    }
+        loginId: loginId[0],
 
-    function onSuccess(handler: () => void): void {
-        state.subscribe((state) => {
-            switch (state.type) {
-                case "success":
-                    handler()
-                    break
-            }
-        })
+        reset,
+        submit: requestWithCurrentState,
     }
 }
 

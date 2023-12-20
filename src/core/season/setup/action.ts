@@ -1,31 +1,34 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
-import { initSeasonFieldAction, SeasonFieldAction } from "../input/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 import { LoadSeasonState } from "../load/action"
-import { ObserveBoardAction } from "../../../z_vendor/getto-application/board/observe_board/action"
-import { ValidateBoardAction } from "../../../z_vendor/getto-application/board/validate_board/action"
+import { ValidateBoardState } from "../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../common/util/board/observe/action"
 import {
     EditableBoardAction,
     initEditableBoardAction,
-} from "../../../z_vendor/getto-application/board/editable/action"
-import { initRegisterField } from "../../../common/util/register/action"
+} from "../../../common/util/board/editable/action"
+import {
+    SelectFieldBoard,
+    composeRegisterFieldBoard,
+    initSelectFieldBoard,
+} from "../../../common/util/board/field/action"
+
+import { seasonToString } from "../kernel/convert"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../common/util/clock/infra"
 import { ExpireTime, WaitTime } from "../../../common/util/config/infra"
 
 import { RepositoryError } from "../../../common/util/repository/data"
-import { DetectedSeason, Season } from "../kernel/data"
-import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/kernel/data"
+import { DetectedSeason, Season, defaultSeason, detectedSeason } from "../kernel/data"
 import { ticker } from "../../../common/util/timer/helper"
+import { ConvertBoardResult } from "../../../common/util/board/kernel/data"
+import { loadState_loaded } from "../../../common/util/load/data"
 
 export interface SetupSeasonAction {
-    readonly state: ApplicationState<SetupSeasonState>
-    readonly season: SeasonFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<SetupSeasonState>
+    readonly season: SelectFieldBoard<DetectedSeason>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
     readonly editable: EditableBoardAction
 
     setup(): Promise<SetupSeasonState>
@@ -58,14 +61,23 @@ export function initSetupSeasonAction(
     material: SetupSeasonMaterial,
     load: LoadAction,
 ): SetupSeasonAction {
-    const { state, post } = initApplicationState({ initialState })
+    const { state, post } = initAtom({ initialState })
     const editable = initEditableBoardAction()
 
-    const season = initSeasonFieldAction(material.infra.availableSeasons)
+    const seasonOptions = initAtom({
+        initialState: loadState_loaded([
+            defaultSeason(),
+            ...material.infra.availableSeasons.map((season) => detectedSeason(season)),
+        ]),
+    })
+
+    const season = initSelectFieldBoard(seasonOptions.state, {
+        convert: (data) => seasonToString(data),
+    })
 
     const convert = (): ConvertBoardResult<DetectedSeason> => {
         const result = {
-            season: season.validate.check(),
+            season: season[0].validate.currentState(),
         }
         if (!result.season.valid) {
             return { valid: false }
@@ -76,16 +88,12 @@ export function initSetupSeasonAction(
         }
     }
 
-    const { validate, observe } = initRegisterField([["season", season]], convert)
+    const { validate, observe, reset: _reset } = composeRegisterFieldBoard([season])
 
     load.state.ignitionState.then((state) => {
         switch (state.type) {
             case "success":
-                if (state.default) {
-                    season.reset({ default: true })
-                } else {
-                    season.reset({ default: false, season: state.season })
-                }
+                season[1].init(state.season)
         }
     })
 
@@ -97,7 +105,7 @@ export function initSetupSeasonAction(
     return {
         state,
 
-        season,
+        season: season[0],
 
         validate,
         observe,

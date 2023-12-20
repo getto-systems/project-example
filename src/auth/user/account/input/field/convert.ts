@@ -2,17 +2,17 @@ import { converter } from "../../../../../common/util/validate/helper"
 import { check_text_tooLong } from "../../../../../common/util/validate/text"
 import { restoreAuthUserField } from "../../kernel/convert"
 
-import { ValidateAuthUserTextResult } from "./data"
+import { ValidateAuthUserTextValue } from "./data"
 
-export type AuthUserTextField = keyof typeof textValidators
-export type AuthUserMultipleField = "granted"
+export type AuthUserTextFieldName = keyof typeof textValidators
+export type AuthUserMultipleFieldName = "granted"
 
 const textValidators = {
     memo: [check_text_tooLong(255)],
 } as const
 
-export function authUserTextConverter<K extends AuthUserTextField>(
+export function authUserTextConverter<K extends AuthUserTextFieldName>(
     key: K,
-): (value: string) => ValidateAuthUserTextResult<K> {
+): (value: string) => ValidateAuthUserTextValue<K> {
     return converter((value: string) => restoreAuthUserField(value), textValidators[key])
 }

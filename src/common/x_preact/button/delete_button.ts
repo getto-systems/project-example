@@ -1,29 +1,37 @@
 import { html } from "htm/preact"
-import { VNode } from "preact"
+import { PreactContent, PreactNode } from "../vnode"
 
-import { VNodeContent } from "../vnode"
+import { useAtom } from "../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { button_delete } from "../../../z_vendor/getto-css/preact/design/form"
-
 import { icon_delete, icon_spinner } from "../../../x_content/icon"
 import { iconHtml } from "../../util/icon/x_preact/icon"
 
-import { Icon } from "../../util/icon/data"
+import { Atom } from "../../../z_vendor/getto-atom/atom"
 
-type Props = Readonly<{
-    label?: VNodeContent
+import { Icon } from "../../util/icon/data"
+import { ConnectState } from "../../util/connect/data"
+
+export function DeleteButton({
+    connect,
+    label,
+    icon,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     icon?: Icon
-    isConnecting: boolean
+    connect: Atom<ConnectState>
     onClick: { (e: Event): void }
-}>
-export function DeleteButton({ isConnecting, label, icon, onClick }: Props): VNode {
-    if (isConnecting) {
+}>): PreactNode {
+    const connectState = useAtom(connect)
+
+    if (connectState.isConnecting) {
         return button_delete({ state: "connect", label: buttonLabel(icon_spinner) })
     }
 
     return button_delete({ state: "confirm", label: buttonLabel(icon || icon_delete), onClick })
 
-    function buttonLabel(icon: Icon): VNode {
+    function buttonLabel(icon: Icon): PreactNode {
         return html`${label || "削除"} ${iconHtml(icon)}`
     }
 }

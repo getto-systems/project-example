@@ -1,86 +1,45 @@
-use getto_application::{data::MethodResult, infra::ActionStatePubSub};
+mod detail;
 
-use crate::auth::ticket::logout::action::LogoutActionInfo;
-
-use crate::auth::ticket::authenticate::{
-    method::{authenticate_with_token, AuthenticateWithTokenEvent, AuthenticateWithTokenInfra},
-    proxy::method::AuthProxyCallEvent,
-};
-
-use crate::common::proxy::infra::ProxyCall;
+use std::sync::Arc;
 
 use crate::{
-    auth::{proxy::data::AuthProxyError, ticket::kernel::data::AuthenticateTokenExtract},
-    common::proxy::data::ProxyResponseBody,
+    auth::ticket::logout::proxy::infra::{LogoutProxyInfra, LogoutProxyLogger},
+    common::proxy::infra::ProxyCall,
 };
 
-pub enum LogoutProxyState {
-    AuthenticateWithToken(AuthenticateWithTokenEvent),
-    ProxyCall(AuthProxyCallEvent<ProxyResponseBody>),
+use crate::{
+    auth::ticket::{
+        authenticate::data::CheckAuthenticateTokenSuccess, kernel::data::AuthenticateTokenExtract,
+        logout::proxy::data::LogoutProxyError,
+    },
+    common::{api::request::data::RequestInfo, proxy::data::ProxyResponseBody},
+};
+
+pub struct LogoutProxyAction<M: LogoutProxyInfra> {
+    logger: Arc<dyn LogoutProxyLogger>,
+    infra: M,
 }
 
-impl std::fmt::Display for LogoutProxyState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::AuthenticateWithToken(event) => event.fmt(f),
-            Self::ProxyCall(event) => event.fmt(f),
-        }
-    }
-}
-
-pub trait LogoutProxyMaterial {
-    type AuthenticateWithToken: AuthenticateWithTokenInfra;
-    type ProxyCall: ProxyCall<Request = (), Response = ProxyResponseBody, Error = AuthProxyError>;
-
-    fn authenticate_with_token(&self) -> &Self::AuthenticateWithToken;
-    fn proxy_call(&self) -> &Self::ProxyCall;
-}
-
-pub struct LogoutProxyAction<M: LogoutProxyMaterial> {
-    pubsub: ActionStatePubSub<LogoutProxyState>,
-    material: M,
-}
-
-impl<M: LogoutProxyMaterial> LogoutProxyAction<M> {
-    pub fn with_material(material: M) -> Self {
-        Self {
-            pubsub: ActionStatePubSub::new(),
-            material,
-        }
-    }
-
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&LogoutProxyState) + Send + Sync) {
-        self.pubsub.subscribe(handler);
-    }
-
-    pub async fn ignite(
-        self,
+impl<M: LogoutProxyInfra> LogoutProxyAction<M> {
+    pub async fn logout(
+        &self,
+        info: RequestInfo,
         token: impl AuthenticateTokenExtract,
-    ) -> MethodResult<LogoutProxyState> {
-        let (_ticket, token) =
-            authenticate_with_token(self.material.authenticate_with_token(), token, |event| {
-                self.pubsub
-                    .post(LogoutProxyState::AuthenticateWithToken(event))
-            })
-            .await?;
+        auth: CheckAuthenticateTokenSuccess,
+    ) -> Result<ProxyResponseBody, LogoutProxyError> {
+        self.logger.try_to_logout();
 
-        self.pubsub
-            .post(LogoutProxyState::ProxyCall(AuthProxyCallEvent::TryToCall(
-                LogoutActionInfo.name().to_owned(),
-            )));
+        let token = token
+            .convert()
+            .map_err(|err| self.logger.invalid_request(err))?;
 
-        Ok(self
-            .pubsub
-            .post(LogoutProxyState::ProxyCall(AuthProxyCallEvent::Response(
-                self.material
-                    .proxy_call()
-                    .call(token, ())
-                    .await
-                    .map_err(|err| {
-                        self.pubsub.post(LogoutProxyState::ProxyCall(
-                            AuthProxyCallEvent::ServiceError(err),
-                        ))
-                    })?,
-            ))))
+        let auth = self
+            .infra
+            .proxy_call()
+            .call(info, token, auth)
+            .await
+            .map_err(|err| self.logger.proxy_error(err))?;
+
+        Ok(self.logger.succeed_to_logout(auth))
     }
 }

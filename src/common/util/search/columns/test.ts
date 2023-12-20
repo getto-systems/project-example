@@ -1,64 +1,67 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../z_vendor/getto-atom/test_helper"
+import { ticker } from "../../timer/helper"
 
-import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
-import { initMemoryDB } from "../../repository/init/memory"
+import { mockMultipleBoardStore } from "../../board/input/test_helper"
+import { initMemoryDB } from "../../repository/detail/memory"
 
 import { searchColumnsRepositoryConverter } from "./convert"
-import { convertDB } from "../../repository/init/convert"
+import { convertDB } from "../../repository/detail/convert"
 
-import { initSearchColumnsAction, SearchColumnsAction, visibleKeys } from "./action"
+import { initSearchColumnsBoard, SearchColumnsBoard } from "./action"
 
-import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
-import { ticker } from "../../timer/helper"
+import { MultipleBoardStore } from "../../board/input/infra"
 
 test("select columns", async () => {
     const { field, store } = standard()
 
-    expect(
-        await observeApplicationState(field.state, async () => {
-            await field.state.ignitionState
+    const result = observeAtom(field.filter)
 
-            store.columns.set(["column-a"])
-            await ticker({ wait_millisecond: 0 }, () => null)
+    await field.state.ignitionState
 
-            store.columns.set(["column-a", "column-b"])
-            return field.state.currentState()
-        }),
-    ).toEqual([
-        { type: "columns", visibleKeys: ["stored"] },
-        { type: "columns", visibleKeys: ["column-a"] },
-        { type: "columns", visibleKeys: ["column-a", "column-b"] },
-    ])
-})
+    store.columns.set(["column-a", "column-b"])
+    await ticker({ wait_millisecond: 0 }, () => null)
 
-test("visibleKeys", async () => {
-    expect(visibleKeys({ type: "columns", visibleKeys: ["key"] })).toEqual(["key"])
+    store.columns.set(["column-a"])
+    await ticker({ wait_millisecond: 0 }, () => null)
+
+    expect(result()).toEqual([["column-a"], ["column-a", "column-b"], ["column-a"]])
 })
 
 function standard(): Readonly<{
-    field: SearchColumnsAction
+    field: SearchColumnsBoard
     store: Readonly<{
-        columns: MultipleBoardValueStore
+        columns: MultipleBoardStore
     }>
 }> {
-    const field = initSearchColumnsAction(
+    const field = initSearchColumnsBoard(
         {
             columnsRepository: standard_columnRepository(),
         },
-        ["initial"],
+        [
+            {
+                key: "column-a",
+                content: "A",
+                isInitiallyVisible: true,
+            },
+            {
+                key: "column-b",
+                content: "B",
+                isInitiallyVisible: true,
+            },
+        ],
     )
 
     return {
         field,
         store: {
-            columns: mockMultipleBoardValueStore(field.input),
+            columns: mockMultipleBoardStore(field.input),
         },
     }
 }
 
 function standard_columnRepository() {
     const db = initMemoryDB()
-    db.set(["stored"])
+    db.set(["column-a"])
     return convertDB(db, searchColumnsRepositoryConverter)
 }

@@ -1,7 +1,5 @@
 import { html } from "htm/preact"
-import { VNode } from "preact"
-
-import { VNodeContent } from "../vnode"
+import { PreactContent, PreactNode } from "../vnode"
 
 import { button_send } from "../../../z_vendor/getto-css/preact/design/form"
 
@@ -10,12 +8,15 @@ import { iconHtml } from "../../util/icon/x_preact/icon"
 
 import { Icon } from "../../util/icon/data"
 
-type Props = Readonly<{
-    label?: VNodeContent
+export function VectorAddButton({
+    label,
+    icon,
+    onClick,
+}: Readonly<{
+    label?: PreactContent
     icon?: Icon
     onClick: { (e: Event): void }
-}>
-export function VectorAddButton({ label, icon, onClick }: Props): VNode {
+}>): PreactNode {
     return button_send({
         state: "normal",
         submit: false,
@@ -23,7 +24,7 @@ export function VectorAddButton({ label, icon, onClick }: Props): VNode {
         onClick,
     })
 
-    function buttonLabel(icon: Icon): VNode {
+    function buttonLabel(icon: Icon): PreactNode {
         return html`${label || "項目を追加"} ${iconHtml(icon)}`
     }
 }

@@ -1,7 +1,11 @@
-import { Season, SeasonPeriod } from "./data"
+import { DetectedSeason, SeasonPeriod } from "./data"
 
-export function seasonLabel(season: Season): string {
-    return `${season.year} ${periodLabel(season.period)}`
+export function seasonLabel(data: DetectedSeason): string {
+    if (data.default) {
+        return "今シーズン"
+    } else {
+        return `${data.season.year} ${periodLabel(data.season.period)}`
+    }
 }
 function periodLabel(period: SeasonPeriod): string {
     switch (period) {

@@ -1,5 +1,6 @@
 use std::env::var;
 
+#[derive(Debug)]
 pub struct ProxyEnv {
     pub log_level: String,
     pub port: String,
@@ -17,7 +18,7 @@ pub struct ProxyEnv {
 }
 
 impl ProxyEnv {
-    pub fn new() -> Self {
+    pub fn load() -> Self {
         Self {
             log_level: load("PROXY_LOG_LEVEL"),
             port: load("PORT"),

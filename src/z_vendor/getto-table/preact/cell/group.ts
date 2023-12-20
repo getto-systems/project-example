@@ -1,12 +1,12 @@
-import { VNodeContent } from "../common"
+import { PreactContent } from "../common"
 
 import {
-    TableDataCellKey,
+    TableDataKey,
     TableDataColumn,
     TableDataHeader,
     TableDataHeaderGroup,
     TableDataSummary,
-    TableDataView,
+    TableDataCell,
 } from "../core"
 
 import { tableDataMutable_base } from "../mutable/base"
@@ -44,8 +44,8 @@ import {
 } from "../style"
 
 export type TableDataGroupContent<M, R> = Readonly<{
-    key: TableDataCellKey
-    header: VNodeContent
+    key: TableDataKey
+    header: PreactContent
     cells: readonly TableCell<M, R>[]
 }>
 export function tableCell_group<M, R>(content: TableDataGroupContent<M, R>): TableCellGroup<M, R> {
@@ -68,11 +68,11 @@ class Cell<M, R> implements TableCellGroup<M, R> {
         }
     }
 
-    initiallyVisibleCells(): readonly TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataKey[] {
         return tableCellInitiallyVisibleCells(this.content.cells)
     }
 
-    view(): readonly TableDataView[] {
+    view(): readonly TableDataCell[] {
         return tableCellView(this.content.cells)
     }
     header(

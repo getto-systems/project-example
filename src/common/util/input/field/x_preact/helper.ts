@@ -1,16 +1,14 @@
-import { VNodeContent } from "../../../../x_preact/vnode"
+import { PreactContent } from "../../../../x_preact/vnode"
 
-import { ValidateBoardFieldState } from "../../../../../z_vendor/getto-application/board/validate_field/action"
+import { ValidateBoardValue } from "../../../board/validate/data"
 
 type ValidateState =
     | Readonly<{ type: "normal" }>
-    | Readonly<{ type: "error"; notice: readonly VNodeContent[] }>
+    | Readonly<{ type: "error"; notice: readonly PreactContent[] }>
 
-export function mapValidateState<T, E>(
-    validateState: ValidateBoardFieldState<T, E>,
-    map: (err: E) => readonly VNodeContent[],
+export function mapValidateBoardValue<T, E>(
+    result: ValidateBoardValue<T, E>,
+    map: (err: E) => readonly PreactContent[],
 ): ValidateState {
-    return validateState.type === "initial" || validateState.result.valid
-        ? { type: "normal" }
-        : { type: "error", notice: map(validateState.result.err) }
+    return result.valid ? { type: "normal" } : { type: "error", notice: map(result.err) }
 }

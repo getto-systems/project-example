@@ -1,13 +1,11 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
-
-import { VNodeContent } from "../common"
+import { PreactContent, PreactNode } from "../common"
 
 export type ReportContent = Readonly<{
     id: string
-    header: VNodeContent
-    body: VNodeContent
-    footer: VNodeContent
+    header: PreactContent
+    body: PreactContent
+    footer: PreactContent
 }>
 
 type ReportStyle = Readonly<{ size: ReportPageSize; layout: ReportLayout }>
@@ -18,10 +16,13 @@ function reportClass({ size, layout }: ReportStyle) {
 }
 
 // id 付与 : ルート要素
-export function report_a4_portrait(content: ReportContent): VNode {
+export function report_a4_portrait(content: ReportContent): PreactNode {
     return reportContent({ size: "a4", layout: "portrait" }, content)
 }
-function reportContent(style: ReportStyle, { id, header, body, footer }: ReportContent): VNode {
+function reportContent(
+    style: ReportStyle,
+    { id, header, body, footer }: ReportContent,
+): PreactNode {
     return html`<article class="report ${reportClass(style)}" id=${id} key=${id}>
         <main>
             ${contentLimitMarker()}
@@ -40,7 +41,7 @@ function reportContent(style: ReportStyle, { id, header, body, footer }: ReportC
 
 export type ReportTitleContent = Readonly<{
     style: ReportTitleStyle
-    title: VNodeContent
+    title: PreactContent
 }>
 
 type ReportTitleTypedContent = Readonly<{
@@ -64,16 +65,16 @@ function mapReportTitleStyle(style: ReportTitleStyle): string {
     }
 }
 
-export function reportTitle(content: ReportTitleContent): VNode {
+export function reportTitle(content: ReportTitleContent): PreactNode {
     return reportTitleContent({ type: "large", content })
 }
-export function reportTitle_small(content: ReportTitleContent): VNode {
+export function reportTitle_small(content: ReportTitleContent): PreactNode {
     return reportTitleContent({ type: "small", content })
 }
-export function reportTitle_xSmall(content: ReportTitleContent): VNode {
+export function reportTitle_xSmall(content: ReportTitleContent): PreactNode {
     return reportTitleContent({ type: "xSmall", content })
 }
-function reportTitleContent(report: ReportTitleTypedContent): VNode {
+function reportTitleContent(report: ReportTitleTypedContent): PreactNode {
     return html`<h1 class="${titleClass()}">${report.content.title}</h1>`
 
     function titleClass(): string {
@@ -86,16 +87,16 @@ function reportTitleContent(report: ReportTitleTypedContent): VNode {
 }
 
 export type ReportFoliosContent = Readonly<{
-    left: VNodeContent
-    right: VNodeContent
+    left: PreactContent
+    right: PreactContent
 }>
-export function reportFolios({ left, right }: ReportFoliosContent): VNode {
+export function reportFolios({ left, right }: ReportFoliosContent): PreactNode {
     return html`<section class="report__folio__container">
         <aside class="report__folio_left">${left}</aside>
         <aside class="report__folio_right">${right}</aside>
     </section>`
 }
 
-export function reportFolio(content: VNodeContent): VNode {
+export function reportFolio(content: PreactContent): PreactNode {
     return html`<address class="report__folio">${content}</address>`
 }

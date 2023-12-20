@@ -1,11 +1,11 @@
 import { Validator } from "./infra"
 
-import { ValidateBoardFieldResult } from "../../../z_vendor/getto-application/board/validate_field/data"
+import { ValidateBoardValue } from "../board/validate/data"
 
 export function converter<T, V, E>(
     map: { (value: T): V },
     validators: readonly Validator<T, E>[],
-): { (value: T): ValidateBoardFieldResult<V, readonly E[]> } {
+): { (value: T): ValidateBoardValue<V, readonly E[]> } {
     return (value) => {
         const err: E[] = []
         validators.forEach((validator) => {

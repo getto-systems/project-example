@@ -1,25 +1,27 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/vnode"
 
 import { remoteCommonErrorReason } from "../../../../../../common/util/remote/x_error/reason"
 
-import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
-import { VNodeContent } from "../../../../../../common/x_preact/vnode"
 import { siteInfo } from "../../../../../../x_content/site"
 import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField, ValidationMessage } from "../../../../../../common/x_preact/design/form"
+import {
+    takeLongtimeField,
+    ValidateBoardMessage,
+} from "../../../../../../common/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../../avail/x_preact/application_error"
-import { LoginIdField } from "../../../../login_id/input/x_preact/field"
-import { PasswordField } from "../../../input/x_preact/input"
 import { ClearChangesButton } from "../../../../../../common/x_preact/button/clear_changes_button"
 import { ChangeButton } from "../../../../../../common/x_preact/button/change_button"
+import { AuthUserPasswordField } from "../../../input/field/x_preact/input"
 
 import { ResetPasswordAction } from "../action"
 import { SignLink } from "../../../../../sign/nav/action"
@@ -30,12 +32,10 @@ type Props = Readonly<{
     link: SignLink
     reset: ResetPasswordAction
 }>
-export function ResetPassword(props: Props): VNode {
+export function ResetPassword(props: Props): PreactNode {
     useLoadScript(props.reset)
 
-    const resetState = useApplicationState(props.reset.state)
-    const validateState = useApplicationState(props.reset.validate.state)
-    const observeState = useApplicationState(props.reset.observe.state)
+    const resetState = useAtom(props.reset.state)
 
     switch (resetState.type) {
         case "try-to-load":
@@ -59,29 +59,24 @@ export function ResetPassword(props: Props): VNode {
         form: true,
         title: "パスワードリセット",
         body: [
-            h(LoginIdField, {
-                field: props.reset.loginId,
-                help: ["入力したログインIDをもう一度入力してください"],
-                autocomplete: "username",
-            }),
-            h(PasswordField, {
-                field: props.reset.password,
+            h(AuthUserPasswordField, {
+                field: props.reset.newPassword,
                 help: ["新しいパスワードを入力してください"],
                 autocomplete: "new-password",
             }),
-            buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
-            h(ValidationMessage, props.reset.validate),
+            buttons({ left: h(Submit, {}), right: h(Reset, {}) }),
+            h(ValidateBoardMessage, { state: props.reset.validate }),
             h(Message, {}),
         ],
         footer: footerLinks(),
     })
 
-    function Submit(_props: unknown): VNode {
+    function Submit(_props: unknown): PreactNode {
         return h(ChangeButton, {
             label: "パスワードリセット",
-            isConnecting: resetState.type === "try-to-reset",
-            validateState,
-            observeState,
+            connect: props.reset.connect,
+            validate: props.reset.validate,
+            observe: props.reset.observe,
             onClick,
         })
 
@@ -91,16 +86,19 @@ export function ResetPassword(props: Props): VNode {
         }
     }
 
-    function Clear(_props: unknown): VNode {
-        return h(ClearChangesButton, { observeState, onClick })
+    function Reset(_props: unknown): PreactNode {
+        return h(ClearChangesButton, {
+            observe: props.reset.observe,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.reset.clear()
+            props.reset.reset()
         }
     }
 
-    function Message(_props: unknown): VNode {
+    function Message(_props: unknown): PreactNode {
         switch (resetState.type) {
             case "initial-reset":
             case "try-to-load":
@@ -134,13 +132,13 @@ export function ResetPassword(props: Props): VNode {
     }
 }
 
-function resetError(err: ResetPasswordError): readonly VNodeContent[] {
+function resetError(err: ResetPasswordError): readonly PreactContent[] {
     switch (err.type) {
         case "empty-reset-token":
             return ["リセットトークンが指定されていません"]
 
         case "invalid-reset":
-            return ["ログインIDが最初に入力したものと違うか、有効期限が切れています"]
+            return ["リセットトークンの有効期限が切れています"]
 
         case "already-reset":
             return [
@@ -157,7 +155,7 @@ function resetError(err: ResetPasswordError): readonly VNodeContent[] {
 }
 
 function useLoadScript(reset: ResetPasswordAction): void {
-    const resetState = useApplicationState(reset.state)
+    const resetState = useAtom(reset.state)
 
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う

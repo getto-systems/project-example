@@ -1,5 +1,5 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../../x_preact/vnode"
 
 import {
     mainBreadcrumbLink,
@@ -7,7 +7,7 @@ import {
     mainBreadcrumbSeparator,
 } from "../../../../z_vendor/getto-css/preact/layout/app"
 import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
-import { lnir } from "../../../util/icon/init/line_icon"
+import { lnir } from "../../../util/icon/detail/line_icon"
 
 import { siteInfo } from "../../../../x_content/site"
 import { iconHtml } from "../../../util/icon/x_preact/icon"
@@ -18,20 +18,20 @@ import { MENU_ID } from "./display_menu"
 import { OutlineBreadcrumbListAction } from "../action"
 
 import { BreadcrumbList, BreadcrumbNode, MenuCategory, MenuItem } from "../data"
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 type Props = Readonly<{
     breadcrumbList: OutlineBreadcrumbListAction
 }>
-export function DisplayOutlineBreadcrumbList(props: Props): VNode {
-    const breadcrumbListState = useApplicationState(props.breadcrumbList.state)
+export function DisplayOutlineBreadcrumbList(props: Props): PreactNode {
+    const breadcrumbListState = useAtom(props.breadcrumbList.state)
     return mainBreadcrumbList(toContent(breadcrumbListState.list))
 }
 
-function toContent(breadcrumbList: BreadcrumbList): readonly VNode[] {
+function toContent(breadcrumbList: BreadcrumbList): readonly PreactNode[] {
     return [top()].concat(breadcrumbList.map((node) => withSeparator(...content(node))))
 
-    function content(node: BreadcrumbNode): [string, VNode] {
+    function content(node: BreadcrumbNode): [string, PreactNode] {
         switch (node.type) {
             case "category":
                 return [node.category.label, category(node.category)]
@@ -41,12 +41,12 @@ function toContent(breadcrumbList: BreadcrumbList): readonly VNode[] {
         }
     }
 
-    function withSeparator(key: string, content: VNode): VNode {
+    function withSeparator(key: string, content: PreactNode): PreactNode {
         return html`<span class="noWrap" key=${key}>${SEPARATOR}${content}</span>`
     }
 }
 
-function top(): VNode {
+function top(): PreactNode {
     // トップリンク href="#menu" は menu の id="menu" と対応
     // mobile レイアウトで menu の位置に移動
     return item({
@@ -55,10 +55,10 @@ function top(): VNode {
         href: `#${MENU_ID}`,
     } as MenuItem)
 }
-function category({ label }: MenuCategory): VNode {
+function category({ label }: MenuCategory): PreactNode {
     return linky(label)
 }
-function item({ label, icon, href }: MenuItem): VNode {
+function item({ label, icon, href }: MenuItem): PreactNode {
     return mainBreadcrumbLink(href, html`${iconHtml(icon)} ${label}`)
 }
 

@@ -1,7 +1,7 @@
 import { render, h } from "preact"
 
 import { newForegroundOutsideFeature } from "../../../x_outside_feature/common"
-import { newBaseResource } from "../base/init/resource"
+import { newBaseResource } from "../base/detail/resource"
 
 import { DashboardPage } from "./page"
 

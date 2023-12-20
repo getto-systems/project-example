@@ -8,12 +8,11 @@ use crate::{
             login_id::kernel::data::{LoginId, SearchLoginId},
         },
     },
-    common::api::search::data::{SearchOffsetValue, SearchPage, SearchSort},
+    common::api::search::data::{SearchPage, SearchProps, SearchSort},
 };
 
 pub struct SearchAuthUserAccountFilter {
-    pub offset: SearchOffsetValue,
-    pub sort: SearchSort<SearchAuthUserAccountSortKey>,
+    pub search: SearchProps<SearchAuthUserAccountSortKey>,
     pub props: SearchAuthUserAccountFilterProps,
 }
 
@@ -23,17 +22,17 @@ pub struct SearchAuthUserAccountFilterProps {
 }
 
 impl SearchAuthUserAccountFilterProps {
-    pub fn match_login_id(&self, login_id: &LoginId) -> bool {
+    pub fn is_match(&self, model: &AuthUserAccount) -> bool {
+        self.match_login_id(&model.login_id) && self.match_granted(&model.attrs.granted)
+    }
+    fn match_login_id(&self, login_id: &LoginId) -> bool {
         login_id == &self.login_id
     }
-    pub fn match_granted(&self, granted: &Option<AuthPermissionGranted>) -> bool {
+    fn match_granted(&self, granted: &AuthPermissionGranted) -> bool {
         if self.granted.is_empty() {
             return true;
         }
-        match granted {
-            None => false,
-            Some(granted) => granted.all_contains(&self.granted),
-        }
+        granted.all_contains(&self.granted)
     }
 }
 

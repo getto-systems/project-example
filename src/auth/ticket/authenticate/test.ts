@@ -1,12 +1,12 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../common/util/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../common/util/clock/mock"
-import { mockGetScriptPathShell, mockSecureServerURL } from "../../sign/get_script_path/init/mock"
-import { initMemoryDB } from "../../../common/util/repository/init/memory"
+import { mockGetScriptPathShell, mockSecureServerURL } from "../../sign/get_script_path/detail/mock"
+import { initMemoryDB } from "../../../common/util/repository/detail/memory"
 
-import { convertDB } from "../../../common/util/repository/init/convert"
+import { convertDB } from "../../../common/util/repository/detail/convert"
 import { authTicketRepositoryConverter } from "../kernel/convert"
 import { convertCheckRemote } from "./convert"
 
@@ -17,7 +17,6 @@ import { CheckAuthTicketRemote } from "./infra"
 
 import { AuthenticateWithTokenAction, initAuthenticateWithTokenAction } from "./action"
 
-import { LoadScriptError } from "../../sign/get_script_path/data"
 import { AuthTicket } from "../kernel/data"
 
 // last auth at : テスト開始時刻と expire 設定によって instant load の可否が決まる
@@ -40,13 +39,15 @@ const CONTINUOUS_RENEW_AT = [
 test("instant load", async () => {
     const { clock, action } = instantLoadable()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            await action.state.ignitionState
-            clock.update(CONTINUOUS_RENEW_START_AT)
-            return action.succeedToInstantLoad()
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    clock.update(CONTINUOUS_RENEW_START_AT)
+
+    await action.succeedToInstantLoad()
+
+    expect(result()).toEqual([
         {
             type: "try-to-instant-load",
             scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
@@ -62,13 +63,15 @@ test("instant load", async () => {
 test("instant load failed", async () => {
     const { clock, action } = instantLoadable()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            await action.state.ignitionState
-            clock.update(CONTINUOUS_RENEW_START_AT)
-            return action.failedToInstantLoad()
-        }),
-    ).toEqual([
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    clock.update(CONTINUOUS_RENEW_START_AT)
+
+    await action.failedToInstantLoad()
+
+    expect(result()).toEqual([
         {
             type: "try-to-instant-load",
             scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
@@ -87,6 +90,8 @@ test("instant load failed", async () => {
 test("renew stored credential", async () => {
     const { clock, action } = standard()
 
+    const result = observeAtom(action.state)
+
     action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
@@ -95,11 +100,9 @@ test("renew stored credential", async () => {
         }
     })
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         { type: "try-to-renew", hasTakenLongtime: false },
         {
             type: "try-to-load",
@@ -115,6 +118,8 @@ test("renew stored credential; take long time", async () => {
     // wait for take longtime timeout
     const { clock, action } = takeLongtime()
 
+    const result = observeAtom(action.state)
+
     action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
@@ -123,11 +128,9 @@ test("renew stored credential; take long time", async () => {
         }
     })
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([
+    await action.state.ignitionState
+
+    expect(result()).toEqual([
         { type: "try-to-renew", hasTakenLongtime: false },
         { type: "try-to-renew", hasTakenLongtime: true },
         {
@@ -144,23 +147,23 @@ test("renew without stored credential", async () => {
     // empty credential
     const { action } = noStored()
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.state.ignitionState
-        }),
-    ).toEqual([{ type: "required-to-login" }])
+    const result = observeAtom(action.state)
+
+    await action.state.ignitionState
+
+    expect(result()).toEqual([{ type: "required-to-login" }])
 })
 
 test("load error", async () => {
     const { action } = standard()
 
-    const err: LoadScriptError = { type: "infra-error", err: "load error" }
+    const result = observeAtom(action.state)
 
-    expect(
-        await observeApplicationState(action.state, async () => {
-            return action.loadError(err)
-        }),
-    ).toEqual([{ type: "load-error", err }])
+    await action.loadError({ type: "infra-error", err: "load error" })
+
+    expect(result()).toEqual([
+        { type: "load-error", err: { type: "infra-error", err: "load error" } },
+    ])
 })
 
 function standard() {

@@ -1,7 +1,6 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../vnode"
 
-import { VNodeContent } from "../vnode"
 import { PagerOptionsProps, SortSignContent } from "../../../z_vendor/getto-css/preact/design/table"
 
 import { iconHtml } from "../../util/icon/x_preact/icon"
@@ -16,7 +15,7 @@ export const SORT_SIGN: SortSignContent = {
     reverse: () => iconHtml(icon_sort_reverse),
 }
 
-export function pagerCount(all: number): VNodeContent {
+export function pagerCount(all: number): PreactContent {
     return `全 ${pageCountFormat(all)} 件中`
 }
 export function pagerParams(page: SearchPageResponse): PagerOptionsProps {
@@ -34,21 +33,21 @@ export function focusClass(isFocused: boolean): string {
         return ""
     }
 }
-export function listEditLabel(): VNode {
+export function listEditLabel(): PreactNode {
     return html`編集 ${iconHtml(icon_edit)}`
 }
 
-export function emptyTable(): VNode {
+export function emptyTable(): PreactNode {
     return container(box_grow({ body: notice_gray("指定された条件で 1件も見つかりませんでした") }))
 }
 
-export function emptyRegisteredTable(label?: VNodeContent): VNode {
+export function emptyRegisteredTable(label?: PreactContent): PreactNode {
     return container(
         box_grow({ body: notice_gray(html`${label || "登録"}するとここに表示されます`) }),
     )
 }
 
-export function takeLongtimeTable(): VNode {
+export function takeLongtimeTable(): PreactNode {
     return container(
         box_grow({
             body: notice_gray(

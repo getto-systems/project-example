@@ -1,5 +1,5 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactNode } from "../../common/x_preact/vnode"
 
 import { env } from "../../y_environment/ui/env"
 
@@ -11,10 +11,7 @@ import { siteInfo } from "../../x_content/site"
 import { iconHtml } from "../../common/util/icon/x_preact/icon"
 import { icon_home } from "../../x_content/icon"
 
-type Props = {
-    // no props
-}
-export function NotFound(_props: Props): VNode {
+export function NotFound(_props: unknown): PreactNode {
     useDocumentTitle("Not Found")
 
     return loginBox(siteInfo, {

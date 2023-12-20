@@ -1,6 +1,6 @@
 use crate::auth::ticket::kernel::data::{AuthPermissionGranted, AuthTicketAttrs};
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AuthUser {
     pub user_id: AuthUserId,
     pub granted: AuthPermissionGranted,
@@ -21,7 +21,7 @@ impl Into<AuthTicketAttrs> for AuthUser {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AuthUserId(String);
 
 impl AuthUserId {

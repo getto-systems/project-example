@@ -1,15 +1,15 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../z_vendor/getto-atom/test_helper"
 
 import { markMenuCategoryLabel, standard_MenuTree } from "./test_helper"
 
-import { initMemoryDB } from "../../util/repository/init/memory"
-import { initMenuBadgeStore, initMenuExpandStore } from "./init/store"
+import { initMemoryDB } from "../../util/repository/detail/memory"
+import { initMenuBadgeStore, initMenuExpandStore } from "./detail/store"
 
 import { detectMenuTargetPath } from "./convert"
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "./convert"
 import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
-import { convertDB } from "../../util/repository/init/convert"
+import { convertDB } from "../../util/repository/detail/convert"
 
 import { initOutlineMenuAction, OutlineMenuAction } from "./action"
 
@@ -26,11 +26,11 @@ import { AuthTicket } from "../../../auth/ticket/kernel/data"
 test("load menu", async () => {
     const { menu } = standard()
 
-    expect(
-        await observeApplicationState(menu.state, async () => {
-            return menu.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(menu.state)
+
+    await menu.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "succeed-to-load",
             menu: [
@@ -67,21 +67,21 @@ test("load menu", async () => {
 test("load menu; empty permissions", async () => {
     const { menu } = empty()
 
-    expect(
-        await observeApplicationState(menu.state, async () => {
-            return menu.state.ignitionState
-        }),
-    ).toEqual([{ type: "required-to-login" }])
+    const result = observeAtom(menu.state)
+
+    await menu.state.ignitionState
+
+    expect(result()).toEqual([{ type: "required-to-login" }])
 })
 
 test("load menu; saved expands", async () => {
     const { menu } = expand()
 
-    expect(
-        await observeApplicationState(menu.state, async () => {
-            return menu.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(menu.state)
+
+    await menu.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "succeed-to-load",
             menu: [
@@ -120,11 +120,11 @@ test("load menu; toggle expands", async () => {
 
     await menu.state.ignitionState
 
-    expect(
-        await observeApplicationState(menu.state, async () => {
-            return menu.show([markMenuCategoryLabel("DOCUMENT")])
-        }),
-    ).toEqual([
+    const result_1 = observeAtom(menu.state)
+
+    await menu.show([markMenuCategoryLabel("DOCUMENT")])
+
+    expect(result_1()).toEqual([
         {
             type: "succeed-to-toggle",
             menu: [
@@ -148,11 +148,11 @@ test("load menu; toggle expands", async () => {
         value: { values: [["DOCUMENT"]] },
     })
 
-    expect(
-        await observeApplicationState(menu.state, async () => {
-            return menu.show([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")])
-        }),
-    ).toEqual([
+    const result_2 = observeAtom(menu.state)
+
+    await menu.show([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")])
+
+    expect(result_2()).toEqual([
         {
             type: "succeed-to-toggle",
             menu: [
@@ -176,11 +176,11 @@ test("load menu; toggle expands", async () => {
         value: { values: [["DOCUMENT"], ["DOCUMENT", "DETAIL"]] },
     })
 
-    expect(
-        await observeApplicationState(menu.state, async () => {
-            return menu.hide([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")])
-        }),
-    ).toEqual([
+    const result_3 = observeAtom(menu.state)
+
+    await menu.hide([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")])
+
+    expect(result_3()).toEqual([
         {
             type: "succeed-to-toggle",
             menu: [
@@ -208,11 +208,11 @@ test("load menu; toggle expands", async () => {
 test("load menu; dev docs", async () => {
     const { menu } = user()
 
-    expect(
-        await observeApplicationState(menu.state, async () => {
-            return menu.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(menu.state)
+
+    await menu.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "succeed-to-load",
             menu: [

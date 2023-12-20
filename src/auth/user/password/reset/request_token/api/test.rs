@@ -1,185 +1,125 @@
+use std::sync::Arc;
+
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use pretty_assertions::assert_eq;
 
-use getto_application_test::ApplicationActionStateHolder;
-
-use crate::auth::{
-    kernel::init::clock::test::StaticChronoAuthClock,
-    user::{
-        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
-        password::reset::request_token::init::test::{
-            StaticRequestResetTokenFields, StaticRequestResetTokenMaterial,
-            StaticResetTokenGenerator,
+use crate::{
+    auth::{
+        kernel::detail::test::MockChronoAuthClock,
+        user::{
+            kernel::detail::repository::memory::{
+                login_id::MapLoginId, StoreLoginId, StoreResetToken,
+            },
+            password::reset::request_token::api::detail::test::MockResetTokenGenerator,
         },
     },
+    common::api::feature::AsInfra,
 };
 
-use crate::auth::user::password::reset::request_token::action::RequestResetTokenAction;
+use crate::auth::user::password::reset::request_token::action::RequestResetPasswordTokenAction;
 
 use crate::auth::user::password::reset::request_token::infra::{
     RequestResetPasswordTokenConfig, RequestResetPasswordTokenFields,
 };
 
-use crate::{
-    auth::{
-        kernel::data::ExpireDuration,
-        user::{
-            kernel::data::AuthUserId,
-            login_id::kernel::data::{LoginId, ValidateLoginIdError},
-            password::reset::kernel::data::{
+use crate::auth::{
+    kernel::data::ExpireDuration,
+    user::{
+        kernel::data::AuthUserId,
+        login_id::kernel::data::LoginId,
+        password::reset::{
+            kernel::data::{
                 ResetPasswordId, ResetPasswordTokenDestination, ResetPasswordTokenDestinationEmail,
             },
+            request_token::data::RequestResetPasswordTokenError,
         },
     },
-    common::api::validate::data::ValidateTextError,
 };
 
 #[tokio::test]
-async fn info() {
-    let store = TestStore::new();
-    let material = StaticRequestResetTokenMaterial::new(
-        standard_clock(),
-        standard_reset_token_repository(&store),
-        standard_token_generator(),
-        standard_request_token_config(),
-    );
-
-    let action = RequestResetTokenAction::with_material(material);
-
-    assert_eq!(action.info.name(), "auth.user.password.reset.request-token");
-}
-
-#[tokio::test]
-async fn success_request_token() {
-    let holder = ApplicationActionStateHolder::new();
-
-    let store = TestStore::new();
-    let material = StaticRequestResetTokenMaterial::new(
-        standard_clock(),
-        standard_reset_token_repository(&store),
-        standard_token_generator(),
-        standard_request_token_config(),
-    );
-    let fields = StaticRequestResetTokenFields::Valid(RequestResetPasswordTokenFields {
-        login_id: stored_login_id(),
+async fn success() -> Result<(), RequestResetPasswordTokenError> {
+    let feature = feature(Infra {
+        now: Utc.with_ymd_and_hms(2021, 1, 1, 10, 0, 0).unwrap(),
+        request_id: ResetPasswordId::restore("request-id".to_owned()),
+        user: vec![(
+            AuthUserId::restore("user-id".to_owned()),
+            LoginId::restore("login-id".to_owned()),
+            ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+                "destination@example.com".to_owned(),
+            )),
+        )],
+        config: RequestResetPasswordTokenConfig {
+            token_expires: ExpireDuration::with_duration(Duration::days(1)),
+        },
     });
+    let action = RequestResetPasswordTokenAction::mock(feature.as_infra());
 
-    let mut action = RequestResetTokenAction::with_material(material);
-    action.subscribe(holder.handler());
+    let fields = RequestResetPasswordTokenFields {
+        login_id: LoginId::restore("login-id".to_owned()),
+    };
 
-    let result = action.ignite(fields).await;
-    assert_eq!(
-        holder.extract(),
-        vec![
-            "token expires calculated; 2021-01-02 10:00:00 UTC",
-            "token notified; message-id: message-id",
-            "request reset-token success",
-        ],
-    );
-    assert!(result.is_ok());
+    action.request(fields).await?;
+
+    Ok(())
 }
 
 #[tokio::test]
-async fn error_invalid_login_id() {
-    let holder = ApplicationActionStateHolder::new();
-
-    let store = TestStore::new();
-    let material = StaticRequestResetTokenMaterial::new(
-        standard_clock(),
-        standard_reset_token_repository(&store),
-        standard_token_generator(),
-        standard_request_token_config(),
-    );
-    let fields = StaticRequestResetTokenFields::Invalid(ValidateLoginIdError::LoginId(
-        ValidateTextError::Empty,
-    ));
-
-    let mut action = RequestResetTokenAction::with_material(material);
-    action.subscribe(holder.handler());
-
-    let result = action.ignite(fields).await;
-    assert_eq!(
-        holder.extract(),
-        vec!["request reset-token error; invalid; login-id: empty"],
-    );
-    assert!(result.is_err());
-}
-
-#[tokio::test]
-async fn error_destination_not_stored() {
-    let holder = ApplicationActionStateHolder::new();
-
-    let store = TestStore::new();
-    let material = StaticRequestResetTokenMaterial::new(
-        standard_clock(),
-        no_destination_reset_token_repository(&store),
-        standard_token_generator(),
-        standard_request_token_config(),
-    );
-    let fields = StaticRequestResetTokenFields::Valid(RequestResetPasswordTokenFields {
-        login_id: stored_login_id(),
+async fn error_user_not_found() {
+    let feature = feature(Infra {
+        now: Utc.with_ymd_and_hms(2021, 1, 1, 10, 0, 0).unwrap(),
+        request_id: ResetPasswordId::restore("request-id".to_owned()),
+        user: vec![(
+            AuthUserId::restore("user-id".to_owned()),
+            LoginId::restore("login-id".to_owned()),
+            ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
+                "destination@example.com".to_owned(),
+            )),
+        )],
+        config: RequestResetPasswordTokenConfig {
+            token_expires: ExpireDuration::with_duration(Duration::days(1)),
+        },
     });
+    let action = RequestResetPasswordTokenAction::mock(feature.as_infra());
 
-    let mut action = RequestResetTokenAction::with_material(material);
-    action.subscribe(holder.handler());
+    let fields = RequestResetPasswordTokenFields {
+        login_id: LoginId::restore("UNKNOWN-login-id".to_owned()),
+    };
 
-    let result = action.ignite(fields).await;
+    let err = action.request(fields).await.unwrap_err();
+
     assert_eq!(
-        holder.extract(),
-        vec!["request reset-token error; not found"],
-    );
-    assert!(result.is_err());
-}
-
-struct TestStore {
-    reset_token: MemoryAuthUserStore,
-}
-
-impl TestStore {
-    fn new() -> Self {
-        Self {
-            reset_token: MemoryAuthUserStore::new(),
-        }
-    }
-}
-
-fn standard_request_token_config() -> RequestResetPasswordTokenConfig {
-    RequestResetPasswordTokenConfig {
-        token_expires: ExpireDuration::with_duration(Duration::days(1)),
-    }
-}
-
-fn standard_now() -> DateTime<Utc> {
-    Utc.with_ymd_and_hms(2021, 1, 1, 10, 0, 0).latest().unwrap()
-}
-fn standard_clock() -> StaticChronoAuthClock {
-    StaticChronoAuthClock::new(standard_now())
-}
-
-fn standard_token_generator() -> StaticResetTokenGenerator {
-    StaticResetTokenGenerator::new(ResetPasswordId::restore("TOKEN".into()))
-}
-
-fn standard_reset_token_repository<'a>(store: &'a TestStore) -> MemoryAuthUserRepository<'a> {
-    MemoryAuthUserRepository::with_user_id_and_destination(
-        &store.reset_token,
-        stored_login_id(),
-        stored_user_id(),
-        stored_destination(),
+        format!("{}", err),
+        format!("{}", RequestResetPasswordTokenError::NotFound),
     )
 }
-fn no_destination_reset_token_repository<'a>(store: &'a TestStore) -> MemoryAuthUserRepository<'a> {
-    MemoryAuthUserRepository::with_user_id(&store.reset_token, stored_login_id(), stored_user_id())
+
+struct Infra {
+    now: DateTime<Utc>,
+    request_id: ResetPasswordId,
+    user: Vec<(AuthUserId, LoginId, ResetPasswordTokenDestination)>,
+    config: RequestResetPasswordTokenConfig,
 }
 
-fn stored_user_id() -> AuthUserId {
-    AuthUserId::restore("user-id".to_owned())
-}
-fn stored_login_id() -> LoginId {
-    LoginId::restore("login-id".to_owned())
-}
-fn stored_destination() -> ResetPasswordTokenDestination {
-    ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(
-        "user@example.com".to_owned(),
-    ))
+fn feature(
+    infra: Infra,
+) -> (
+    MockChronoAuthClock,
+    Arc<StoreLoginId>,
+    Arc<StoreResetToken>,
+    MockResetTokenGenerator,
+    RequestResetPasswordTokenConfig,
+) {
+    let login_id_store = Arc::new(StoreLoginId::default());
+
+    for (user_id, login_id, reset_token_destination) in infra.user {
+        MapLoginId::insert_entry(&login_id_store, login_id, user_id, reset_token_destination);
+    }
+
+    (
+        MockChronoAuthClock::new(infra.now),
+        login_id_store,
+        Arc::new(StoreResetToken::default()),
+        MockResetTokenGenerator::new(infra.request_id),
+        infra.config,
+    )
 }

@@ -1,21 +1,28 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../../z_vendor/getto-atom/test_helper"
 import { ticker } from "../../../../common/util/timer/helper"
 import {
-    mockBoardValueStore,
-    mockMultipleBoardValueStore,
-} from "../../../../z_vendor/getto-application/board/input/test_helper"
+    mockSingleBoardStore,
+    mockMultipleBoardStore,
+} from "../../../../common/util/board/input/test_helper"
 
-import { ModifyAuthUserAccountAction, initModifyAuthUserAccountAction } from "./action"
-
-import { restoreLoginId } from "../../login_id/input/convert"
+import { restoreLoginId } from "../../login_id/kernel/convert"
 import { restoreAuthUserField } from "../kernel/convert"
 
-import { ModifyAuthUserAccountRemote } from "./infra"
+import { initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
 import {
-    BoardValueStore,
-    MultipleBoardValueStore,
-} from "../../../../z_vendor/getto-application/board/input/infra"
+    LoadState,
+    loadState_loaded,
+    loadState_loading,
+    mapLoadState,
+} from "../../../../common/util/load/data"
+import { initLoadableListAtomUpdater } from "../../../../common/util/list/action"
+import { ModifyAuthUserAccountAction, initModifyAuthUserAccountAction } from "./action"
+
+import { ModifyAuthUserAccountRemote } from "./infra"
+import { SingleBoardStore, MultipleBoardStore } from "../../../../common/util/board/input/infra"
+
+import { AuthUserAccount } from "../kernel/data"
 
 const VALID_INFO = {
     memo: "memo",
@@ -25,18 +32,23 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { modify, store } = standard()
 
-    expect(
-        await observeApplicationState(modify.state, async () => {
-            store.memo.set(VALID_INFO.memo)
-            store.granted.set(VALID_INFO.granted)
+    const result = observeAtom(modify.state)
 
-            return modify.submit()
-        }),
-    ).toEqual([
+    store.memo.set(VALID_INFO.memo)
+    store.granted.set(VALID_INFO.granted)
+
+    await modify.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         {
             type: "success",
-            data: { loginId: "user-id", granted: ["auth-user"], memo: "memo" },
+            data: {
+                loginId: "user-id",
+                granted: ["auth-user"],
+                resetTokenDestination: { type: "none" },
+                memo: "memo",
+            },
         },
         { type: "initial" },
     ])
@@ -46,19 +58,24 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { modify, store } = takeLongtime_elements()
 
-    expect(
-        await observeApplicationState(modify.state, async () => {
-            store.memo.set(VALID_INFO.memo)
-            store.granted.set(VALID_INFO.granted)
+    const result = observeAtom(modify.state)
 
-            return modify.submit()
-        }),
-    ).toEqual([
+    store.memo.set(VALID_INFO.memo)
+    store.granted.set(VALID_INFO.granted)
+
+    await modify.submit()
+
+    expect(result()).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
         {
             type: "success",
-            data: { loginId: "user-id", granted: ["auth-user"], memo: "memo" },
+            data: {
+                loginId: "user-id",
+                granted: ["auth-user"],
+                resetTokenDestination: { type: "none" },
+                memo: "memo",
+            },
         },
         { type: "initial" },
     ])
@@ -86,11 +103,15 @@ function takeLongtime_elements() {
 function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     modify: ModifyAuthUserAccountAction
     store: Readonly<{
-        memo: BoardValueStore
-        granted: MultipleBoardValueStore
+        memo: SingleBoardStore
+        granted: MultipleBoardStore
     }>
 }> {
-    const modify = initModifyAuthUserAccountAction({
+    const list = initAtom<LoadState<readonly AuthUserAccount[]>>({
+        initialState: loadState_loading(),
+    })
+    const data = mapAtom(list.state, (list) => mapLoadState(list, (list) => list[0]))
+    const modify = initModifyAuthUserAccountAction(data, initLoadableListAtomUpdater(list), {
         infra: {
             modifyUserRemote,
         },
@@ -100,17 +121,22 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
         },
     })
 
-    modify.handler.focus({
-        loginId: restoreLoginId("user-id"),
-        granted: [],
-        memo: restoreAuthUserField("initial-memo"),
-    })
+    list.post(
+        loadState_loaded([
+            {
+                loginId: restoreLoginId("user-id"),
+                granted: [],
+                resetTokenDestination: { type: "none" },
+                memo: restoreAuthUserField("initial-memo"),
+            },
+        ]),
+    )
 
     return {
-        modify: modify.action,
+        modify,
         store: {
-            memo: mockBoardValueStore(modify.action.memo.input),
-            granted: mockMultipleBoardValueStore(modify.action.granted.input),
+            memo: mockSingleBoardStore(modify.memo.input),
+            granted: mockMultipleBoardStore(modify.granted.input),
         },
     }
 }

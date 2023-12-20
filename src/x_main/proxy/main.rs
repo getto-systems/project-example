@@ -1,8 +1,7 @@
-use std::io;
+use std::{io::Result as IOResult, sync::OnceLock};
 
 use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
-use lazy_static::lazy_static;
 
 use example_api::x_outside_feature::proxy::{env::ProxyEnv, feature::ProxyAppFeature};
 
@@ -11,18 +10,18 @@ use example_api::{
     common::x_actix_web::route::scope_common,
 };
 
-lazy_static! {
-    static ref ENV: ProxyEnv = ProxyEnv::new();
-}
+static ENV: OnceLock<ProxyEnv> = OnceLock::new();
 
 #[actix_web::main]
-async fn main() -> io::Result<()> {
-    let feature: Data<ProxyAppFeature> = Data::new(ProxyAppFeature::new(&ENV).await);
+async fn main() -> IOResult<()> {
+    ENV.set(ProxyEnv::load()).unwrap();
+
+    let feature: Data<ProxyAppFeature> = Data::new(ProxyAppFeature::new(&ENV.get().unwrap()).await);
 
     HttpServer::new(move || {
         let cors = Cors::default()
             .supports_credentials()
-            .allowed_origin(&ENV.origin)
+            .allowed_origin(&ENV.get().unwrap().origin)
             .allowed_methods(vec!["GET", "POST", "PUT", "PATCH", "DELETE"])
             .allowed_headers(vec!["GETTO-EXAMPLE-NONCE"])
             .max_age(3600);
@@ -35,7 +34,7 @@ async fn main() -> io::Result<()> {
             .service(scope_avail())
             .service(scope_common())
     })
-    .bind(format!("0.0.0.0:{}", &ENV.port))?
+    .bind(format!("0.0.0.0:{}", &ENV.get().unwrap().port))?
     .run()
     .await
 }

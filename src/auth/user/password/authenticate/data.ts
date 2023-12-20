@@ -1,6 +1,6 @@
 import { RemoteCommonError } from "../../../../common/util/remote/data"
 import { LoginId } from "../../login_id/kernel/data"
-import { Password } from "../input/data"
+import { Password } from "../input/field/data"
 
 export type AuthenticatePasswordFields = Readonly<{
     loginId: LoginId

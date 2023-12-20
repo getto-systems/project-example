@@ -1,11 +1,10 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { html } from "htm/preact"
-
-import { VNodeContent } from "../../../../../../common/x_preact/vnode"
+import { PreactContent, PreactNode } from "../../../../../../common/x_preact/vnode"
 
 import { remoteCommonErrorReason } from "../../../../../../common/util/remote/x_error/reason"
 
-import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
@@ -13,9 +12,12 @@ import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/log
 import { siteInfo } from "../../../../../../x_content/site"
 import { icon_change } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField, ValidationMessage } from "../../../../../../common/x_preact/design/form"
+import {
+    takeLongtimeField,
+    ValidateBoardMessage,
+} from "../../../../../../common/x_preact/design/form"
 
-import { LoginIdField } from "../../../../login_id/input/x_preact/field"
+import { AuthUserLoginIdField } from "../../../../login_id/input/field/x_preact/input"
 import { ClearChangesButton } from "../../../../../../common/x_preact/button/clear_changes_button"
 import { SendButton } from "../../../../../../common/x_preact/button/send_button"
 
@@ -28,8 +30,8 @@ type Props = Readonly<{
     link: SignLink
     requestToken: RequestResetTokenAction
 }>
-export function RequestResetToken(props: Props): VNode {
-    const requestTokenState = useApplicationState(props.requestToken.state)
+export function RequestResetToken(props: Props): PreactNode {
+    const requestTokenState = useAtom(props.requestToken.state)
 
     return loginBox(siteInfo, {
         title: "パスワードリセット",
@@ -47,27 +49,24 @@ export function RequestResetToken(props: Props): VNode {
             : {
                   form: true,
                   body: [
-                      h(LoginIdField, {
+                      h(AuthUserLoginIdField, {
                           field: props.requestToken.loginId,
                           help: ["登録されたメールアドレスにリセットトークンを送信します"],
                       }),
-                      buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
-                      h(ValidationMessage, props.requestToken.validate),
+                      buttons({ left: h(Submit, {}), right: h(Reset, {}) }),
+                      h(ValidateBoardMessage, { state: props.requestToken.validate }),
                       h(Message, {}),
                   ],
               }),
     })
 
-    function Submit(_props: unknown): VNode {
-        const validateState = useApplicationState(props.requestToken.validate.state)
-        const observeState = useApplicationState(props.requestToken.observe.state)
-
+    function Submit(_props: unknown): PreactNode {
         return h(SendButton, {
             label: "トークン送信",
             icon: icon_change,
-            isConnecting: requestTokenState.type === "try",
-            validateState,
-            observeState,
+            connect: props.requestToken.connect,
+            validate: props.requestToken.validate,
+            observe: props.requestToken.observe,
             onClick,
         })
 
@@ -77,18 +76,19 @@ export function RequestResetToken(props: Props): VNode {
         }
     }
 
-    function Clear(_props: unknown): VNode {
-        const observeState = useApplicationState(props.requestToken.observe.state)
-
-        return h(ClearChangesButton, { observeState, onClick })
+    function Reset(_props: unknown): PreactNode {
+        return h(ClearChangesButton, {
+            observe: props.requestToken.observe,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.clear()
+            props.requestToken.reset()
         }
     }
 
-    function Message(_props: unknown): VNode {
+    function Message(_props: unknown): PreactNode {
         switch (requestTokenState.type) {
             case "initial":
             case "success":
@@ -105,18 +105,18 @@ export function RequestResetToken(props: Props): VNode {
         }
     }
 
-    function footerLinks(): VNode {
+    function footerLinks(): PreactNode {
         return buttons({ left: privacyPolicyLink(), right: loginLink() })
     }
-    function privacyPolicyLink(): VNode {
+    function privacyPolicyLink(): PreactNode {
         return signNav(props.link.getNav_static_privacyPolicy())
     }
-    function loginLink(): VNode {
+    function loginLink(): PreactNode {
         return signNav(props.link.getNav_password_authenticate())
     }
 }
 
-function requestTokenError(err: RequestResetTokenError): readonly VNodeContent[] {
+function requestTokenError(err: RequestResetTokenError): readonly PreactContent[] {
     switch (err.type) {
         case "invalid-reset":
             return ["ログインIDが登録されていないか、トークンの送信先が登録されていません"]

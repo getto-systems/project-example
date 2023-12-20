@@ -1,6 +1,6 @@
-import { VNode } from "preact"
+import { PreactNode } from "../../../../../common/x_preact/vnode"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import {
     table,
@@ -20,13 +20,19 @@ type Props = Readonly<{
     register: RegisterAuthUserAccountAction
     structure: RegisteredAuthUserAccountTableStructure
 }>
-export function ListRegisteredAuthUserAccount(props: Props): VNode {
-    const state = useApplicationState(props.register.list.state)
+export function ListRegisteredAuthUserAccount(props: Props): PreactNode {
+    const state = useAtom(props.register.list)
     if (!state.isLoad) {
         return emptyRegisteredTable()
     }
 
-    const params = { summary: {}, visibleKeys: props.structure.initialVisibleCells() }
+    const params = {
+        summary: {},
+        visibleKeys: props.structure
+            .allCells()
+            .filter((cell) => cell.isInitiallyVisible)
+            .map((cell) => cell.key),
+    }
 
     const sticky = props.structure.sticky()
     return table(sticky, [

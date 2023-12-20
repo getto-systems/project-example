@@ -1,27 +1,31 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
-
 import { checkTakeLongtime } from "../../../../common/util/timer/helper"
-
-import { initTextFilterAction, TextFilterAction } from "../../../../common/util/input/filter/text"
-import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { SearchOffsetAction } from "../../../../common/util/search/offset/action"
-import { initSearchFilter } from "../../../../common/util/search/filter/action"
-import {
-    AuthPermissionGrantedFilterAction,
-    initAuthPermissionGrantedFilterAction,
-} from "../input/filter/action"
-import { initListSearchedAction, ListSearchedAction } from "../../../../common/util/list/action"
+import { nextSort } from "../../../../common/util/search/sort/helper"
 
 import { ALL_AUTH_PERMISSIONS } from "../../../../x_content/permission"
 
+import { Atom, initAtom, mapAtom } from "../../../../z_vendor/getto-atom/atom"
+import { LoadState, loadState_loaded, loadState_loading } from "../../../../common/util/load/data"
 import {
-    FocusAuthUserAccountDetecter,
+    FocusModifyListAction,
+    FocusModifyListInfra,
+    initFocusModifyListAction,
+    initLoadableListAtomUpdater,
+    LoadableListAtomUpdater,
+} from "../../../../common/util/list/action"
+import { ObserveBoardState } from "../../../../common/util/board/observe/action"
+import {
+    composeSearchFilterBoard,
+    initMultipleFilterBoard,
+    initOffsetFilterBoard,
+    initTextFilterBoard,
+    MultipleFilterBoard,
+    OffsetFilterBoard,
+    TextFilterBoard,
+} from "../../../../common/util/board/filter/action"
+
+import {
     SearchAuthUserAccountFilterDetecter,
     SearchAuthUserAccountRemote,
-    UpdateFocusAuthUserAccountQuery,
     UpdateSearchAuthUserAccountFieldsQuery,
 } from "./infra"
 import { WaitTime } from "../../../../common/util/config/infra"
@@ -29,36 +33,36 @@ import { WaitTime } from "../../../../common/util/config/infra"
 import { RemoteCommonError } from "../../../../common/util/remote/data"
 import {
     SearchAuthUserAccountFilter,
+    SearchAuthUserAccountFilterData,
     SearchAuthUserAccountRemoteResponse,
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
-    SearchAuthUserAccountSummary,
 } from "./data"
 import { AuthUserAccount } from "../kernel/data"
-import { prepared, preparing } from "../../../../common/util/prepare/data"
+import { SearchPageResponseResult } from "../../../../common/util/search/kernel/data"
+import { AuthPermission } from "../../kernel/data"
+import { ConnectState } from "../../../../common/util/connect/data"
 
 export interface SearchAuthUserAccountAction {
-    readonly state: ApplicationState<SearchAuthUserAccountState>
-    readonly list: ListSearchedAuthUserAccountAction
-    readonly offset: SearchOffsetAction
+    readonly focus: FocusModifyListAction<AuthUserAccount>
 
-    readonly loginId: TextFilterAction
-    readonly granted: AuthPermissionGrantedFilterAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<SearchAuthUserAccountState>
+    readonly list: Atom<LoadState<readonly AuthUserAccount[]>>
+    readonly connect: Atom<ConnectState>
+    readonly page: Atom<LoadState<SearchPageResponseResult<RemoteCommonError>>>
+    readonly sortKey: Atom<SearchAuthUserAccountSort>
+    readonly observe: Atom<ObserveBoardState>
 
-    currentSort(): SearchAuthUserAccountSort
+    readonly offset: OffsetFilterBoard
+    readonly loginId: TextFilterBoard
+    readonly granted: MultipleFilterBoard<AuthPermission, AuthPermission>
 
-    clear(): void
+    reset(): void
+
     search(): Promise<SearchAuthUserAccountState>
     load(): Promise<SearchAuthUserAccountState>
     sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState>
 }
-
-type ListSearchedAuthUserAccountAction = ListSearchedAction<
-    AuthUserAccount,
-    SearchAuthUserAccountSummary,
-    RemoteCommonError
->
 
 export type SearchAuthUserAccountState = Readonly<{ type: "initial" }> | SearchAuthUserAccountEvent
 
@@ -77,8 +81,7 @@ export type SearchAuthUserAccountInfra = Readonly<{
 export type SearchAuthUserAccountShell = Readonly<{
     detectFilter: SearchAuthUserAccountFilterDetecter
     updateQuery: UpdateSearchAuthUserAccountFieldsQuery
-    detectFocus: FocusAuthUserAccountDetecter
-    updateFocus: UpdateFocusAuthUserAccountQuery
+    focus: FocusModifyListInfra
 }>
 
 export type SearchAuthUserAccountConfig = Readonly<{
@@ -87,113 +90,121 @@ export type SearchAuthUserAccountConfig = Readonly<{
 
 export function initSearchAuthUserAccountAction(
     material: SearchAuthUserAccountMaterial,
-): SearchAuthUserAccountAction {
-    const { state, post } = initApplicationState({ initialState, ignite: load })
+): [SearchAuthUserAccountAction, LoadableListAtomUpdater<AuthUserAccount>] {
+    const search = initAtom({ initialState, ignite: searchWithCurrentState })
+    function searchWithCurrentState(): Promise<SearchAuthUserAccountState> {
+        return searchAuthUserAccount(
+            material,
+            {
+                offset: offset[0].value.currentState(),
+                sort: sortKey.state.currentState(),
+                filter: currentFilter(),
+            },
+            search.post,
+        )
+    }
 
-    const initialFilter = material.shell.detectFilter()
+    const initialSearch = material.shell.detectFilter()
+    const sortKey = initAtom({ initialState: initialSearch.sort })
 
-    const loginId = initTextFilterAction(initialFilter.loginId)
-    const granted = initAuthPermissionGrantedFilterAction(initialFilter.granted)
+    const offset = initOffsetFilterBoard(initialSearch.offset)
 
-    const { observe, offset, filter, clear } = initSearchFilter(
-        initialFilter,
-        [
-            ["loginId", loginId.input],
-            ["granted", granted.input],
-        ],
-        () => ({
-            loginId: loginId.pin(),
-            granted: granted.pin(),
-        }),
-    )
-
-    granted.setOptions(ALL_AUTH_PERMISSIONS)
-
-    const list = initListSearchedAction({
-        initialSearch: state.ignitionState.then((state) => {
-            switch (state.type) {
-                case "initial":
-                case "try":
-                    return preparing()
-
-                case "success":
-                case "failed":
-                    return prepared(state)
-            }
-        }),
-        detect: {
-            get: () => material.shell.detectFocus(),
-            key: (data: AuthUserAccount) => data.loginId,
-        },
+    const grantedOptions = initAtom<LoadState<readonly AuthPermission[]>>({
+        initialState: loadState_loaded(ALL_AUTH_PERMISSIONS),
     })
 
-    list.action.focus.state.subscribe((state) => {
-        switch (state.type) {
-            case "focus-change":
-                material.shell.updateFocus.focus(state.data)
-                break
+    const loginId = initTextFilterBoard(initialSearch.filter.loginId)
+    const granted = initMultipleFilterBoard({
+        initial: initialSearch.filter.granted,
+        options: grantedOptions.state,
+        toFilter: (option) => option,
+        toValue: (option) => option,
+    })
 
-            case "close":
-                material.shell.updateFocus.clear()
+    const currentFilter = (): SearchAuthUserAccountFilter => ({
+        loginId: loginId[0].filter.currentState(),
+        granted: granted[0].filter.currentState(),
+    })
+
+    const { observe, reset, pin } = composeSearchFilterBoard(offset[0], [loginId, granted])
+
+    const list = initAtom<LoadState<readonly AuthUserAccount[]>>({
+        initialState: loadState_loading(),
+    })
+
+    search.state.subscribe((state) => {
+        switch (state.type) {
+            case "success":
+                sortKey.post(state.response.sort)
+                offset[1].init(`${state.response.page.offset}`)
+                list.post(loadState_loaded(state.response.list))
                 break
         }
     })
 
-    onSuccess((data) => {
-        filter.setSort(data.sort)
-    })
-    onSearched((state) => {
-        list.handler.load({ isLoad: true, data: state })
-    })
-
-    return {
-        state,
-        list: list.action,
-        offset,
-
-        loginId: loginId.input,
-        granted: granted.input,
-
-        observe,
-
-        clear,
-
-        currentSort(): SearchAuthUserAccountSort {
-            return filter.get().sort
-        },
-
-        load,
-        search(): Promise<SearchAuthUserAccountState> {
-            return search(material, filter.search(), post)
-        },
-        sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
-            return search(material, filter.sort(key), post)
-        },
-    }
-
-    function load(): Promise<SearchAuthUserAccountState> {
-        return search(material, filter.load(), post)
-    }
-
-    function onSuccess(handler: (response: SearchAuthUserAccountRemoteResponse) => void): void {
-        state.subscribe((state) => {
-            if (state.type === "success") {
-                handler(state.response)
-            }
-        })
-    }
-    function onSearched(
-        handler: (state: Exclude<SearchAuthUserAccountEvent, { type: "try" }>) => void,
-    ): void {
-        state.subscribe((state) => {
+    const page = mapAtom(
+        search.state,
+        (state): LoadState<SearchPageResponseResult<RemoteCommonError>> => {
             switch (state.type) {
+                case "initial":
+                case "try":
+                    return { isLoad: false }
+
                 case "success":
+                    return { isLoad: true, data: { isSuccess: true, page: state.response.page } }
+
                 case "failed":
-                    handler(state)
-                    break
+                    return { isLoad: true, data: { isSuccess: false, err: state.err } }
             }
-        })
-    }
+        },
+    )
+
+    const connect = mapAtom(search.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
+    })
+
+    const focus = initFocusModifyListAction(
+        list.state,
+        (entry) => `${entry.loginId}`,
+        material.shell.focus,
+    )
+
+    return [
+        {
+            focus,
+
+            state: search.state,
+            list: list.state,
+            connect,
+            page,
+            sortKey: sortKey.state,
+            observe,
+
+            offset: offset[0],
+            loginId: loginId[0],
+            granted: granted[0],
+
+            reset,
+
+            async search(): Promise<SearchAuthUserAccountState> {
+                pin()
+                return searchWithCurrentState()
+            },
+            async load(): Promise<SearchAuthUserAccountState> {
+                offset[1].pin()
+                return searchWithCurrentState()
+            },
+            async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
+                sortKey.post(nextSort(sortKey.state.currentState(), key))
+                return searchWithCurrentState()
+            },
+        },
+        initLoadableListAtomUpdater(list),
+    ]
 }
 
 type SearchAuthUserAccountEvent =
@@ -201,9 +212,9 @@ type SearchAuthUserAccountEvent =
     | Readonly<{ type: "failed"; err: RemoteCommonError }>
     | Readonly<{ type: "success"; response: SearchAuthUserAccountRemoteResponse }>
 
-async function search<S>(
+async function searchAuthUserAccount<S>(
     { infra, shell, config }: SearchAuthUserAccountMaterial,
-    fields: SearchAuthUserAccountFilter,
+    fields: SearchAuthUserAccountFilterData,
     post: Post<SearchAuthUserAccountEvent, S>,
 ): Promise<S> {
     shell.updateQuery(fields)

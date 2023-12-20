@@ -1,4 +1,5 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
+import { PreactNode } from "../../../../common/x_preact/vnode"
 
 import {
     appLayout,
@@ -22,7 +23,7 @@ import { RequestResetTokenProfile } from "../../../../auth/user/password/reset/r
 
 import { ProfilePageResource } from "./resource"
 
-export function ProfilePage(props: ProfilePageResource): VNode {
+export function ProfilePage(props: ProfilePageResource): PreactNode {
     const pageTitle = "プロフィール" as const
 
     useDocumentTitle(pageTitle)

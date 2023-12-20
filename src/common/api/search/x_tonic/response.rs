@@ -12,7 +12,7 @@ impl Into<SearchPagePb> for SearchPage {
     }
 }
 
-impl<K: Into<String>> Into<SearchSortPb> for SearchSort<K> {
+impl<K: Copy + Into<String>> Into<SearchSortPb> for SearchSort<K> {
     fn into(self) -> SearchSortPb {
         SearchSortPb {
             key: self.key.into(),

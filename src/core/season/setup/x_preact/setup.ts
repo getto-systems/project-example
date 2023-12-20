@@ -1,29 +1,32 @@
-import { h, VNode } from "preact"
+import { PreactNode } from "../../../../common/x_preact/vnode"
+import { h } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { box } from "../../../../z_vendor/getto-css/preact/design/box"
 import { fieldHelp_error } from "../../../../z_vendor/getto-css/preact/design/form"
 
-import { SeasonField } from "../../input/x_preact/input"
+import { SeasonField } from "../../input/field/x_preact/input"
 import { EditButton } from "../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../common/x_preact/button/edit_success_button"
 import { ChangeButton } from "../../../../common/x_preact/button/change_button"
 
 import { repositoryErrorReason } from "../../../../common/util/repository/x_error/reason"
 
+import { initAtom } from "../../../../z_vendor/getto-atom/atom"
 import { LoadSeasonAction } from "../../load/action"
 import { SetupSeasonAction } from "../action"
 
 import { RepositoryError } from "../../../../common/util/repository/data"
+import { ConnectState } from "../../../../common/util/connect/data"
 
 type Props = Readonly<{
     season: LoadSeasonAction
     setup: SetupSeasonAction
 }>
-export function SetupSeason(props: Props): VNode {
-    const loadSeasonState = useApplicationState(props.season.state)
+export function SetupSeason(props: Props): PreactNode {
+    const loadSeasonState = useAtom(props.season.state)
     switch (loadSeasonState.type) {
         case "initial":
         case "failed":
@@ -39,23 +42,22 @@ export function SetupSeason(props: Props): VNode {
             h(SeasonField, {
                 title: "シーズン",
                 field: props.setup.season,
-                availableSeasons: loadSeasonState.availableSeasons,
                 edit,
             }),
         ],
         footer: h(Footer, {}),
     })
 
-    function Footer(_props: unknown): VNode {
-        const editableState = useApplicationState(props.setup.editable.state)
+    function Footer(_props: unknown): PreactNode {
+        const editableState = useAtom(props.setup.editable.state)
 
         if (!editableState.isEditable) {
             return h(Edit, {})
         }
         return html`${[h(Submit, {}), h(Message, {})]}`
 
-        function Edit(_props: unknown): VNode {
-            const setupSeasonState = useApplicationState(props.setup.state)
+        function Edit(_props: unknown): PreactNode {
+            const setupSeasonState = useAtom(props.setup.state)
 
             if (setupSeasonState.type === "success") {
                 return h(EditSuccessButton, { onClick })
@@ -69,14 +71,11 @@ export function SetupSeason(props: Props): VNode {
             }
         }
 
-        function Submit(_props: unknown): VNode {
-            const validateState = useApplicationState(props.setup.validate.state)
-            const observeState = useApplicationState(props.setup.observe.state)
-
+        function Submit(_props: unknown): PreactNode {
             return h(ChangeButton, {
-                isConnecting: false,
-                validateState,
-                observeState,
+                connect: initAtom<ConnectState>({ initialState: { isConnecting: false } }).state,
+                validate: props.setup.validate,
+                observe: props.setup.observe,
                 onClick,
             })
 
@@ -86,8 +85,8 @@ export function SetupSeason(props: Props): VNode {
             }
         }
 
-        function Message(_props: unknown): VNode {
-            const setupSeasonState = useApplicationState(props.setup.state)
+        function Message(_props: unknown): PreactNode {
+            const setupSeasonState = useAtom(props.setup.state)
 
             switch (setupSeasonState.type) {
                 case "initial":

@@ -1,6 +1,6 @@
 import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/common"
-import { newBaseResource } from "../../../base/init/resource"
-import { newLogoutInfra } from "../../../../../auth/ticket/logout/init/infra"
+import { newBaseResource } from "../../../base/detail/resource"
+import { newLogoutInfra } from "../../../../../auth/ticket/logout/detail/infra"
 
 import { BaseResource } from "../../../base/resource"
 

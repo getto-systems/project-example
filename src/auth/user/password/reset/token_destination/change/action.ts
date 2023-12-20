@@ -1,48 +1,35 @@
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../../../../z_vendor/getto-application/action/action"
-
 import { checkTakeLongtime, ticker } from "../../../../../../common/util/timer/helper"
 
-import {
-    initResetTokenDestinationFieldAction,
-    ResetTokenDestinationFieldAction,
-} from "../input/action"
-import { ValidateBoardAction } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
-import { ObserveBoardAction } from "../../../../../../z_vendor/getto-application/board/observe_board/action"
-import {
-    initModifyField,
-    modifyField,
-    ModifyFieldHandler,
-} from "../../../../../../common/util/modify/action"
-import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
+import { Atom, initAtom, mapAtom } from "../../../../../../z_vendor/getto-atom/atom"
+import { LoadState, loadState_loaded } from "../../../../../../common/util/load/data"
+import { EditableBoardAction } from "../../../../../../common/util/board/editable/action"
+import { ValidateBoardState } from "../../../../../../common/util/board/validate/action"
+import { ObserveBoardState } from "../../../../../../common/util/board/observe/action"
+import { composeModifyFieldBoard } from "../../../../../../common/util/board/field/action"
+import { LoadableListAtomUpdater } from "../../../../../../common/util/list/action"
+import { initResetTokenDestinationField, ResetTokenDestinationField } from "../input/field/action"
 
-import { ChangeResetTokenDestinationRemote } from "./infra"
 import { WaitTime } from "../../../../../../common/util/config/infra"
+import { ChangeResetTokenDestinationRemote } from "./infra"
 
-import { ResetTokenDestination } from "../kernel/data"
-import { LoginId } from "../../../../login_id/kernel/data"
+import { ConvertBoardResult } from "../../../../../../common/util/board/kernel/data"
+import { AuthUserAccount } from "../../../../account/kernel/data"
+import { ResetTokenDestination, resetTokenDestinationTypeVariants } from "../kernel/data"
 import { ChangeResetTokenDestinationError } from "./data"
-import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
+import { ConnectState } from "../../../../../../common/util/connect/data"
 
 export interface ChangeResetTokenDestinationAction {
-    readonly state: ApplicationState<ChangeResetTokenDestinationState>
-    readonly destination: ResetTokenDestinationFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
+    readonly state: Atom<ChangeResetTokenDestinationState>
+    readonly connect: Atom<ConnectState>
+    readonly validate: Atom<ValidateBoardState>
+    readonly observe: Atom<ObserveBoardState>
     readonly editable: EditableBoardAction
 
-    onSuccess(handler: (data: ChangeResetTokenDestinationEntry) => void): void
+    readonly destination: ResetTokenDestinationField
 
     reset(): void
     submit(): Promise<ChangeResetTokenDestinationState>
 }
-
-export type ChangeResetTokenDestinationEntry = Readonly<{
-    loginId: LoginId
-    resetTokenDestination: ResetTokenDestination
-}>
 
 export type ChangeResetTokenDestinationState = ChangeDestinationEvent
 
@@ -63,89 +50,79 @@ export type ChangeResetTokenDestinationConfig = Readonly<{
 }>
 
 export function initChangeResetTokenDestinationAction(
+    data: Atom<LoadState<AuthUserAccount>>,
+    updater: LoadableListAtomUpdater<AuthUserAccount>,
     material: ChangeResetTokenDestinationMaterial,
-): Readonly<{
-    action: ChangeResetTokenDestinationAction
-    handler: ModifyFieldHandler<ChangeResetTokenDestinationEntry>
-}> {
-    const { state, post } = initApplicationState({ initialState })
-
-    const destination = initResetTokenDestinationFieldAction()
-
-    const convert = (): ConvertBoardResult<ResetTokenDestination> => {
-        const result = destination.validate.check()
-        if (!result.valid) {
-            return { valid: false }
+): ChangeResetTokenDestinationAction {
+    const modify = initAtom({ initialState })
+    async function modifyWithCurrentState(): Promise<ChangeResetTokenDestinationState> {
+        const element = data.currentState()
+        if (!element.isLoad) {
+            return modify.state.currentState()
         }
-        return {
-            valid: true,
-            value: result.value,
+
+        const fields = currentFields()
+        if (!fields.valid) {
+            return modify.state.currentState()
         }
+        return changeDestination(material, element.data, fields.value, modify.post)
     }
 
-    const { validate, observe, editable, data, handler, reset } = initModifyField(
-        [
-            modifyField(
-                "destination",
-                destination,
-                (data: ChangeResetTokenDestinationEntry) => data.resetTokenDestination,
-            ),
-        ],
-        convert,
-    )
+    const destinationOptions = initAtom({
+        initialState: loadState_loaded(resetTokenDestinationTypeVariants),
+    })
 
-    onSuccess(() => {
-        editable.close()
+    const destination = initResetTokenDestinationField(destinationOptions.state)
+
+    const currentFields = (): ConvertBoardResult<ResetTokenDestination> => {
+        return destination[0].validate.currentState()
+    }
+
+    const { editable, validate, observe, reset } = composeModifyFieldBoard(data, [
+        [destination, (data: AuthUserAccount) => data.resetTokenDestination],
+    ])
+
+    modify.state.subscribe((state) => {
+        if (state.type === "success") {
+            updater.update((list) =>
+                list.map((item) => {
+                    return item.loginId === state.data.loginId ? state.data : item
+                }),
+            )
+        }
+    })
+
+    const connect = mapAtom(modify.state, (state): ConnectState => {
+        if (state.type === "try") {
+            return { isConnecting: true, hasTakenLongtime: state.hasTakenLongtime }
+        } else {
+            return { isConnecting: false }
+        }
     })
 
     return {
-        action: {
-            state,
+        state: modify.state,
+        connect,
+        validate,
+        observe,
+        editable,
 
-            destination,
+        destination: destination[0],
 
-            validate,
-            observe,
-            editable,
-
-            reset,
-
-            onSuccess,
-
-            async submit(): Promise<ChangeResetTokenDestinationState> {
-                const element = data()
-                if (!element.isLoad) {
-                    return state.currentState()
-                }
-
-                const fields = convert()
-                if (!fields.valid) {
-                    return state.currentState()
-                }
-                return changeDestination(material, element.data, fields.value, post)
-            },
-        },
-        handler,
-    }
-
-    function onSuccess(handler: (data: ChangeResetTokenDestinationEntry) => void): void {
-        state.subscribe((state) => {
-            if (state.type === "success") {
-                handler(state.data)
-            }
-        })
+        reset,
+        submit: modifyWithCurrentState,
     }
 }
 
 type ChangeDestinationEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeResetTokenDestinationError }>
-    | Readonly<{ type: "success"; data: ChangeResetTokenDestinationEntry }>
+    | Readonly<{ type: "success"; data: AuthUserAccount }>
     | Readonly<{ type: "initial" }>
 
 async function changeDestination<S>(
     { infra, config }: ChangeResetTokenDestinationMaterial,
-    user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
+    user: AuthUserAccount,
     fields: ResetTokenDestination,
     post: Post<ChangeDestinationEvent, S>,
 ): Promise<S> {
@@ -163,7 +140,7 @@ async function changeDestination<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", data: { loginId: user.loginId, resetTokenDestination: fields } })
+    post({ type: "success", data: { ...user, resetTokenDestination: fields } })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

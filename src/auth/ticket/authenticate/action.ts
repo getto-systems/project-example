@@ -1,9 +1,6 @@
 import { checkTakeLongtime } from "../../../common/util/timer/helper"
 
-import {
-    ApplicationState,
-    initApplicationState,
-} from "../../../z_vendor/getto-application/action/action"
+import { Atom, initAtom } from "../../../z_vendor/getto-atom/atom"
 
 import { startContinuousRenew } from "./method"
 import { getScriptPath } from "../../sign/get_script_path/method"
@@ -27,7 +24,7 @@ import { RepositoryError } from "../../../common/util/repository/data"
 import { RemoteCommonError } from "../../../common/util/remote/data"
 
 export interface AuthenticateWithTokenAction {
-    readonly state: ApplicationState<AuthenticateWithTokenState>
+    readonly state: Atom<AuthenticateWithTokenState>
     succeedToInstantLoad(): Promise<AuthenticateWithTokenState>
     failedToInstantLoad(): Promise<AuthenticateWithTokenState>
     loadError(err: LoadScriptError): Promise<AuthenticateWithTokenState>
@@ -68,7 +65,7 @@ const initialState: AuthenticateWithTokenState = { type: "initial-check" }
 export function initAuthenticateWithTokenAction(
     material: AuthenticateWithTokenMaterial,
 ): AuthenticateWithTokenAction {
-    const { state, post } = initApplicationState({
+    const { state, post } = initAtom({
         initialState,
         ignite: async (): Promise<AuthenticateWithTokenState> => {
             const result = await check(material, post)

@@ -1,6 +1,6 @@
 import { env } from "../../y_environment/ui/env"
 
-import { lnir } from "../../common/util/icon/init/line_icon"
+import { lnir } from "../../common/util/icon/detail/line_icon"
 import { icon_home } from "../icon"
 
 import { category, item } from "./common"

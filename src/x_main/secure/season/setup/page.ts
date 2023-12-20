@@ -1,4 +1,5 @@
-import { h, VNode } from "preact"
+import { PreactNode } from "../../../../common/x_preact/vnode"
+import { h } from "preact"
 
 import {
     appLayout,
@@ -22,7 +23,7 @@ import { SetupSeason } from "../../../../core/season/setup/x_preact/setup"
 
 import { SetupSeasonPageResource } from "./resource"
 
-export function SetupSeasonPage(props: SetupSeasonPageResource): VNode {
+export function SetupSeasonPage(props: SetupSeasonPageResource): PreactNode {
     const pageTitle = "シーズン設定" as const
 
     useDocumentTitle(pageTitle)

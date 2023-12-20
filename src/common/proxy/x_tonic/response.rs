@@ -1,12 +1,10 @@
 use tonic::{Code, Response, Status};
 
-use crate::common::api::response::tonic::ServiceResponder;
+use crate::common::api::response::x_tonic::ServiceResponder;
 
-use crate::common::proxy::event::ProxyCallEvent;
+use crate::common::proxy::data::CoreProxyCallError;
 
-use crate::common::proxy::data::CoreProxyError;
-
-impl From<Status> for CoreProxyError {
+impl From<Status> for CoreProxyCallError {
     fn from(status: Status) -> Self {
         match status.code() {
             Code::PermissionDenied => Self::PermissionDenied(status.message().into()),
@@ -15,26 +13,16 @@ impl From<Status> for CoreProxyError {
     }
 }
 
-impl<T, R, E: ServiceResponder<T>> ServiceResponder<T> for ProxyCallEvent<R, E> {
-    fn respond_to(self) -> Result<Response<T>, Status> {
-        match self {
-            Self::TryToCall(message) => Err(Status::cancelled(format!(
-                "cancelled at proxy call: {}",
-                message
-            ))),
-            Self::Response(_) => Err(Status::cancelled("cancelled at proxy call succeeded")),
-            Self::ServiceError(err) => err.respond_to(),
-        }
-    }
-}
-
-impl<T> ServiceResponder<T> for CoreProxyError {
+impl<T> ServiceResponder<T> for CoreProxyCallError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::PermissionDenied(message) => Err(Status::permission_denied(message)),
             Self::InfraError(message) => Err(Status::internal(message)),
+            Self::CheckAuthorizeTokenError(err) => err.respond_to(),
+            Self::ValidateAuthorizeTokenError(err) => err.respond_to(),
             Self::ServiceConnectError(err) => err.respond_to(),
             Self::ServiceMetadataError(err) => err.respond_to(),
+            Self::ServiceAuthorizeError(err) => err.respond_to(),
             Self::MessageError(err) => err.respond_to(),
         }
     }

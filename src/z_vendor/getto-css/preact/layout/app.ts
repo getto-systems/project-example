@@ -1,23 +1,22 @@
-import { VNode } from "preact"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../common"
 
 import { buttons } from "../design/form"
 
-import { VNodeContent } from "../common"
 import { SiteInfo } from "../../site"
 
 export type AppLayoutContent = Readonly<{
     siteInfo: SiteInfo
-    header: readonly VNodeContent[]
-    main: VNodeContent
-    menu: VNodeContent
+    header: readonly PreactContent[]
+    main: PreactContent
+    menu: PreactContent
 }> &
     Partial<{
-        sidebar: VNodeContent
-        sidebar_double: VNodeContent
+        sidebar: PreactContent
+        sidebar_double: PreactContent
     }>
 
-export function appLayout(content: AppLayoutContent): VNode {
+export function appLayout(content: AppLayoutContent): PreactNode {
     const { siteInfo, header, main, menu } = content
     if (content.sidebar) {
         return layoutContent("sidebar_single", siteInfo, header, [
@@ -49,8 +48,8 @@ function toAppLayoutClass(type: AppLayoutType): string {
 function layoutContent(
     type: AppLayoutType,
     siteInfo: SiteInfo,
-    header: readonly VNodeContent[],
-    content: readonly VNodeContent[],
+    header: readonly PreactContent[],
+    content: readonly PreactContent[],
 ) {
     return html`<main class="layout__app ${toAppLayoutClass(type)}">
         ${appHeader(siteInfo, header)}
@@ -58,7 +57,10 @@ function layoutContent(
     </main>`
 }
 
-function appHeader({ brand, title, subTitle }: SiteInfo, header: readonly VNodeContent[]): VNode {
+function appHeader(
+    { brand, title, subTitle }: SiteInfo,
+    header: readonly PreactContent[],
+): PreactNode {
     return html`<header class="app__header">${logo()} ${header.map(box)}</header>`
 
     function logo() {
@@ -68,40 +70,40 @@ function appHeader({ brand, title, subTitle }: SiteInfo, header: readonly VNodeC
             <cite class="app__logo__subTitle">${subTitle}</cite>
         </aside>`
     }
-    function box(content: VNodeContent) {
+    function box(content: PreactContent) {
         return html`<section class="app__header__box">${content}</section>`
     }
 }
-function appBodyContainer(content: readonly VNodeContent[]): VNode {
+function appBodyContainer(content: readonly PreactContent[]): PreactNode {
     return html`<section class="layout__app__body__container">${content}</section>`
 }
 
 export type MainLayoutContent = Readonly<{
-    header: VNodeContent
-    body: VNodeContent
-    copyright: VNodeContent
+    header: PreactContent
+    body: PreactContent
+    copyright: PreactContent
 }>
-export function appMain({ header, body, copyright }: MainLayoutContent): VNode {
+export function appMain({ header, body, copyright }: MainLayoutContent): PreactNode {
     return html`<article>${header} ${body} ${mainFooter(copyright)}</article>`
 }
-export function appSidebar({ header, body, copyright }: MainLayoutContent): VNode {
+export function appSidebar({ header, body, copyright }: MainLayoutContent): PreactNode {
     return html`<aside class="sidebar">${header} ${body} ${mainFooter(copyright)}</aside>`
 }
-export function appMenu(content: VNodeContent): VNode {
+export function appMenu(content: PreactContent): PreactNode {
     return html`<aside class="menu">${content}</aside>`
 }
 
-export function mainHeader(content: VNodeContent): VNode {
+export function mainHeader(content: PreactContent): PreactNode {
     return html`<header class="main__header">${content}</header>`
 }
 
-export function mainTitle(content: VNodeContent): VNode {
+export function mainTitle(content: PreactContent): PreactNode {
     return html`<h1 class="main__title">${content}</h1>`
 }
 export function mainTitleWithSidebarButton({
     title,
     button,
-}: Readonly<{ title: VNodeContent; button: VNodeContent }>): VNode {
+}: Readonly<{ title: PreactContent; button: PreactContent }>): PreactNode {
     return mainTitle(
         buttons({
             left: title,
@@ -110,33 +112,33 @@ export function mainTitleWithSidebarButton({
     )
 }
 
-export function mainBody(content: VNodeContent): VNode {
+export function mainBody(content: PreactContent): PreactNode {
     return html`<section class="main__body">${content}</section>`
 }
 
 export type SidebarBodyProps = Partial<{
     id: string
 }>
-export function sidebarBody(content: VNodeContent, props: SidebarBodyProps = {}): VNode {
+export function sidebarBody(content: PreactContent, props: SidebarBodyProps = {}): PreactNode {
     return html`<section id="${props.id}" class="sidebar__body">${content}</section>`
 }
-export function sidebarBody_grow(content: VNodeContent, props: SidebarBodyProps = {}): VNode {
+export function sidebarBody_grow(content: PreactContent, props: SidebarBodyProps = {}): PreactNode {
     return html`<section id="${props.id}" class="sidebar__body sidebar__body_grow">
         ${content}
     </section>`
 }
 
-export function mainFooter(copyright: VNodeContent): VNode {
+export function mainFooter(copyright: PreactContent): PreactNode {
     return html`<footer class="main__footer">
         <p class="main__footer__message">${copyright}</p>
     </footer>`
 }
 
-export function menuBox(content: VNodeContent): VNode {
+export function menuBox(content: PreactContent): PreactNode {
     return html`<section class="menu__box">${content}</section>`
 }
 
-export function menuBody(id: string, content: VNodeContent): VNode {
+export function menuBody(id: string, content: PreactContent): PreactNode {
     return html`<nav id=${id} class="menu__body">${content}</nav>`
 }
 
@@ -145,8 +147,8 @@ export type MenuCategoryContent = Readonly<{
     label: string
     show: Handler<Event>
     hide: Handler<Event>
-    badge: VNodeContent
-    children: VNodeContent
+    badge: PreactContent
+    children: PreactContent
 }>
 export function menuCategory({
     isExpand,
@@ -155,7 +157,7 @@ export function menuCategory({
     hide,
     badge,
     children,
-}: MenuCategoryContent): VNode {
+}: MenuCategoryContent): PreactNode {
     return html`<details class="menu__nav" open=${isExpand} key=${label}>
         <summary class="menu__nav__summary" onClick=${isExpand ? hide : show}>
             <span class="menu__nav__summary__container">
@@ -172,10 +174,10 @@ export function menuCategory({
 export type MenuItemContent = Readonly<{
     isActive: boolean
     href: string
-    content: VNodeContent
-    badge: VNodeContent
+    content: PreactContent
+    badge: PreactContent
 }>
-export function menuItem({ isActive, href, content, badge }: MenuItemContent): VNode {
+export function menuItem({ isActive, href, content, badge }: MenuItemContent): PreactNode {
     const activeClass = isActive ? "menu__nav__item_active" : ""
 
     return html`<li class="menu__nav__item" key=${href}>
@@ -186,7 +188,7 @@ export function menuItem({ isActive, href, content, badge }: MenuItemContent): V
     </li>`
 }
 
-export function menuFooter(poweredBy: readonly string[]): VNode {
+export function menuFooter(poweredBy: readonly string[]): PreactNode {
     return html`<footer class="menu__footer">
         <p class="menu__footer__message">
             powered by :<br />
@@ -195,13 +197,13 @@ export function menuFooter(poweredBy: readonly string[]): VNode {
     </footer>`
 }
 
-export function mainBreadcrumbList(content: VNodeContent): VNode {
+export function mainBreadcrumbList(content: PreactContent): PreactNode {
     return html`<aside class="main__breadcrumb">${content}</aside>`
 }
-export function mainBreadcrumbLink(href: string, content: VNodeContent): VNode {
+export function mainBreadcrumbLink(href: string, content: PreactContent): PreactNode {
     return html`<a class="main__breadcrumb__item" href="${href}">${content}</a>`
 }
-export function mainBreadcrumbSeparator(content: VNodeContent): VNode {
+export function mainBreadcrumbSeparator(content: PreactContent): PreactNode {
     return html`<span class="main__breadcrumb__separator">${content}</span>`
 }
 

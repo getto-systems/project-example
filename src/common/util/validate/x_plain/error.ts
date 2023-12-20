@@ -1,4 +1,5 @@
-import { ValidateSelectError, ValidateTextError } from "../data"
+import { SelectBoardValueError } from "../../board/validate/data"
+import { ValidateTextError } from "../data"
 
 export function textValidationError(err: readonly ValidateTextError[]): readonly string[] {
     return err.map((err) => {
@@ -15,9 +16,21 @@ export function textValidationError(err: readonly ValidateTextError[]): readonly
     })
 }
 
-export function selectValidationError(err: ValidateSelectError): readonly string[] {
+export function selectValidationError(err: SelectBoardValueError): readonly string[] {
     switch (err.type) {
+        case "not-loaded":
+            return ["読み込み中"]
+
         case "not-selected":
             return ["選択してください"]
+
+        case "invalid-selected":
+            return ["正しく選択されていません"]
     }
+}
+
+export function textVectorValidationError(
+    err: readonly (readonly ValidateTextError[])[],
+): readonly string[] {
+    return textValidationError(err.flat())
 }

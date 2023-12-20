@@ -12,11 +12,11 @@ use crate::{
     },
 };
 
-use crate::common::api::response::actix_web::ProxyResponder;
+use crate::common::api::response::x_actix_web::ProxyResponder;
 
 use crate::auth::{
     kernel::data::ExpireDateTime,
-    proxy::data::{AuthProxyError, ProxyDomain},
+    proxy::data::{AuthProxyCallError, ProxyDomain},
     ticket::{
         authenticate::proxy::data::ProxyResponseAuthenticated,
         kernel::data::{
@@ -124,11 +124,14 @@ fn add_cdn_cookie(
     }
 }
 
-impl ProxyResponder for AuthProxyError {
+impl ProxyResponder for AuthProxyCallError {
     fn respond_to(self) -> HttpResponse {
         match self {
             Self::Unauthenticated(_) => unauthenticated(),
             Self::InfraError(_) => HttpResponse::InternalServerError().finish(),
+            Self::CheckAuthorizeTokenError(err) => err.respond_to(),
+            Self::ValidateAuthorizeTokenError(err) => err.respond_to(),
+            Self::ServiceAuthorizeError(err) => err.respond_to(),
             Self::ServiceConnectError(err) => err.respond_to(),
             Self::ServiceMetadataError(err) => err.respond_to(),
             Self::MessageError(err) => err.respond_to(),

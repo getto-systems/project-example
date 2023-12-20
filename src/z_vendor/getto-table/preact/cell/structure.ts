@@ -23,7 +23,7 @@ import {
 } from "../decorator"
 import { TableDataHorizontalBorder, TableDataSticky } from "../style"
 import {
-    TableDataCellKey,
+    TableDataKey,
     TableDataColumnRow,
     TableDataFooterRow,
     TableDataHeaderKeyProvider,
@@ -31,7 +31,7 @@ import {
     TableDataKeyProvider,
     TableDataParams,
     TableDataSummaryRow,
-    TableDataView,
+    TableDataCell,
     TableStructure,
 } from "../core"
 import { tableDataMutable_row } from "../mutable/row"
@@ -61,11 +61,11 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         }
     }
 
-    initialVisibleCells(): readonly TableDataCellKey[] {
+    initialVisibleCells(): readonly TableDataKey[] {
         return tableCellInitiallyVisibleCells(this.cells)
     }
 
-    view(): readonly TableDataView[] {
+    allCells(): readonly TableDataCell[] {
         return tableCellView(this.cells)
     }
     header(params: TableDataParams<M>): TableDataHeaderRow {
@@ -123,15 +123,21 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         this.mutable.core.horizontalBorderRelated(borders)
         return this
     }
-    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
+    horizontalBorder_header(
+        borders: readonly TableDataHorizontalBorder[],
+    ): TableStructure_hot<M, R> {
         this.mutable.core.horizontalBorder_header(borders)
         return this
     }
-    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
+    horizontalBorder_summary(
+        borders: readonly TableDataHorizontalBorder[],
+    ): TableStructure_hot<M, R> {
         this.mutable.core.horizontalBorder_summary(borders)
         return this
     }
-    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
+    horizontalBorder_footer(
+        borders: readonly TableDataHorizontalBorder[],
+    ): TableStructure_hot<M, R> {
         this.mutable.core.horizontalBorder_footer(borders)
         return this
     }

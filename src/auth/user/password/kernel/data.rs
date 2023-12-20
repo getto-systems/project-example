@@ -13,6 +13,7 @@ impl std::fmt::Display for ValidatePasswordError {
     }
 }
 
+#[derive(Debug)]
 pub enum PasswordHashError {
     InfraError(String),
 }

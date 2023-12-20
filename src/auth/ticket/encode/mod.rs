@@ -1,5 +1,8 @@
+pub mod action;
 pub mod data;
+mod detail;
 pub mod infra;
-pub mod init;
-pub mod method;
 pub mod x_tonic;
+
+#[cfg(test)]
+mod test;

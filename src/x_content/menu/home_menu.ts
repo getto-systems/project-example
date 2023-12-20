@@ -1,4 +1,4 @@
-import { lnir } from "../../common/util/icon/init/line_icon"
+import { lnir } from "../../common/util/icon/detail/line_icon"
 
 import { icon_home } from "../icon"
 

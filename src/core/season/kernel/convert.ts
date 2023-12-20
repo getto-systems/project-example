@@ -1,9 +1,16 @@
 import { RepositoryConverter } from "../../../common/util/repository/infra"
 import { SeasonExpires, SeasonRepositoryValue } from "./infra"
 
-import { ValidateSeasonResult, Season } from "./data"
+import { ValidateSeasonResult, Season, DetectedSeason } from "./data"
 
-export function seasonToString(
+export function seasonToString(data: DetectedSeason): string {
+    if (data.default) {
+        return ""
+    } else {
+        return seasonString(data.season)
+    }
+}
+function seasonString(
     season: Readonly<{
         year: number
         period: string
@@ -11,6 +18,7 @@ export function seasonToString(
 ): string {
     return `${season.year}.${season.period}`
 }
+
 export function seasonConverter(
     availableSeasons: readonly Season[],
     value: string,
@@ -32,7 +40,7 @@ export function seasonRepositoryConverter(
     return {
         toRepository: (value) => value,
         fromRepository: (value) => {
-            const result = findSeason(availableSeasons, seasonToString(value.season))
+            const result = findSeason(availableSeasons, seasonString(value.season))
             if (!result.found) {
                 return { valid: false }
             }
@@ -44,7 +52,7 @@ export function seasonRepositoryConverter(
 type FindSeasonResult = Readonly<{ found: false }> | Readonly<{ found: true; season: Season }>
 function findSeason(availableSeasons: readonly Season[], value: string): FindSeasonResult {
     for (const season of availableSeasons) {
-        if (seasonToString(season) === value) {
+        if (seasonString(season) === value) {
             return { found: true, season }
         }
     }

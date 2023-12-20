@@ -1,7 +1,7 @@
 import { test, expect } from "vitest"
 import { standard_MenuTree } from "./test_helper"
 
-import { mockOutlineBreadcrumbListShell } from "./init/mock"
+import { mockOutlineBreadcrumbListShell } from "./detail/mock"
 
 import { initOutlineBreadcrumbListAction, OutlineBreadcrumbListAction } from "./action"
 

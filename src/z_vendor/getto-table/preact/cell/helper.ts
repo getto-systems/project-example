@@ -1,10 +1,10 @@
 import { TableDataInherit } from "../cell"
-import { TableDataCellKey } from "../core"
+import { TableDataKey } from "../core"
 import { TableDataVisibleMutable } from "../mutable"
 
-type VisibleParams = Partial<{ visibleKeys: readonly TableDataCellKey[] }>
+type VisibleParams = Partial<{ visibleKeys: readonly TableDataKey[] }>
 export function isVisible(
-    key: TableDataCellKey,
+    key: TableDataKey,
     { visibleType }: TableDataVisibleMutable,
     inherit: TableDataInherit,
     params: VisibleParams,
@@ -26,9 +26,9 @@ export function isVisible(
 }
 
 export function initiallyVisibleCells(
-    key: TableDataCellKey,
+    key: TableDataKey,
     { visibleType }: TableDataVisibleMutable,
-): readonly TableDataCellKey[] {
+): readonly TableDataKey[] {
     switch (visibleType) {
         case "always":
             // 常に表示されるセルは初期表示セルの中に含めない

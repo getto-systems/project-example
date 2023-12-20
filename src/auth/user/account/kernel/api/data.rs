@@ -33,7 +33,7 @@ impl std::fmt::Display for AuthUserAccount {
     }
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Default, Clone, PartialEq, Eq)]
 pub struct AuthUserMemo(String);
 
 impl AuthUserMemo {
@@ -47,9 +47,6 @@ impl AuthUserMemo {
 
     pub(in crate::auth) const fn restore(value: String) -> Self {
         Self(value)
-    }
-    pub(in crate::auth) fn empty() -> Self {
-        Self("".to_owned())
     }
 
     pub fn extract(self) -> String {

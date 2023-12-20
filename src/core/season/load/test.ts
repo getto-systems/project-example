@@ -1,9 +1,9 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeAtom } from "../../../z_vendor/getto-atom/test_helper"
 import { markSeason } from "../kernel/test_helper"
 
 import { mockClock, mockClockPubSub } from "../../../common/util/clock/mock"
-import { initMemoryDB } from "../../../common/util/repository/init/memory"
+import { initMemoryDB } from "../../../common/util/repository/detail/memory"
 
 import { seasonLabel } from "../kernel/helper"
 
@@ -13,28 +13,21 @@ import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../common/util/clock/infra"
 
 import { seasonRepositoryConverter } from "../kernel/convert"
-import { convertDB } from "../../../common/util/repository/init/convert"
+import { convertDB } from "../../../common/util/repository/detail/convert"
 
 import { Season } from "../kernel/data"
-import { currentSeason } from "../kernel/init/current_season"
 
 test("load from repository", async () => {
     const { season } = standard()
 
-    expect(
-        await observeApplicationState(season.state, async () => {
-            return season.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(season.state)
+
+    await season.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
-            season: { year: 2022, period: "summer" },
-            default: false,
-            availableSeasons: [
-                { year: 2022, period: "summer" },
-                { year: 2021, period: "winter" },
-                { year: 2021, period: "summer" },
-            ],
+            season: { default: false, season: { year: 2022, period: "summer" } },
         },
     ])
 })
@@ -42,20 +35,14 @@ test("load from repository", async () => {
 test("expired; use default", async () => {
     const { season } = expired()
 
-    expect(
-        await observeApplicationState(season.state, async () => {
-            return season.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(season.state)
+
+    await season.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
-            season: { year: 2021, period: "summer" },
-            default: true,
-            availableSeasons: [
-                { year: 2022, period: "summer" },
-                { year: 2021, period: "winter" },
-                { year: 2021, period: "summer" },
-            ],
+            season: { default: true },
         },
     ])
 })
@@ -63,20 +50,14 @@ test("expired; use default", async () => {
 test("not found; use default", async () => {
     const { season } = empty_summer()
 
-    expect(
-        await observeApplicationState(season.state, async () => {
-            return season.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(season.state)
+
+    await season.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
-            season: { year: 2021, period: "summer" },
-            default: true,
-            availableSeasons: [
-                { year: 2022, period: "summer" },
-                { year: 2021, period: "winter" },
-                { year: 2021, period: "summer" },
-            ],
+            season: { default: true },
         },
     ])
 })
@@ -84,20 +65,14 @@ test("not found; use default", async () => {
 test("not found; use default; winter", async () => {
     const { season } = empty_winter()
 
-    expect(
-        await observeApplicationState(season.state, async () => {
-            return season.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(season.state)
+
+    await season.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
-            season: { year: 2021, period: "winter" },
-            default: true,
-            availableSeasons: [
-                { year: 2022, period: "summer" },
-                { year: 2021, period: "winter" },
-                { year: 2021, period: "summer" },
-            ],
+            season: { default: true },
         },
     ])
 })
@@ -105,27 +80,26 @@ test("not found; use default; winter", async () => {
 test("not found; use default; last winter", async () => {
     const { season } = empty_last_winter()
 
-    expect(
-        await observeApplicationState(season.state, async () => {
-            return season.state.ignitionState
-        }),
-    ).toEqual([
+    const result = observeAtom(season.state)
+
+    await season.state.ignitionState
+
+    expect(result()).toEqual([
         {
             type: "success",
-            season: { year: 2021, period: "winter" },
-            default: true,
-            availableSeasons: [
-                { year: 2022, period: "summer" },
-                { year: 2021, period: "winter" },
-                { year: 2021, period: "summer" },
-            ],
+            season: { default: true },
         },
     ])
 })
 
 test("season label", () => {
-    expect(seasonLabel(markSeason({ year: 2021, period: "summer" }))).toEqual("2021 夏")
-    expect(seasonLabel(markSeason({ year: 2021, period: "winter" }))).toEqual("2021 冬")
+    expect(seasonLabel({ default: true })).toEqual("今シーズン")
+    expect(
+        seasonLabel({ default: false, season: markSeason({ year: 2021, period: "summer" }) }),
+    ).toEqual("2021 夏")
+    expect(
+        seasonLabel({ default: false, season: markSeason({ year: 2021, period: "winter" }) }),
+    ).toEqual("2021 冬")
 })
 
 function standard() {
@@ -155,8 +129,6 @@ function initResource(
 ): Readonly<{ season: LoadSeasonAction }> {
     return {
         season: initLoadSeasonAction({
-            defaultSeason: currentSeason(clock),
-            availableSeasons: standard_availableSeasons(),
             seasonRepository,
             clock,
         }),

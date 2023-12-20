@@ -1,4 +1,4 @@
-import { VNodeContent, VNodeKey } from "./common"
+import { PreactContent, PreactKey } from "./common"
 
 import {
     TableDataColumn,
@@ -14,10 +14,10 @@ import {
     TableDataSummaryExpansion,
     TableDataKeyProvider,
     TableDataSummarySimple,
-    TableDataView,
+    TableDataCell,
     TableStructure,
     TableDataParams,
-    TableDataCellKey,
+    TableDataKey,
 } from "./core"
 
 import {
@@ -52,8 +52,8 @@ export interface TableCellSimple<M, R>
         TableCell_leaf<TableCellSimple<M, R>> {
     type: "simple"
 
-    initiallyVisibleCells(): readonly TableDataCellKey[]
-    view(): readonly TableDataView[]
+    initiallyVisibleCells(): readonly TableDataKey[]
+    view(): readonly TableDataCell[]
     header(
         inherit: TableDataInherit,
         params: TableDataStyledParams<M>,
@@ -76,8 +76,8 @@ export interface TableCellExpansion<M, R>
         TableCell_leaf<TableCellExpansion<M, R>> {
     type: "expansion"
 
-    initiallyVisibleCells(): readonly TableDataCellKey[]
-    view(): readonly TableDataView[]
+    initiallyVisibleCells(): readonly TableDataKey[]
+    view(): readonly TableDataCell[]
     header(
         inherit: TableDataInherit,
         params: TableDataStyledParams<M>,
@@ -100,8 +100,8 @@ export interface TableCellGroup<M, R>
         TableCell_group<TableCellGroup<M, R>> {
     type: "group"
 
-    initiallyVisibleCells(): readonly TableDataCellKey[]
-    view(): readonly TableDataView[]
+    initiallyVisibleCells(): readonly TableDataKey[]
+    view(): readonly TableDataCell[]
     header(
         inherit: TableDataInherit,
         params: TableDataStyledParams<M>,
@@ -119,8 +119,8 @@ export interface TableCellGroup<M, R>
 export interface TableCellMultipart<M, R> extends TableCell_base<TableCellMultipart<M, R>, R> {
     type: "multipart"
 
-    initiallyVisibleCells(): readonly TableDataCellKey[]
-    view(): readonly TableDataView[]
+    initiallyVisibleCells(): readonly TableDataKey[]
+    view(): readonly TableDataCell[]
     header(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataHeader[]
     summary(
         inherit: TableDataInherit,
@@ -137,8 +137,8 @@ export interface TableCellTree<M, R>
         TableCell_tree<TableCellTree<M, R>, R> {
     type: "tree"
 
-    initiallyVisibleCells(): readonly TableDataCellKey[]
-    view(): readonly TableDataView[]
+    initiallyVisibleCells(): readonly TableDataKey[]
+    view(): readonly TableDataCell[]
     header(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataHeader[]
     summary(
         inherit: TableDataInherit,
@@ -210,14 +210,14 @@ export type TableDataRelatedParams<M, R> = TableDataStyledParams<M> & Readonly<{
 export type TableDataInvisible = Readonly<{ type: "invisible" }>
 
 export interface TableDataColumnContentProvider<R> {
-    (row: R): VNodeContent
+    (row: R): PreactContent
 }
 export interface TableDataExpansionColumnContentProvider<R> {
-    (row: R): readonly VNodeContent[]
+    (row: R): readonly PreactContent[]
 }
 
 export interface TableDataRowKeyProvider<R> {
-    (row: R): VNodeKey
+    (row: R): PreactKey
 }
 export interface TableDataMultipartProvider<M, P> {
     (model: M): readonly P[]
@@ -228,10 +228,10 @@ export interface TableDataTreeChildrenProvider<M, R, C> {
 
 export function tableCellInitiallyVisibleCells<M, R>(
     cells: readonly TableCell<M, R>[],
-): readonly TableDataCellKey[] {
+): readonly TableDataKey[] {
     return cells.flatMap((cell) => cell.initiallyVisibleCells())
 }
-export function tableCellView<M, R>(cells: readonly TableCell<M, R>[]): readonly TableDataView[] {
+export function tableCellView<M, R>(cells: readonly TableCell<M, R>[]): readonly TableDataCell[] {
     return cells.flatMap((cell) => cell.view())
 }
 export function tableCellHeader<M, R>(

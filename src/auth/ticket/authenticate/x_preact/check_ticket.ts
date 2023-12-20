@@ -1,15 +1,15 @@
-import { h, VNode } from "preact"
+import { h } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
+import { PreactContent, PreactNode } from "../../../../common/x_preact/vnode"
 
 import { remoteCommonErrorReason } from "../../../../common/util/remote/x_error/reason"
 
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
-import { VNodeContent } from "../../../../common/x_preact/vnode"
 import { siteInfo } from "../../../../x_content/site"
 import { icon_spinner } from "../../../../x_content/icon"
 import { iconHtml } from "../../../../common/util/icon/x_preact/icon"
@@ -25,8 +25,8 @@ import { RemoteCommonError } from "../../../../common/util/remote/data"
 type Props = Readonly<{
     check: AuthenticateWithTokenAction
 }>
-export function CheckAuthTicket(props: Props): VNode {
-    const state = useApplicationState(props.check.state)
+export function CheckAuthTicket(props: Props): PreactNode {
+    const state = useAtom(props.check.state)
 
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
@@ -119,7 +119,7 @@ export function CheckAuthTicket(props: Props): VNode {
     }
 }
 
-function renewError(err: RemoteCommonError): readonly VNodeContent[] {
+function renewError(err: RemoteCommonError): readonly PreactContent[] {
     return remoteCommonErrorReason(err, (reason) => [
         `${reason.message}により認証に失敗しました`,
         ...reason.detail,

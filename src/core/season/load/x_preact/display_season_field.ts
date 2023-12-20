@@ -1,13 +1,11 @@
-import { VNode } from "preact"
+import { PreactContent, PreactNode } from "../../../../common/x_preact/vnode"
 import { html } from "htm/preact"
 
-import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useAtom } from "../../../../z_vendor/getto-atom/x_preact/hooks"
 
 import { field } from "../../../../z_vendor/getto-css/preact/design/form"
 import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
-
-import { VNodeContent } from "../../../../common/x_preact/vnode"
 
 import { seasonLabel } from "../../kernel/helper"
 
@@ -18,15 +16,15 @@ import { RepositoryError } from "../../../../common/util/repository/data"
 type Props = Readonly<{
     season: LoadSeasonAction
 }>
-export function DisplaySeasonField(props: Props): VNode {
-    const state = useApplicationState(props.season.state)
+export function DisplaySeasonField(props: Props): PreactNode {
+    const state = useAtom(props.season.state)
 
     return field({
         title: "シーズン",
         body: body(),
     })
 
-    function body(): VNodeContent {
+    function body(): PreactContent {
         switch (state.type) {
             case "initial":
                 return html``
@@ -40,10 +38,10 @@ export function DisplaySeasonField(props: Props): VNode {
     }
 }
 
-function loadError(err: RepositoryError): VNodeContent {
+function loadError(err: RepositoryError): PreactContent {
     return [notice_alert("ロードエラー"), ...detail()]
 
-    function detail(): VNode[] {
+    function detail(): readonly PreactNode[] {
         if (err.err.length === 0) {
             return []
         }
